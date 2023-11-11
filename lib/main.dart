@@ -5,6 +5,7 @@ import 'package:flux_news_desktop/database_backend.dart';
 import 'package:flux_news_desktop/flux_news_counter_state.dart';
 import 'package:flux_news_desktop/flux_news_state.dart';
 import 'package:flux_news_desktop/search.dart';
+import 'package:flux_news_desktop/settings.dart';
 import 'package:flux_news_desktop/sync_news.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
@@ -13,18 +14,9 @@ import 'package:window_manager/window_manager.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_gen/gen_l10n/flux_news_localizations.dart';
 
-/// Checks if the current environment is a desktop environment.
-bool get isDesktop {
-  if (kIsWeb) return false;
-  return [
-    TargetPlatform.windows,
-    TargetPlatform.linux,
-    TargetPlatform.macOS,
-  ].contains(defaultTargetPlatform);
-}
-
 Future<void> main() async {
   // Initialize FFI
+  databaseFactory = databaseFactoryFfi;
   sqfliteFfiInit();
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -36,22 +28,20 @@ Future<void> main() async {
     SystemTheme.accentColor.load();
   }
 
-  if (isDesktop) {
-    await flutter_acrylic.Window.initialize();
-    await flutter_acrylic.Window.hideWindowControls();
-    await WindowManager.instance.ensureInitialized();
-    windowManager.waitUntilReadyToShow().then((_) async {
-      await windowManager.setTitleBarStyle(
-        TitleBarStyle.normal,
-        windowButtonVisibility: true,
-      );
-      await windowManager.setMinimumSize(const Size(500, 600));
-      await windowManager.show();
-      await windowManager.setPreventClose(false);
-      await windowManager.setSkipTaskbar(false);
-      windowManager.setTitle(FluxNewsState.applicationName);
-    });
-  }
+  await flutter_acrylic.Window.initialize();
+  await flutter_acrylic.Window.hideWindowControls();
+  await WindowManager.instance.ensureInitialized();
+  windowManager.waitUntilReadyToShow().then((_) async {
+    await windowManager.setTitleBarStyle(
+      TitleBarStyle.normal,
+      windowButtonVisibility: true,
+    );
+    await windowManager.setMinimumSize(const Size(500, 600));
+    await windowManager.show();
+    await windowManager.setPreventClose(false);
+    await windowManager.setSkipTaskbar(false);
+    windowManager.setTitle(FluxNewsState.applicationName);
+  });
 
   runApp(const FluxNewsDesktop());
 }
@@ -93,14 +83,6 @@ class FluxNewsDesktop extends StatelessWidget {
                   Locale('en', ''),
                   Locale('de', ''),
                 ],
-                // define routes for main view (FluxNewsBody), settings view and search view
-                routes: {
-                  //FluxNewsState.rootRouteString: (context) =>
-                  //    const FluxNewsBody(),
-                  //FluxNewsState.settingsRouteString: (context) =>
-                  //    const Settings(),
-                  FluxNewsState.searchRouteString: (context) => const Search(),
-                },
                 home: const MainViewWidget(),
               );
             },
@@ -116,36 +98,47 @@ class MainViewWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    FluxNewsState appState = context.watch<FluxNewsState>();
     return NavigationView(
       appBar: const NavigationAppBar(
         leading: Icon(FontAwesomeIcons.bookOpen),
         title: Text(FluxNewsState.applicationName),
         actions: AppBarButtons(),
       ),
-      pane: NavigationPane(displayMode: PaneDisplayMode.auto, items: [
-        PaneItem(
-            icon: const Icon(FluentIcons.boards),
-            title: const Text("Home"),
-            body: const SizedBox.shrink()),
-        PaneItem(
-          icon: const Icon(FluentIcons.search),
-          title: Text(AppLocalizations.of(context)!.search),
-          body: const SizedBox.shrink(),
-          onTap: () {
-            Navigator.pushNamed(context, FluxNewsState.searchRouteString);
-          },
-        ),
-        PaneItem(
-            icon: const Icon(FluentIcons.settings),
-            title: Text(AppLocalizations.of(context)!.settings),
-            body: const SizedBox.shrink())
-      ]),
-      /*
-      content: Center(
-          child: Text(
-        AppLocalizations.of(context)!.noNewEntries,
-      )),
-      */
+      pane: NavigationPane(
+          displayMode: PaneDisplayMode.auto,
+          selected: appState.selectedNavigation,
+          items: [
+            PaneItem(
+              icon: const Icon(FluentIcons.boards),
+              title: const Text("Home"),
+              body: const Center(child: Text("Blub")),
+              onTap: () {
+                appState.selectedNavigation = 0;
+                appState.refreshView();
+              },
+            )
+          ],
+          footerItems: [
+            PaneItem(
+              icon: const Icon(FluentIcons.search),
+              title: Text(AppLocalizations.of(context)!.search),
+              body: const Search(),
+              onTap: () {
+                appState.selectedNavigation = 1;
+                appState.refreshView();
+              },
+            ),
+            PaneItem(
+              icon: const Icon(FluentIcons.settings),
+              title: Text(AppLocalizations.of(context)!.settings),
+              body: const Settings(),
+              onTap: () {
+                appState.selectedNavigation = 2;
+                appState.refreshView();
+              },
+            )
+          ]),
     );
   }
 }
@@ -161,6 +154,8 @@ class AppBarButtons extends StatelessWidget {
     FluxNewsCounterState appCounterState =
         context.watch<FluxNewsCounterState>();
     return Row(
+      mainAxisAlignment: MainAxisAlignment.end,
+      crossAxisAlignment: CrossAxisAlignment.end,
       children: [
         IconButton(
           onPressed: () async {
@@ -170,7 +165,7 @@ class AppBarButtons extends StatelessWidget {
               ? const SizedBox(
                   height: 15.0,
                   width: 15.0,
-                  //child: //CircularProgressIndicator.adaptive(),
+                  child: ProgressRing(),
                 )
               : const Icon(
                   FluentIcons.refresh,

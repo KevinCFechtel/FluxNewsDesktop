@@ -93,6 +93,7 @@ class FluxNewsState extends ChangeNotifier {
   late Future<List<News>> newsList;
   late Future<Categories> categoryList;
   List<int>? feedIDs;
+  int selectedNavigation = 0;
 
   // vars for main view
   bool syncProcess = false;

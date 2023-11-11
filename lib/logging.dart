@@ -3,5 +3,8 @@ import 'package:logger/logger.dart';
 
 void logThis(String module, String message, Level loglevel) {
   String logMessage = "${FluxNewsState.logTag} - $module : $message";
-  LogEvent(loglevel, logMessage);
+  Logger logger = Logger(
+    printer: PrettyPrinter(methodCount: 0),
+  );
+  logger.log(loglevel, logMessage);
 }
