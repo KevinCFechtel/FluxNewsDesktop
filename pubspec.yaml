@@ -52,6 +52,8 @@ dependencies:
   sqflite_common: ^2.5.0+1
   logger: ^2.0.2+1
   http: ^1.1.0
+  font_awesome_flutter: ^10.6.0
+  fast_cached_network_image: ^1.2.0
 
 dev_dependencies:
   flutter_test:
