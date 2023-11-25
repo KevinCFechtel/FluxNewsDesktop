@@ -1,5 +1,5 @@
 // the list view widget with search result
-import 'package:flutter/material.dart';
+import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flux_news_desktop/flux_news_state.dart';
 import 'package:flux_news_desktop/news_card.dart';
 import 'package:flux_news_desktop/news_model.dart';
@@ -23,7 +23,6 @@ class SearchNewsList extends StatelessWidget {
         switch (snapshot.connectionState) {
           case ConnectionState.none:
           case ConnectionState.waiting:
-            return const Center(child: CircularProgressIndicator.adaptive());
           default:
             if (snapshot.hasError) {
               return const SizedBox.shrink();
@@ -33,14 +32,12 @@ class SearchNewsList extends StatelessWidget {
                   ? Center(
                       child: Text(
                       AppLocalizations.of(context)!.emptySearch,
-                      style: Theme.of(context).textTheme.headlineSmall,
                     ))
                   // show empty dialog if list is empty
                   : snapshot.data!.isEmpty
                       ? Center(
                           child: Text(
                           AppLocalizations.of(context)!.emptySearch,
-                          style: Theme.of(context).textTheme.headlineSmall,
                         ))
                       // otherwise create list view with the news of the search result
                       : Stack(children: [
@@ -54,16 +51,10 @@ class SearchNewsList extends StatelessWidget {
                                   appState.searchItemPositionsListener,
                               initialScrollIndex: 0,
                               itemBuilder: (context, i) {
-                                return appState.orientation ==
-                                        Orientation.landscape
-                                    ? NewsRow(
-                                        news: snapshot.data![i],
-                                        context: context,
-                                        searchView: searchView)
-                                    : NewsCard(
-                                        news: snapshot.data![i],
-                                        context: context,
-                                        searchView: searchView);
+                                return NewsRow(
+                                    news: snapshot.data![i],
+                                    context: context,
+                                    searchView: searchView);
                               }),
                         ]);
             }

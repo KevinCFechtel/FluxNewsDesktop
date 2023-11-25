@@ -701,7 +701,6 @@ class Settings extends StatelessWidget {
                 child: Text(AppLocalizations.of(context)!.cancel),
               ),
               FilledButton(
-                style: ButtonStyle(),
                 onPressed: () async {
                   deleteLocalNewsCache(appState, context);
                   appState.newsList = Future<List<News>>.value([]);

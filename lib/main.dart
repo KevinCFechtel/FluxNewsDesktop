@@ -1,14 +1,14 @@
+import 'dart:io';
+
+import 'package:fast_cached_network_image/fast_cached_network_image.dart';
 import 'package:fluent_ui/fluent_ui.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter_acrylic/flutter_acrylic.dart' as flutter_acrylic;
-import 'package:flux_news_desktop/database_backend.dart';
+import 'package:flux_news_desktop/fluent_app_main_view.dart';
+import 'package:flux_news_desktop/fluent_theme.dart';
 import 'package:flux_news_desktop/flux_news_counter_state.dart';
 import 'package:flux_news_desktop/flux_news_state.dart';
-import 'package:flux_news_desktop/search.dart';
-import 'package:flux_news_desktop/settings.dart';
-import 'package:flux_news_desktop/sync_news.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
+import 'package:system_date_time_format/system_date_time_format.dart';
 import 'package:system_theme/system_theme.dart';
 import 'package:window_manager/window_manager.dart';
 import 'package:provider/provider.dart';
@@ -18,13 +18,11 @@ Future<void> main() async {
   // Initialize FFI
   databaseFactory = databaseFactoryFfi;
   sqfliteFfiInit();
+  await FastCachedImageConfig.init(clearCacheAfter: const Duration(days: 15));
   WidgetsFlutterBinding.ensureInitialized();
 
   // if it's not on the web, windows or android, load the accent color
-  if (!kIsWeb &&
-      [
-        TargetPlatform.windows,
-      ].contains(defaultTargetPlatform)) {
+  if (Platform.isWindows) {
     SystemTheme.accentColor.load();
   }
 
@@ -43,7 +41,7 @@ Future<void> main() async {
     windowManager.setTitle(FluxNewsState.applicationName);
   });
 
-  runApp(const FluxNewsDesktop());
+  runApp(const SDTFScope(child: FluxNewsDesktop()));
 }
 
 class FluxNewsDesktop extends StatelessWidget {
@@ -56,186 +54,43 @@ class FluxNewsDesktop extends StatelessWidget {
         create: (context) => FluxNewsState(),
         builder: (context, child) {
           return ChangeNotifierProvider(
-            create: (context) => FluxNewsCounterState(),
-            builder: (context, child) {
-              return FluentApp(
-                title: FluxNewsState.applicationName,
-                themeMode: ThemeMode.system,
-                debugShowCheckedModeBanner: false,
-                color: Colors.blue,
-                darkTheme: FluentThemeData(
-                  brightness: Brightness.dark,
-                  accentColor: Colors.blue,
-                  visualDensity: VisualDensity.standard,
-                  focusTheme: FocusThemeData(
-                    glowFactor: is10footScreen(context) ? 2.0 : 0.0,
-                  ),
-                ),
-                theme: FluentThemeData(
-                  accentColor: Colors.blue,
-                  visualDensity: VisualDensity.standard,
-                  focusTheme: FocusThemeData(
-                    glowFactor: is10footScreen(context) ? 2.0 : 0.0,
-                  ),
-                ),
-                localizationsDelegates: AppLocalizations.localizationsDelegates,
-                supportedLocales: const [
-                  Locale('en', ''),
-                  Locale('de', ''),
-                ],
-                home: const MainViewWidget(),
-              );
-            },
-          );
+              create: (context) => FluxNewsCounterState(),
+              builder: (context, child) {
+                return ChangeNotifierProvider(
+                  create: (context) => FluentAppTheme(),
+                  builder: (context, child) {
+                    final appTheme = context.watch<FluentAppTheme>();
+                    return FluentApp(
+                      title: FluxNewsState.applicationName,
+                      themeMode: appTheme.mode,
+                      debugShowCheckedModeBanner: false,
+                      color: appTheme.color,
+                      darkTheme: FluentThemeData(
+                        brightness: Brightness.dark,
+                        accentColor: appTheme.color,
+                        visualDensity: VisualDensity.standard,
+                        focusTheme: FocusThemeData(
+                          glowFactor: is10footScreen(context) ? 2.0 : 0.0,
+                        ),
+                      ),
+                      theme: FluentThemeData(
+                        accentColor: appTheme.color,
+                        visualDensity: VisualDensity.standard,
+                        focusTheme: FocusThemeData(
+                          glowFactor: is10footScreen(context) ? 2.0 : 0.0,
+                        ),
+                      ),
+                      localizationsDelegates:
+                          AppLocalizations.localizationsDelegates,
+                      supportedLocales: const [
+                        Locale('en', ''),
+                        Locale('de', ''),
+                      ],
+                      home: const FluentNavigationMainView(),
+                    );
+                  },
+                );
+              });
         });
-  }
-}
-
-class MainViewWidget extends StatelessWidget {
-  const MainViewWidget({
-    super.key,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    FluxNewsState appState = context.watch<FluxNewsState>();
-    return NavigationView(
-      appBar: const NavigationAppBar(
-        leading: Icon(FontAwesomeIcons.bookOpen),
-        title: Text(FluxNewsState.applicationName),
-        actions: AppBarButtons(),
-      ),
-      pane: NavigationPane(
-          displayMode: PaneDisplayMode.auto,
-          selected: appState.selectedNavigation,
-          items: [
-            PaneItem(
-              icon: const Icon(FluentIcons.boards),
-              title: const Text("Home"),
-              body: const Center(child: Text("Blub")),
-              onTap: () {
-                appState.selectedNavigation = 0;
-                appState.refreshView();
-              },
-            )
-          ],
-          footerItems: [
-            PaneItem(
-              icon: const Icon(FluentIcons.search),
-              title: Text(AppLocalizations.of(context)!.search),
-              body: const Search(),
-              onTap: () {
-                appState.selectedNavigation = 1;
-                appState.refreshView();
-              },
-            ),
-            PaneItem(
-              icon: const Icon(FluentIcons.settings),
-              title: Text(AppLocalizations.of(context)!.settings),
-              body: const Settings(),
-              onTap: () {
-                appState.selectedNavigation = 2;
-                appState.refreshView();
-              },
-            )
-          ]),
-    );
-  }
-}
-
-class AppBarButtons extends StatelessWidget {
-  const AppBarButtons({
-    super.key,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    FluxNewsState appState = context.watch<FluxNewsState>();
-    FluxNewsCounterState appCounterState =
-        context.watch<FluxNewsCounterState>();
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.end,
-      crossAxisAlignment: CrossAxisAlignment.end,
-      children: [
-        IconButton(
-          onPressed: () async {
-            await syncNews(appState, context);
-          },
-          icon: appState.syncProcess
-              ? const SizedBox(
-                  height: 15.0,
-                  width: 15.0,
-                  child: ProgressRing(),
-                )
-              : const Icon(
-                  FluentIcons.refresh,
-                ),
-        ),
-        IconButton(
-          onPressed: () async {
-            // switch between newest first and oldest first
-            // if the current sort order is newest first change to oldest first
-            if (appState.sortOrder ==
-                FluxNewsState.sortOrderNewestFirstString) {
-              // switch the state to all news
-              appState.sortOrder = FluxNewsState.sortOrderOldestFirstString;
-
-              // save the state persistent
-              appState.storage.write(
-                  key: FluxNewsState.secureStorageSortOrderKey,
-                  value: FluxNewsState.sortOrderOldestFirstString);
-
-              // refresh news list with the all news state
-              appState.newsList =
-                  queryNewsFromDB(appState, appState.feedIDs).whenComplete(() {
-                waitUntilNewsListBuild(appState).whenComplete(
-                  () {
-                    context
-                        .read<FluxNewsState>()
-                        .itemScrollController
-                        .jumpTo(index: 0);
-                  },
-                );
-              });
-
-              // notify the categories to update the news count
-              appCounterState.listUpdated = true;
-              appCounterState.refreshView();
-              appState.refreshView();
-              // if the current sort order is oldest first change to newest first
-            } else {
-              // switch the state to show only unread news
-              appState.sortOrder = FluxNewsState.sortOrderNewestFirstString;
-
-              // save the state persistent
-              appState.storage.write(
-                  key: FluxNewsState.secureStorageSortOrderKey,
-                  value: FluxNewsState.sortOrderNewestFirstString);
-
-              // refresh news list with the only unread news state
-              appState.newsList =
-                  queryNewsFromDB(appState, appState.feedIDs).whenComplete(() {
-                waitUntilNewsListBuild(appState).whenComplete(
-                  () {
-                    context
-                        .read<FluxNewsState>()
-                        .itemScrollController
-                        .jumpTo(index: 0);
-                  },
-                );
-              });
-
-              // notify the categories to update the news count
-              appCounterState.listUpdated = true;
-              appCounterState.refreshView();
-              appState.refreshView();
-            }
-          },
-          icon: appState.newsStatus == FluxNewsState.unreadNewsStatus
-              ? const Icon(FluentIcons.read)
-              : const Icon(FluentIcons.accept),
-        )
-      ],
-    );
   }
 }

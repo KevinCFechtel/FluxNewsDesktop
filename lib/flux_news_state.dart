@@ -14,19 +14,9 @@ import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 import 'news_model.dart';
 
-// generate android options to usw with flutter secure storage
-sec_store.AndroidOptions _getAndroidOptions() => const sec_store.AndroidOptions(
-      encryptedSharedPreferences: true,
-      keyCipherAlgorithm:
-          sec_store.KeyCipherAlgorithm.RSA_ECB_OAEPwithSHA_256andMGF1Padding,
-      storageCipherAlgorithm:
-          sec_store.StorageCipherAlgorithm.AES_GCM_NoPadding,
-    );
-
 class FluxNewsState extends ChangeNotifier {
   // init the persistent flutter secure storage
-  final storage =
-      sec_store.FlutterSecureStorage(aOptions: _getAndroidOptions());
+  final storage = const sec_store.FlutterSecureStorage();
 
   // define static const variables to replace text within code
   static const String applicationName = 'Flux News';
@@ -37,6 +27,7 @@ class FluxNewsState extends ChangeNotifier {
   static const String miniFluxProjectUrl = ' https://miniflux.app';
   static const String databasePathString = 'news_database.db';
   static const String rootRouteString = '/';
+  static const String bookmarkedRouteString = '/bookmarked';
   static const String settingsRouteString = '/settings';
   static const String searchRouteString = '/search';
   static const int amountOfNewlyCaughtNews = 100;
@@ -93,7 +84,8 @@ class FluxNewsState extends ChangeNotifier {
   late Future<List<News>> newsList;
   late Future<Categories> categoryList;
   List<int>? feedIDs;
-  int selectedNavigation = 0;
+  String selectedNavigation = "";
+  Map<int, String> navigationRouteStrings = {};
 
   // vars for main view
   bool syncProcess = false;
@@ -424,6 +416,20 @@ class FluxNewsState extends ChangeNotifier {
   // notify the listeners of FluxNewsState to refresh views
   void refreshView() {
     notifyListeners();
+  }
+
+  int calculateSelectedFluentNavigationItem() {
+    int itemNumber = 0;
+    if (selectedNavigation != "") {
+      navigationRouteStrings.forEach((k, v) {
+        if (selectedNavigation == v) {
+          itemNumber = k;
+        }
+        //logThis("module", "value: $k Iterated Navigation: $v", Level.info);
+      });
+    }
+
+    return itemNumber;
   }
 }
 

@@ -585,7 +585,8 @@ Future<Categories> queryCategoriesFromDB(
     logThis('queryCategoriesFromDB', 'Starting querying categories from DB',
         Level.info);
   }
-
+  Map<int, String> tempNavigationRouteStrings = {};
+  int itemCount = 0;
   List<Category> categoryList = [];
   appState.db ??= await appState.initializeDB();
   if (appState.db != null) {
@@ -594,13 +595,30 @@ Future<Categories> queryCategoriesFromDB(
         await appState.db!.rawQuery('SELECT * FROM categories');
     categoryList = queryResult.map((e) => Category.fromMap(e)).toList();
     for (Category category in categoryList) {
+      String routeString = "/Categoriy/${category.categoryID}";
+      itemCount++;
+      tempNavigationRouteStrings.addAll({itemCount: routeString});
       List<Feed> feedList = [];
       queryResult = await appState.db!.rawQuery(
           'SELECT * FROM feeds WHERE categoryID = ?', [category.categoryID]);
       feedList = queryResult.map((e) => Feed.fromMap(e)).toList();
+      for (Feed feed in feedList) {
+        String routeString = "/Feed/${feed.feedID}";
+        itemCount++;
+        tempNavigationRouteStrings.addAll({itemCount: routeString});
+      }
       category.feeds = feedList;
     }
   }
+  tempNavigationRouteStrings
+      .addAll({itemCount + 1: FluxNewsState.bookmarkedRouteString});
+  tempNavigationRouteStrings
+      .addAll({itemCount + 2: FluxNewsState.searchRouteString});
+  tempNavigationRouteStrings
+      .addAll({itemCount + 3: FluxNewsState.settingsRouteString});
+  appState.navigationRouteStrings.clear();
+  appState.navigationRouteStrings
+      .addEntries(tempNavigationRouteStrings.entries);
   Categories categories = Categories(categories: categoryList);
   // calculate the news count of the categories and feeds
 
