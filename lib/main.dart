@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:fast_cached_network_image/fast_cached_network_image.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter_acrylic/flutter_acrylic.dart' as flutter_acrylic;
 import 'package:flux_news_desktop/fluent_app_main_view.dart';
@@ -18,9 +17,8 @@ Future<void> main() async {
   // Initialize FFI
   databaseFactory = databaseFactoryFfi;
   sqfliteFfiInit();
-  await FastCachedImageConfig.init(clearCacheAfter: const Duration(days: 15));
-  WidgetsFlutterBinding.ensureInitialized();
 
+  WidgetsFlutterBinding.ensureInitialized();
   // if it's not on the web, windows or android, load the accent color
   if (Platform.isWindows) {
     SystemTheme.accentColor.load();

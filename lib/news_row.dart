@@ -1,4 +1,4 @@
-import 'package:fast_cached_network_image/fast_cached_network_image.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flux_news_desktop/database_backend.dart';
 import 'package:flux_news_desktop/fluent_theme.dart';
@@ -182,16 +182,16 @@ class NewsRow extends StatelessWidget {
                                 ? 4
                                 : 5
                             : 5,
-                        child: FastCachedImage(
-                          url: news.getImageURL(),
-                          height: 230,
+                        child: CachedNetworkImage(
+                          imageUrl: news.getImageURL(),
+                          height: appState.isTablet ? 250 : 175,
+                          width: double.infinity,
                           fit: BoxFit.cover,
-                          alignment: Alignment.center,
-                          errorBuilder: (context, url, error) => const Icon(
+                          fadeInDuration: const Duration(seconds: 0),
+                          errorWidget: (context, url, error) => const Icon(
                             FluentIcons.error,
                           ),
-                        ),
-                      )
+                        ))
                     // if no image is available, shrink this widget
                     : const SizedBox.shrink(),
                 Expanded(

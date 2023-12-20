@@ -90,7 +90,7 @@ class FluentNavigationMainView extends StatelessWidget {
           appState.errorOnMinifluxAuth) {
         // navigate to settings screen if there are problems with the miniflux config
         appState.refreshView();
-        Navigator.pushNamed(context, FluxNewsState.settingsRouteString);
+        //Navigator.pushNamed(context, FluxNewsState.settingsRouteString);
       } else {
         // if everything is fine with the settings, present the list view
         appState.refreshView();
@@ -159,6 +159,11 @@ class FluentCategorieNavigationMainView extends StatelessWidget {
               title: Text(FluxNewsState.applicationName),
               actions: AppBarButtons(),
             ),
+            transitionBuilder: (child, animation) {
+              return SuppressPageTransition(
+                child: child,
+              );
+            },
             pane: NavigationPane(
                 header: const NavigationHeader(),
                 displayMode: PaneDisplayMode.auto,
@@ -254,6 +259,11 @@ class FluentCategorieNavigationMainView extends StatelessWidget {
                         title: Text(FluxNewsState.applicationName),
                         actions: AppBarButtons(),
                       ),
+                      transitionBuilder: (child, animation) {
+                        return SuppressPageTransition(
+                          child: child,
+                        );
+                      },
                       pane: NavigationPane(
                           header: const NavigationHeader(),
                           displayMode: PaneDisplayMode.auto,
@@ -303,7 +313,7 @@ class FluentCategorieNavigationMainView extends StatelessWidget {
         queryNewsFromDB(appState, appState.feedIDs).whenComplete(() {
       waitUntilNewsListBuild(appState).whenComplete(
         () {
-          context.read<FluxNewsState>().itemScrollController.jumpTo(index: 0);
+          appState.itemScrollController.jumpTo(index: 0);
         },
       );
     });
