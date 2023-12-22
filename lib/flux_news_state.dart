@@ -94,6 +94,7 @@ class FluxNewsState extends ChangeNotifier {
   final ItemScrollController itemScrollController = ItemScrollController();
   final ItemPositionsListener itemPositionsListener =
       ItemPositionsListener.create();
+  int macNavigationPosition = 0;
 
   // vars for search view
   Future<List<News>> searchNewsList = Future<List<News>>.value([]);
