@@ -103,6 +103,7 @@ class FluentCategorieNavigationMainView extends StatelessWidget {
   const FluentCategorieNavigationMainView({
     super.key,
   });
+
   @override
   Widget build(BuildContext context) {
     // read the date format of the system and assign it to the date format variable
@@ -597,10 +598,7 @@ class FluentMainView extends StatelessWidget {
           flex: 4,
           child: FluentBodyNewsList(),
         ),
-        Flexible(
-          flex: 5,
-          child: Center(child: Text("Platzhalter")),
-        )
+        Flexible(flex: 5, child: Center(child: Text("Platzhalter")))
       ],
     );
   }
