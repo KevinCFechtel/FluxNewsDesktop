@@ -11,8 +11,8 @@ import 'package:http/http.dart' as http;
 import 'flux_news_state.dart';
 import 'miniflux_backend.dart';
 
-class Settings extends StatelessWidget {
-  const Settings({super.key});
+class FluentSettings extends StatelessWidget {
+  const FluentSettings({super.key});
 
   // define the selection lists for the settings of saved news and starred news
   static const List<int> amountOfSavedNewsList = <int>[

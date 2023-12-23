@@ -6,7 +6,7 @@ import 'package:flux_news_desktop/flux_news_state.dart';
 import 'package:flux_news_desktop/logging.dart';
 import 'package:flux_news_desktop/news_model.dart';
 import 'package:flux_news_desktop/search.dart';
-import 'package:flux_news_desktop/settings.dart';
+import 'package:flux_news_desktop/fluent_settings.dart';
 import 'package:flux_news_desktop/sync_news.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
@@ -186,7 +186,7 @@ class FluentCategorieNavigationMainView extends StatelessWidget {
                   PaneItem(
                     icon: const Icon(FluentIcons.settings),
                     title: Text(AppLocalizations.of(context)!.settings),
-                    body: const Settings(),
+                    body: const FluentSettings(),
                     onTap: () {
                       appState.selectedNavigation =
                           FluxNewsState.settingsRouteString;
@@ -285,7 +285,7 @@ class FluentCategorieNavigationMainView extends StatelessWidget {
                               icon: const Icon(FluentIcons.settings),
                               title:
                                   Text(AppLocalizations.of(context)!.settings),
-                              body: const Settings(),
+                              body: const FluentSettings(),
                               onTap: () {
                                 appState.selectedNavigation =
                                     FluxNewsState.settingsRouteString;
@@ -455,6 +455,69 @@ class AppBarButtons extends StatelessWidget {
         ),
         IconButton(
           onPressed: () async {
+            // switch between all and only unread news view
+            // if the current view is unread news change to all news
+            if (appState.newsStatus == FluxNewsState.unreadNewsStatus) {
+              // switch the state to all news
+              appState.newsStatus = FluxNewsState.allNewsString;
+
+              // save the state persistent
+              appState.storage.write(
+                  key: FluxNewsState.secureStorageNewsStatusKey,
+                  value: FluxNewsState.allNewsString);
+
+              // refresh news list with the all news state
+              appState.newsList =
+                  queryNewsFromDB(appState, appState.feedIDs).whenComplete(() {
+                waitUntilNewsListBuild(appState).whenComplete(
+                  () {
+                    context
+                        .read<FluxNewsState>()
+                        .itemScrollController
+                        .jumpTo(index: 0);
+                  },
+                );
+              });
+
+              // notify the categories to update the news count
+              appCounterState.listUpdated = true;
+              appCounterState.refreshView();
+              appState.refreshView();
+              // if the current view is all news change to only unread news
+            } else {
+              // switch the state to show only unread news
+              appState.newsStatus = FluxNewsState.unreadNewsStatus;
+
+              // save the state persistent
+              appState.storage.write(
+                  key: FluxNewsState.secureStorageNewsStatusKey,
+                  value: FluxNewsState.unreadNewsStatus);
+
+              // refresh news list with the only unread news state
+              appState.newsList =
+                  queryNewsFromDB(appState, appState.feedIDs).whenComplete(() {
+                waitUntilNewsListBuild(appState).whenComplete(
+                  () {
+                    context
+                        .read<FluxNewsState>()
+                        .itemScrollController
+                        .jumpTo(index: 0);
+                  },
+                );
+              });
+
+              // notify the categories to update the news count
+              appCounterState.listUpdated = true;
+              appCounterState.refreshView();
+              appState.refreshView();
+            }
+          },
+          icon: appState.newsStatus == FluxNewsState.unreadNewsStatus
+              ? const Icon(FluentIcons.read)
+              : const Icon(FluentIcons.accept),
+        ),
+        IconButton(
+          onPressed: () async {
             // switch between newest first and oldest first
             // if the current sort order is newest first change to oldest first
             if (appState.sortOrder ==
@@ -513,9 +576,9 @@ class AppBarButtons extends StatelessWidget {
               appState.refreshView();
             }
           },
-          icon: appState.newsStatus == FluxNewsState.unreadNewsStatus
-              ? const Icon(FluentIcons.read)
-              : const Icon(FluentIcons.accept),
+          icon: appState.sortOrder == FluxNewsState.sortOrderNewestFirstString
+              ? const Icon(FluentIcons.sort_lines_ascending)
+              : const Icon(FluentIcons.sort_lines),
         )
       ],
     );
@@ -532,7 +595,7 @@ class FluentMainView extends StatelessWidget {
       children: [
         Flexible(
           flex: 4,
-          child: BodyNewsList(),
+          child: FluentBodyNewsList(),
         ),
         Flexible(
           flex: 5,

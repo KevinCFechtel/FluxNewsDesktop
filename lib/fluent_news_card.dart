@@ -12,8 +12,8 @@ import 'package:provider/provider.dart';
 import 'package:flutter_gen/gen_l10n/flux_news_localizations.dart';
 
 // here we define the appearance of the news cards
-class NewsCard extends StatelessWidget {
-  const NewsCard({
+class FluentNewsCard extends StatelessWidget {
+  const FluentNewsCard({
     super.key,
     required this.news,
     required this.context,

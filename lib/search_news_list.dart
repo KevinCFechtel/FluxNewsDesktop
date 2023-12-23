@@ -1,7 +1,7 @@
 // the list view widget with search result
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flux_news_desktop/flux_news_state.dart';
-import 'package:flux_news_desktop/news_card.dart';
+import 'package:flux_news_desktop/fluent_news_card.dart';
 import 'package:flux_news_desktop/news_model.dart';
 import 'package:flux_news_desktop/news_row.dart';
 import 'package:provider/provider.dart';

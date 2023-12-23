@@ -55,8 +55,6 @@ dependencies:
   font_awesome_flutter: ^10.6.0
   system_date_time_format: ^0.7.0
   cached_network_image: ^3.3.0
-  macos_ui: ^2.0.2
-  cupertino_icons: ^1.0.2
 
 dev_dependencies:
   flutter_test:

@@ -432,6 +432,18 @@ class FluxNewsState extends ChangeNotifier {
 
     return itemNumber;
   }
+
+  String getSelectedMacNavigationItem(int index) {
+    String routeString = "";
+    navigationRouteStrings.forEach((k, v) {
+      if (index == k) {
+        routeString = v;
+      }
+      //logThis("module", "value: $k Iterated Navigation: $v", Level.info);
+    });
+
+    return routeString;
+  }
 }
 
 // helper class to generate the drop down lists in options
