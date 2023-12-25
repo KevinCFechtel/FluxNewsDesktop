@@ -11,7 +11,7 @@ import 'package:flux_news_desktop/fluent_settings.dart';
 import 'package:flux_news_desktop/sync_news.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
-import 'package:logger/logger.dart';
+import 'package:my_logger/core/constants.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_gen/gen_l10n/flux_news_localizations.dart';
 import 'package:system_date_time_format/system_date_time_format.dart';
@@ -76,7 +76,7 @@ class FluentNavigationMainView extends StatelessWidget {
           }
         } catch (e) {
           logThis('initConfig', 'Caught an error in initConfig function!',
-              Level.error, appState);
+              LogLevel.ERROR);
 
           if (context.mounted) {
             if (appState.errorString !=

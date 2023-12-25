@@ -5,7 +5,7 @@ import 'package:flux_news_desktop/flux_news_state.dart';
 import 'package:flux_news_desktop/logging.dart';
 import 'package:flux_news_desktop/fluent_news_card.dart';
 import 'package:flux_news_desktop/news_model.dart';
-import 'package:logger/logger.dart';
+import 'package:my_logger/core/constants.dart';
 import 'package:provider/provider.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import 'package:flutter_gen/gen_l10n/flux_news_localizations.dart';
@@ -87,8 +87,7 @@ class FluentBodyNewsList extends StatelessWidget {
                                           logThis(
                                               'updateNewsStatusInDB',
                                               'Caught an error in updateNewsStatusInDB function! : ${e.toString()}',
-                                              Level.error,
-                                              appState);
+                                              LogLevel.ERROR);
 
                                           if (context
                                                   .read<FluxNewsState>()
@@ -136,8 +135,7 @@ class FluentBodyNewsList extends StatelessWidget {
                                         logThis(
                                             'updateNewsStatusInDB',
                                             'Caught an error in updateNewsStatusInDB function! : ${e.toString()}',
-                                            Level.error,
-                                            appState);
+                                            LogLevel.ERROR);
 
                                         if (context
                                                 .read<FluxNewsState>()

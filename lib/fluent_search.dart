@@ -2,7 +2,7 @@ import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flux_news_desktop/fluent_theme.dart';
 import 'package:flux_news_desktop/logging.dart';
 import 'package:flux_news_desktop/fluent_search_news_list.dart';
-import 'package:logger/logger.dart';
+import 'package:my_logger/core/constants.dart';
 import 'package:provider/provider.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_gen/gen_l10n/flux_news_localizations.dart';
@@ -69,8 +69,7 @@ class FluentSearch extends StatelessWidget {
                 logThis(
                     'fetchSearchedNews',
                     'Caught an error in fetchSearchedNews function! : ${error.toString()}',
-                    Level.error,
-                    appState);
+                    LogLevel.ERROR);
                 if (appState.errorString !=
                     AppLocalizations.of(context)!.communicateionMinifluxError) {
                   appState.errorString =
@@ -121,7 +120,7 @@ class FluentSearch extends StatelessWidget {
                   logThis(
                       'fetchSearchedNews',
                       'Caught an error in fetchSearchedNews function! : ${error.toString()}',
-                      Level.error);
+                      LogLevel.ERROR);
                   if (appState.errorString !=
                       AppLocalizations.of(context)!
                           .communicateionMinifluxError) {

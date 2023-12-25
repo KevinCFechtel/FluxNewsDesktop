@@ -301,6 +301,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.15.4"
+  html_unescape:
+    dependency: transitive
+    description:
+      name: html_unescape
+      sha256: "15362d7a18f19d7b742ef8dcb811f5fd2a2df98db9f80ea393c075189e0b61e3"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.0.0"
   http:
     dependency: "direct main"
     description:
@@ -333,6 +341,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.18.1"
+  jinja:
+    dependency: transitive
+    description:
+      name: jinja
+      sha256: bec5ecbc8f067d2092d8f25c7f861c7875a29c935cffb7628acd4038aef0f129
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.5.0"
   js:
     dependency: transitive
     description:
@@ -405,6 +421,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.10.0"
+  my_logger:
+    dependency: "direct main"
+    description:
+      name: my_logger
+      sha256: "3f0af99ff53d10eacdcc829d58d6a0bb8be1e5f6ef0792dcfd5b9d42badad8f9"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.1"
   nested:
     dependency: transitive
     description:
@@ -565,6 +589,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.3.8"
+  sembast:
+    dependency: transitive
+    description:
+      name: sembast
+      sha256: "85ff944434f7b566fdc388be4f85b23e954736b7d6e51f965f4f419d966c15b1"
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.5.0+1"
   sky_engine:
     dependency: transitive
     description: flutter
@@ -690,6 +722,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.6.1"
+  textwrap:
+    dependency: transitive
+    description:
+      name: textwrap
+      sha256: "342fb85c503a27c68e0dd21f7be35360acf3231f929e0dcb23cc8593d2919c36"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.2.0"
   typed_data:
     dependency: transitive
     description:
@@ -778,6 +818,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "6.5.0"
+  xxtea:
+    dependency: transitive
+    description:
+      name: xxtea
+      sha256: edd57229638e16e88f4bb299737fe76a235d0f11da6df8573b3c7f28dec283ce
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.1.0"
   yaml:
     dependency: transitive
     description:

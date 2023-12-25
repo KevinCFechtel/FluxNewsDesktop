@@ -1,10 +1,9 @@
-import 'dart:io';
-
 import 'package:equatable/equatable.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flux_news_desktop/logging.dart';
 import 'package:intl/intl.dart';
-import 'package:logger/logger.dart';
+import 'package:my_logger/core/constants.dart';
+import 'package:my_logger/logger.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 import 'package:flutter_secure_storage/flutter_secure_storage.dart'
@@ -13,7 +12,6 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart'
 import 'package:path/path.dart' as path_package;
 import 'package:flutter_gen/gen_l10n/flux_news_localizations.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
-import 'package:path_provider/path_provider.dart';
 
 import 'news_model.dart';
 
@@ -164,13 +162,13 @@ class FluxNewsState extends ChangeNotifier {
 
   // init the database connection
   Future<Database> initializeDB() async {
-    logThis('initializeDB', 'Starting initializeDB', Level.info, this);
+    logThis('initializeDB', 'Starting initializeDB', LogLevel.INFO);
     String path = await getDatabasesPath();
-    logThis('initializeDB', 'Finished initializeDB', Level.info, this);
+    logThis('initializeDB', 'Finished initializeDB', LogLevel.INFO);
     return openDatabase(
       path_package.join(path, FluxNewsState.databasePathString),
       onCreate: (db, version) async {
-        logThis('initializeDB', 'Starting creating DB', Level.info, this);
+        logThis('initializeDB', 'Starting creating DB', LogLevel.INFO);
         // create the table news
         await db.execute('DROP TABLE IF EXISTS news');
         await db.execute(
@@ -214,12 +212,12 @@ class FluxNewsState extends ChangeNotifier {
                           attachmentMimeType TEXT)''',
         );
 
-        logThis('initializeDB', 'Finished creating DB', Level.info, this);
+        logThis('initializeDB', 'Finished creating DB', LogLevel.INFO);
       },
       onUpgrade: (db, oldVersion, newVersion) async {
-        logThis('upgradeDB', 'Starting upgrading DB', Level.info, this);
+        logThis('upgradeDB', 'Starting upgrading DB', LogLevel.INFO);
         if (oldVersion == 1) {
-          logThis('upgradeDB', 'Upgrading DB from version 1', Level.info, this);
+          logThis('upgradeDB', 'Upgrading DB from version 1', LogLevel.INFO);
 
           // create the table attachments
           await db.execute('DROP TABLE IF EXISTS attachments');
@@ -238,7 +236,7 @@ class FluxNewsState extends ChangeNotifier {
                      RENAME COLUMN "categorieID" TO "categoryID";''',
           );
         } else if (oldVersion == 2) {
-          logThis('upgradeDB', 'Upgrading DB from version 2', Level.info, this);
+          logThis('upgradeDB', 'Upgrading DB from version 2', LogLevel.INFO);
 
           await db.execute(
             '''ALTER TABLE "categories" 
@@ -249,7 +247,7 @@ class FluxNewsState extends ChangeNotifier {
                      RENAME COLUMN "categorieID" TO "categoryID";''',
           );
         }
-        logThis('upgradeDB', 'Finished upgrading DB', Level.info, this);
+        logThis('upgradeDB', 'Finished upgrading DB', LogLevel.INFO);
       },
       version: 3,
     );
@@ -257,18 +255,28 @@ class FluxNewsState extends ChangeNotifier {
 
   // read the persistent saved configuration
   Future<bool> readConfigValues() async {
-    logThis(
-        'readConfigValues', 'Starting read config values', Level.info, this);
+    logThis('readConfigValues', 'Starting read config values', LogLevel.INFO);
 
     storageValues = await storage.readAll();
 
-    logThis(
-        'readConfigValues', 'Finished read config values', Level.info, this);
+    logThis('readConfigValues', 'Finished read config values', LogLevel.INFO);
 
     return true;
   }
 
   Future<void> initLogging() async {
+    LogConfig config = MyLogger.config
+      ..outputFormat =
+          "{{time}} {{level}} [{{class}}:{{method}}] -> {{message}}"
+      ..timestampFormat = TimestampFormat.TIME_FORMAT_FULL_3;
+
+    MyLogger.applyConfig(config);
+    final dateTime = DateTime.now().subtract(const Duration(days: 1));
+    final filter = LogFilter(endDateTime: dateTime);
+    MyLogger.logs
+        .deleteByFilter(filter)
+        .then((_) => logThis('initLogging', 'Deleted old logs', LogLevel.INFO));
+    /*
     final directory = await getApplicationDocumentsDirectory();
     loggingFilePath = directory.path;
     DateTime yesterday = DateTime.now().subtract(const Duration(days: 1));
@@ -281,12 +289,13 @@ class FluxNewsState extends ChangeNotifier {
         }
       }
     }
-    logThis('initLogging', 'Finished init logging', Level.info, this);
+    */
+    logThis('initLogging', 'Finished init logging', LogLevel.INFO);
   }
 
   // init the persistent saved configuration
   bool readConfig(BuildContext context) {
-    logThis('readConfig', 'Starting read config', Level.info, this);
+    logThis('readConfig', 'Starting read config', LogLevel.INFO);
 
     // init the maps for the brightness mode list
     // this maps use the key as the technical string and the value as the display name
@@ -440,7 +449,7 @@ class FluxNewsState extends ChangeNotifier {
         }
       }
     });
-    logThis('readConfig', 'Finished read config', Level.info, this);
+    logThis('readConfig', 'Finished read config', LogLevel.INFO);
 
     // return true if everything was read
     return true;

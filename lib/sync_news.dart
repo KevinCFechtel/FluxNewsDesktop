@@ -8,11 +8,10 @@ import 'package:flux_news_desktop/miniflux_backend.dart';
 import 'package:flux_news_desktop/news_model.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_gen/gen_l10n/flux_news_localizations.dart';
-import 'package:logger/logger.dart';
+import 'package:my_logger/core/constants.dart';
 
 Future<void> syncNews(FluxNewsState appState, BuildContext context) async {
-  logThis(
-      'syncNews', 'Start syncing with miniflux server.', Level.info, appState);
+  logThis('syncNews', 'Start syncing with miniflux server.', LogLevel.INFO);
 
   // this is the part where the app syncs with the miniflux server
   // to reduce the appearance of error pop ups,
@@ -32,8 +31,7 @@ Future<void> syncNews(FluxNewsState appState, BuildContext context) async {
     logThis(
         'authCheck',
         'Caught an error in authCheck function! : ${error.toString()}',
-        Level.error,
-        appState);
+        LogLevel.ERROR);
 
     if (appState.errorString !=
         AppLocalizations.of(context)!.communicateionMinifluxError) {
@@ -58,8 +56,7 @@ Future<void> syncNews(FluxNewsState appState, BuildContext context) async {
       logThis(
           'toggleNewsAsRead',
           'Caught an error in toggleNewsAsRead function! : ${error.toString()}',
-          Level.error,
-          appState);
+          LogLevel.ERROR);
 
       if (appState.errorString !=
           AppLocalizations.of(context)!.communicateionMinifluxError) {
@@ -76,8 +73,7 @@ Future<void> syncNews(FluxNewsState appState, BuildContext context) async {
       logThis(
           'fetchNews',
           'Caught an error in fetchNews function! : ${error.toString()}',
-          Level.error,
-          appState);
+          LogLevel.ERROR);
 
       if (appState.errorString !=
           AppLocalizations.of(context)!.communicateionMinifluxError) {
@@ -97,8 +93,7 @@ Future<void> syncNews(FluxNewsState appState, BuildContext context) async {
       logThis(
           'markNotFetchedNewsAsRead',
           'Caught an error in markNotFetchedNewsAsRead function! : ${error.toString()}',
-          Level.error,
-          appState);
+          LogLevel.ERROR);
 
       if (appState.errorString != AppLocalizations.of(context)!.databaseError) {
         appState.errorString = AppLocalizations.of(context)!.databaseError;
@@ -113,8 +108,7 @@ Future<void> syncNews(FluxNewsState appState, BuildContext context) async {
       logThis(
           'insertNewsInDB',
           'Caught an error in insertNewsInDB function! : ${error.toString()}',
-          Level.error,
-          appState);
+          LogLevel.ERROR);
 
       if (appState.errorString != AppLocalizations.of(context)!.databaseError) {
         appState.errorString = AppLocalizations.of(context)!.databaseError;
@@ -146,8 +140,7 @@ Future<void> syncNews(FluxNewsState appState, BuildContext context) async {
         logThis(
             'renewAllNewsCount',
             'Caught an error in renewAllNewsCount function! : ${error.toString()}',
-            Level.error,
-            appState);
+            LogLevel.ERROR);
       });
     }
     appState.refreshView();
@@ -159,8 +152,7 @@ Future<void> syncNews(FluxNewsState appState, BuildContext context) async {
       logThis(
           'fetchCategoryInformation',
           'Caught an error in fetchCategoryInformation function! : ${error.toString()}',
-          Level.error,
-          appState);
+          LogLevel.ERROR);
 
       if (appState.errorString !=
           AppLocalizations.of(context)!.communicateionMinifluxError) {
@@ -178,8 +170,7 @@ Future<void> syncNews(FluxNewsState appState, BuildContext context) async {
       logThis(
           'insertCategoriesInDB',
           'Caught an error in insertCategoriesInDB function! : ${error.toString()}',
-          Level.error,
-          appState);
+          LogLevel.ERROR);
 
       if (appState.errorString != AppLocalizations.of(context)!.databaseError) {
         appState.errorString = AppLocalizations.of(context)!.databaseError;
@@ -195,8 +186,7 @@ Future<void> syncNews(FluxNewsState appState, BuildContext context) async {
       logThis(
           'fetchStarredNews',
           'Caught an error in fetchStarredNews function! : ${error.toString()}',
-          Level.error,
-          appState);
+          LogLevel.ERROR);
 
       if (appState.errorString !=
           AppLocalizations.of(context)!.communicateionMinifluxError) {
@@ -215,8 +205,7 @@ Future<void> syncNews(FluxNewsState appState, BuildContext context) async {
       logThis(
           'updateStarredNewsInDB',
           'Caught an error in updateStarredNewsInDB function! ${error.toString()}',
-          Level.error,
-          appState);
+          LogLevel.ERROR);
 
       if (appState.errorString != AppLocalizations.of(context)!.databaseError) {
         appState.errorString = AppLocalizations.of(context)!.databaseError;
@@ -231,8 +220,7 @@ Future<void> syncNews(FluxNewsState appState, BuildContext context) async {
       logThis(
           'cleanUnstarredNews',
           'Caught an error in cleanUnstarredNews function! : ${error.toString()}',
-          Level.error,
-          appState);
+          LogLevel.ERROR);
 
       if (appState.errorString != AppLocalizations.of(context)!.databaseError) {
         appState.errorString = AppLocalizations.of(context)!.databaseError;
@@ -246,8 +234,7 @@ Future<void> syncNews(FluxNewsState appState, BuildContext context) async {
       logThis(
           'cleanStarredNews',
           'Caught an error in cleanStarredNews function! : ${error.toString()}',
-          Level.error,
-          appState);
+          LogLevel.ERROR);
 
       if (appState.errorString != AppLocalizations.of(context)!.databaseError) {
         appState.errorString = AppLocalizations.of(context)!.databaseError;
@@ -265,8 +252,7 @@ Future<void> syncNews(FluxNewsState appState, BuildContext context) async {
       logThis(
           'updateStarredCounter',
           'Caught an error in updateStarredCounter function! : ${e.toString()}',
-          Level.error,
-          appState);
+          LogLevel.ERROR);
 
       if (context.mounted) {
         if (appState.errorString !=
@@ -305,8 +291,7 @@ Future<void> syncNews(FluxNewsState appState, BuildContext context) async {
     appState.syncProcess = false;
     appState.refreshView();
   }
-  logThis('syncNews', 'Finished syncing with miniflux server.', Level.info,
-      appState);
+  logThis('syncNews', 'Finished syncing with miniflux server.', LogLevel.INFO);
 }
 
 Future<void> waitUntilNewsListBuild(FluxNewsState appState) async {

@@ -7,6 +7,9 @@ import 'package:flux_news_desktop/database_backend.dart';
 import 'package:flux_news_desktop/fluent_theme.dart';
 import 'package:flux_news_desktop/flux_news_counter_state.dart';
 import 'package:flux_news_desktop/news_model.dart';
+import 'package:intl/intl.dart';
+import 'package:my_logger/logger.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_gen/gen_l10n/flux_news_localizations.dart';
 import 'package:http/http.dart' as http;
@@ -507,6 +510,7 @@ class FluentSettings extends StatelessWidget {
                           ZipFileEncoder encoder = ZipFileEncoder();
 
                           encoder.create(outputFile);
+                          /*
                           List<FileSystemEntity> files =
                               Directory(appState.loggingFilePath).listSync();
                           for (FileSystemEntity file in files) {
@@ -514,6 +518,22 @@ class FluentSettings extends StatelessWidget {
                               encoder.addFile(File(file.path));
                             }
                           }
+                          */
+
+                          List<Log> logs = await MyLogger.logs
+                              .getByFilter(LogFilter.last24Hours());
+                          DateTime now = DateTime.now();
+                          DateFormat formatter = DateFormat('yyyy-MM-dd');
+                          String formattedDate = formatter.format(now);
+                          final directory =
+                              await getApplicationDocumentsDirectory();
+                          File logFile = File(
+                              '${directory.path}/FluxNewsLogs-$formattedDate.log');
+                          for (Log log in logs) {
+                            logFile.writeAsStringSync(log.toString(),
+                                mode: FileMode.append);
+                          }
+                          encoder.addFile(logFile);
                           encoder.close();
                         }
                       },

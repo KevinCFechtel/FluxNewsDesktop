@@ -7,7 +7,7 @@ import 'package:flux_news_desktop/flux_news_state.dart';
 import 'package:flux_news_desktop/logging.dart';
 import 'package:flux_news_desktop/news_model.dart';
 import 'package:flux_news_desktop/news_widget_functions.dart';
-import 'package:logger/logger.dart';
+import 'package:my_logger/core/constants.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_gen/gen_l10n/flux_news_localizations.dart';
 
@@ -46,8 +46,7 @@ class NewsRow extends StatelessWidget {
                 logThis(
                     'updateNewsStatusInDB',
                     'Caught an error in updateNewsStatusInDB function! : ${e.toString()}',
-                    Level.error,
-                    appState);
+                    LogLevel.ERROR);
 
                 if (context.mounted) {
                   if (appState.errorString !=
