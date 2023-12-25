@@ -504,7 +504,7 @@ class FluentSettings extends StatelessWidget {
                         );
 
                         if (outputFile != null) {
-                          var encoder = ZipFileEncoder();
+                          ZipFileEncoder encoder = ZipFileEncoder();
 
                           encoder.create(outputFile);
                           List<FileSystemEntity> files =
@@ -580,6 +580,7 @@ class FluentSettings extends StatelessWidget {
 // It also initializes the database connection.
 Future<void> initConfig(BuildContext context, FluentAppTheme appTheme) async {
   FluxNewsState appState = context.read<FluxNewsState>();
+  await appState.initLogging();
   await appState.readConfigValues();
   if (context.mounted) {
     appState.readConfig(context);

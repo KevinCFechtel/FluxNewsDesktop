@@ -37,6 +37,7 @@ class FluentNavigationMainView extends StatelessWidget {
   // helper function for the initState() to use async function on init
   Future<void> initConfig(BuildContext context, FluxNewsState appState,
       FluentAppTheme appTheme) async {
+    await appState.initLogging();
     // read persistent saved config
     bool completed = await appState.readConfigValues();
 

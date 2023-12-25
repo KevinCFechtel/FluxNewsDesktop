@@ -259,6 +259,16 @@ class FluxNewsState extends ChangeNotifier {
   Future<bool> readConfigValues() async {
     logThis(
         'readConfigValues', 'Starting read config values', Level.info, this);
+
+    storageValues = await storage.readAll();
+
+    logThis(
+        'readConfigValues', 'Finished read config values', Level.info, this);
+
+    return true;
+  }
+
+  Future<void> initLogging() async {
     final directory = await getApplicationDocumentsDirectory();
     loggingFilePath = directory.path;
     DateTime yesterday = DateTime.now().subtract(const Duration(days: 1));
@@ -269,15 +279,9 @@ class FluxNewsState extends ChangeNotifier {
         if (stat.changed.isBefore(yesterday)) {
           file.deleteSync();
         }
-        //file.deleteSync();
       }
     }
-    storageValues = await storage.readAll();
-
-    logThis(
-        'readConfigValues', 'Finished read config values', Level.info, this);
-
-    return true;
+    logThis('initLogging', 'Finished init logging', Level.info, this);
   }
 
   // init the persistent saved configuration
@@ -349,7 +353,6 @@ class FluxNewsState extends ChangeNotifier {
       if (key == FluxNewsState.secureStorageSortOrderKey) {
         if (value != '') {
           sortOrder = value;
-          logThis("module", "Value: $value", Level.info, this);
         }
       }
 
@@ -455,7 +458,6 @@ class FluxNewsState extends ChangeNotifier {
         if (selectedNavigation == v) {
           itemNumber = k;
         }
-        //logThis("module", "value: $k Iterated Navigation: $v", Level.info, this);
       });
     }
 
@@ -468,7 +470,6 @@ class FluxNewsState extends ChangeNotifier {
       if (index == k) {
         routeString = v;
       }
-      //logThis("module", "value: $k Iterated Navigation: $v", Level.info, this);
     });
 
     return routeString;
