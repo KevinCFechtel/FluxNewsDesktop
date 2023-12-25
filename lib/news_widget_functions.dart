@@ -26,7 +26,8 @@ Future<void> markAsBookmarkContextFunction(News news, FluxNewsState appState,
     logThis(
         'toggleBookmark',
         'Caught an error in toggleBookmark function! : ${error.toString()}',
-        Level.error);
+        Level.error,
+        appState);
 
     if (appState.errorString !=
         AppLocalizations.of(context)!.communicateionMinifluxError) {
@@ -47,7 +48,8 @@ Future<void> markAsBookmarkContextFunction(News news, FluxNewsState appState,
     logThis(
         'updateNewsStarredStatusInDB',
         'Caught an error in updateNewsStarredStatusInDB function! : ${e.toString()}',
-        Level.error);
+        Level.error,
+        appState);
 
     if (context.mounted) {
       if (appState.errorString != AppLocalizations.of(context)!.databaseError) {
@@ -80,7 +82,8 @@ Future<void> markAsBookmarkContextFunction(News news, FluxNewsState appState,
           logThis(
               'queryNewsFromDB',
               'Caught an error in queryNewsFromDB function! : ${error.toString()}',
-              Level.error);
+              Level.error,
+              appState);
 
           appState.errorString = AppLocalizations.of(context)!.databaseError;
           return [];
@@ -104,7 +107,8 @@ void markNewsAsReadContextAction(
     logThis(
         'updateNewsStatusInDB',
         'Caught an error in updateNewsStatusInDB function! : ${e.toString()}',
-        Level.error);
+        Level.error,
+        appState);
 
     if (context.mounted) {
       if (appState.errorString != AppLocalizations.of(context)!.databaseError) {
@@ -125,7 +129,8 @@ void markNewsAsReadContextAction(
       logThis(
           'toggleOneNewsAsRead',
           'Caught an error in toggleOneNewsAsRead function! : ${e.toString()}',
-          Level.error);
+          Level.error,
+          appState);
     }
     // update the news list of the main view
     appState.newsList = queryNewsFromDB(appState, appState.feedIDs)
@@ -133,7 +138,8 @@ void markNewsAsReadContextAction(
       logThis(
           'queryNewsFromDB',
           'Caught an error in queryNewsFromDB function! : ${error.toString()}',
-          Level.error);
+          Level.error,
+          appState);
 
       appState.errorString = AppLocalizations.of(context)!.databaseError;
       return [];
@@ -161,7 +167,8 @@ void markNewsAsUnreadContextAction(
     logThis(
         'updateNewsStatusInDB',
         'Caught an error in updateNewsStatusInDB function! : ${e.toString()}',
-        Level.error);
+        Level.error,
+        appState);
 
     if (context.mounted) {
       if (appState.errorString != AppLocalizations.of(context)!.databaseError) {
@@ -183,7 +190,8 @@ void markNewsAsUnreadContextAction(
       logThis(
           'toggleOneNewsAsRead',
           'Caught an error in toggleOneNewsAsRead function! : ${e.toString()}',
-          Level.error);
+          Level.error,
+          appState);
     }
     // update the news list of the main view
     appState.newsList = queryNewsFromDB(appState, appState.feedIDs)
@@ -191,7 +199,8 @@ void markNewsAsUnreadContextAction(
       logThis(
           'queryNewsFromDB',
           'Caught an error in queryNewsFromDB function! : ${error.toString()}',
-          Level.error);
+          Level.error,
+          appState);
 
       appState.errorString = AppLocalizations.of(context)!.databaseError;
       return [];

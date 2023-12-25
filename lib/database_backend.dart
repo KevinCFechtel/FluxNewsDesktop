@@ -15,7 +15,8 @@ import 'news_model.dart';
 // function to insert news in database which are located in the newsList parameter
 Future<int> insertNewsInDB(NewsList newsList, FluxNewsState appState) async {
   if (appState.debugMode) {
-    logThis('insertNewsInDB', 'Starting inserting news in DB', Level.info);
+    logThis('insertNewsInDB', 'Starting inserting news in DB', Level.info,
+        appState);
   }
   // init the return value of the function
   int result = 0;
@@ -42,8 +43,11 @@ Future<int> insertNewsInDB(NewsList newsList, FluxNewsState appState) async {
         }
 
         if (appState.debugMode) {
-          logThis('insertNewsInDB',
-              'Inserted news with id ${news.newsID} in DB', Level.info);
+          logThis(
+              'insertNewsInDB',
+              'Inserted news with id ${news.newsID} in DB',
+              Level.info,
+              appState);
         }
       } else {
         // if the news is present, update the status of the news
@@ -52,7 +56,7 @@ Future<int> insertNewsInDB(NewsList newsList, FluxNewsState appState) async {
             [news.status, FluxNewsState.notSyncedSyncStatus, news.newsID]);
         if (appState.debugMode) {
           logThis('insertNewsInDB', 'Updated news with id ${news.newsID} in DB',
-              Level.info);
+              Level.info, appState);
         }
       }
       // check if the feed of the news already contains an icon
@@ -71,14 +75,16 @@ Future<int> insertNewsInDB(NewsList newsList, FluxNewsState appState) async {
             logThis(
                 'insertNewsInDB',
                 'Inserted Feed icon for feed with id ${news.feedID} in DB',
-                Level.info);
+                Level.info,
+                appState);
           }
         }
       }
     }
   }
   if (appState.debugMode) {
-    logThis('insertNewsInDB', 'Finished inserting news in DB', Level.info);
+    logThis('insertNewsInDB', 'Finished inserting news in DB', Level.info,
+        appState);
   }
   // return the result from the inserts into the database
   return result;
@@ -89,7 +95,7 @@ Future<int> updateStarredNewsInDB(
     NewsList newsList, FluxNewsState appState) async {
   if (appState.debugMode) {
     logThis('updateStarredNewsInDB', 'Starting updating starred news in DB',
-        Level.info);
+        Level.info, appState);
   }
   int result = 0;
   appState.db ??= await appState.initializeDB();
@@ -108,7 +114,8 @@ Future<int> updateStarredNewsInDB(
           logThis(
               'updateStarredNewsInDB',
               'Marked news with id ${news.newsID} as bookmarked in DB',
-              Level.info);
+              Level.info,
+              appState);
         }
       }
     }
@@ -129,14 +136,15 @@ Future<int> updateStarredNewsInDB(
           logThis(
               'updateStarredNewsInDB',
               'Deleted starred status for news with id ${news.newsID} in DB',
-              Level.info);
+              Level.info,
+              appState);
         }
       }
     }
   }
   if (appState.debugMode) {
     logThis('updateStarredNewsInDB', 'Finished updating starred news in DB',
-        Level.info);
+        Level.info, appState);
   }
   return result;
 }
@@ -148,7 +156,7 @@ Future<int> markNotFetchedNewsAsRead(
     NewsList newNewsList, FluxNewsState appState) async {
   if (appState.debugMode) {
     logThis('markNotFetchedNewsAsRead',
-        'Starting marking not fetched news as read', Level.info);
+        'Starting marking not fetched news as read', Level.info, appState);
   }
   int result = 0;
   appState.db ??= await appState.initializeDB();
@@ -177,14 +185,15 @@ Future<int> markNotFetchedNewsAsRead(
           logThis(
               'markNotFetchedNewsAsRead',
               'Marked the news with id ${news.newsID} as read in DB',
-              Level.info);
+              Level.info,
+              appState);
         }
       }
     }
   }
   if (appState.debugMode) {
     logThis('markNotFetchedNewsAsRead',
-        'Finished marking not fetched news as read', Level.info);
+        'Finished marking not fetched news as read', Level.info, appState);
   }
   return result;
 }
@@ -193,7 +202,8 @@ Future<int> markNotFetchedNewsAsRead(
 Future<List<News>> queryNewsFromDB(
     FluxNewsState appState, List<int>? feedIDs) async {
   if (appState.debugMode) {
-    logThis('queryNewsFromDB', 'Starting querying news from DB', Level.info);
+    logThis('queryNewsFromDB', 'Starting querying news from DB', Level.info,
+        appState);
   }
   List<News> newList = [];
   appState.db ??= await appState.initializeDB();
@@ -303,7 +313,8 @@ Future<List<News>> queryNewsFromDB(
     }
   }
   if (appState.debugMode) {
-    logThis('queryNewsFromDB', 'Finished querying news from DB', Level.info);
+    logThis('queryNewsFromDB', 'Finished querying news from DB', Level.info,
+        appState);
   }
   return newList;
 }
@@ -313,7 +324,7 @@ void updateNewsStatusInDB(
     int newsID, String status, FluxNewsState appState) async {
   if (appState.debugMode) {
     logThis('updateNewsStatusInDB', 'Starting updating news status in DB',
-        Level.info);
+        Level.info, appState);
   }
   appState.db ??= await appState.initializeDB();
   if (appState.db != null) {
@@ -322,7 +333,7 @@ void updateNewsStatusInDB(
   }
   if (appState.debugMode) {
     logThis('updateNewsStatusInDB', 'Finished updating news status in DB',
-        Level.info);
+        Level.info, appState);
   }
 }
 
@@ -331,7 +342,7 @@ void updateStarredCounter(FluxNewsState appState, BuildContext context) async {
   FluxNewsCounterState appCounterState = context.read<FluxNewsCounterState>();
   if (appState.debugMode) {
     logThis('updateNewsStatusInDB', 'Starting updating starred counter',
-        Level.info);
+        Level.info, appState);
   }
 
   int? starredNewsCount;
@@ -353,7 +364,7 @@ void updateStarredCounter(FluxNewsState appState, BuildContext context) async {
 
   if (appState.debugMode) {
     logThis('updateNewsStatusInDB', 'Finished updating starred counter',
-        Level.info);
+        Level.info, appState);
   }
   appCounterState.refreshView();
 }
@@ -363,7 +374,7 @@ void updateNewsStarredStatusInDB(
     int newsID, bool starred, FluxNewsState appState) async {
   if (appState.debugMode) {
     logThis('updateNewsStarredStatusInDB',
-        'Starting updating news starred status in DB', Level.info);
+        'Starting updating news starred status in DB', Level.info, appState);
   }
 
   int starredStatus = 0;
@@ -378,7 +389,7 @@ void updateNewsStarredStatusInDB(
 
   if (appState.debugMode) {
     logThis('updateNewsStarredStatusInDB',
-        'Finished updating news starred status in DB', Level.info);
+        'Finished updating news starred status in DB', Level.info, appState);
   }
 }
 
@@ -387,8 +398,8 @@ void updateNewsStarredStatusInDB(
 // this limit can be changed in the settings.
 Future<void> cleanUnstarredNews(FluxNewsState appState) async {
   if (appState.debugMode) {
-    logThis(
-        'cleanUnstarredNews', 'Starting cleaning unstarred news', Level.info);
+    logThis('cleanUnstarredNews', 'Starting cleaning unstarred news',
+        Level.info, appState);
   }
 
   appState.db ??= await appState.initializeDB();
@@ -403,8 +414,8 @@ Future<void> cleanUnstarredNews(FluxNewsState appState) async {
   }
 
   if (appState.debugMode) {
-    logThis(
-        'cleanUnstarredNews', 'Finished cleaning unstarred news', Level.info);
+    logThis('cleanUnstarredNews', 'Finished cleaning unstarred news',
+        Level.info, appState);
   }
 }
 
@@ -414,7 +425,8 @@ Future<void> cleanUnstarredNews(FluxNewsState appState) async {
 // maybe the bookmarked news should have another limit as the not bookmarked news
 Future<void> cleanStarredNews(FluxNewsState appState) async {
   if (appState.debugMode) {
-    logThis('cleanStarredNews', 'Starting cleaning starred news', Level.info);
+    logThis('cleanStarredNews', 'Starting cleaning starred news', Level.info,
+        appState);
   }
 
   appState.db ??= await appState.initializeDB();
@@ -429,7 +441,8 @@ Future<void> cleanStarredNews(FluxNewsState appState) async {
   }
 
   if (appState.debugMode) {
-    logThis('cleanStarredNews', 'Finished cleaning starred news', Level.info);
+    logThis('cleanStarredNews', 'Finished cleaning starred news', Level.info,
+        appState);
   }
 }
 
@@ -438,7 +451,7 @@ Future<int> insertCategoriesInDB(
     Categories categoryList, FluxNewsState appState) async {
   if (appState.debugMode) {
     logThis('insertCategoriesInDB', 'Starting inserting categories in DB',
-        Level.info);
+        Level.info, appState);
   }
 
   int result = 0;
@@ -457,7 +470,8 @@ Future<int> insertCategoriesInDB(
           logThis(
               'insertCategoriesInDB',
               'Inserted category with id ${category.categoryID} in DB',
-              Level.info);
+              Level.info,
+              appState);
         }
       } else {
         // if they exists locally, update the category
@@ -468,7 +482,8 @@ Future<int> insertCategoriesInDB(
           logThis(
               'insertCategoriesInDB',
               'Updated category with id ${category.categoryID} in DB',
-              Level.info);
+              Level.info,
+              appState);
         }
       }
       for (Feed feed in category.feeds) {
@@ -489,8 +504,11 @@ Future<int> insertCategoriesInDB(
                 category.categoryID
               ]);
           if (appState.debugMode) {
-            logThis('insertCategoriesInDB',
-                'Inserted feed with id ${feed.feedID} in DB', Level.info);
+            logThis(
+                'insertCategoriesInDB',
+                'Inserted feed with id ${feed.feedID} in DB',
+                Level.info,
+                appState);
           }
         } else {
           // if they exists locally, update the feed
@@ -506,8 +524,11 @@ Future<int> insertCategoriesInDB(
                 feed.feedID
               ]);
           if (appState.debugMode) {
-            logThis('insertCategoriesInDB',
-                'Updated feed with id ${feed.feedID} in DB', Level.info);
+            logThis(
+                'insertCategoriesInDB',
+                'Updated feed with id ${feed.feedID} in DB',
+                Level.info,
+                appState);
           }
         }
       }
@@ -534,7 +555,8 @@ Future<int> insertCategoriesInDB(
           logThis(
               'insertCategoriesInDB',
               'Deleted category with id ${category.categoryID} in DB',
-              Level.info);
+              Level.info,
+              appState);
         }
       }
     }
@@ -565,15 +587,18 @@ Future<int> insertCategoriesInDB(
         result = await appState.db!
             .rawDelete('DELETE FROM news WHERE feedID = ?', [feed.feedID]);
         if (appState.debugMode) {
-          logThis('insertCategoriesInDB',
-              'Deleted news and feed with id ${feed.feedID} in DB', Level.info);
+          logThis(
+              'insertCategoriesInDB',
+              'Deleted news and feed with id ${feed.feedID} in DB',
+              Level.info,
+              appState);
         }
       }
     }
   }
   if (appState.debugMode) {
     logThis('insertCategoriesInDB', 'Finished inserting categories in DB',
-        Level.info);
+        Level.info, appState);
   }
   return result;
 }
@@ -583,7 +608,7 @@ Future<Categories> queryCategoriesFromDB(
     FluxNewsState appState, BuildContext context) async {
   if (appState.debugMode) {
     logThis('queryCategoriesFromDB', 'Starting querying categories from DB',
-        Level.info);
+        Level.info, appState);
   }
   Map<int, String> tempNavigationRouteStrings = {};
   int itemCount = 0;
@@ -629,7 +654,7 @@ Future<Categories> queryCategoriesFromDB(
   }
   if (appState.debugMode) {
     logThis('queryCategoriesFromDB', 'Finished querying categories from DB',
-        Level.info);
+        Level.info, appState);
   }
   return categories;
 }
@@ -639,8 +664,8 @@ Future<void> renewAllNewsCount(
     FluxNewsState appState, BuildContext context) async {
   FluxNewsCounterState appCounterState = context.read<FluxNewsCounterState>();
   if (appState.debugMode) {
-    logThis(
-        'renewAllNewsCount', 'Starting renewing all news count', Level.info);
+    logThis('renewAllNewsCount', 'Starting renewing all news count', Level.info,
+        appState);
   }
   appState.db ??= await appState.initializeDB();
   int? allNewsCount = 0;
@@ -668,8 +693,8 @@ Future<void> renewAllNewsCount(
     }
   }
   if (appState.debugMode) {
-    logThis(
-        'renewAllNewsCount', 'Finished renewing all news count', Level.info);
+    logThis('renewAllNewsCount', 'Finished renewing all news count', Level.info,
+        appState);
   }
 
   // notify the app about the updated count of news
@@ -681,7 +706,7 @@ Future<void> deleteLocalNewsCache(
     FluxNewsState appState, BuildContext context) async {
   if (appState.debugMode) {
     logThis('deleteLocalNewsCache', 'Starting deleting the local news cache',
-        Level.info);
+        Level.info, appState);
   }
   appState.db ??= await appState.initializeDB();
   if (appState.db != null) {
@@ -730,6 +755,6 @@ Future<void> deleteLocalNewsCache(
   }
   if (appState.debugMode) {
     logThis('deleteLocalNewsCache', 'Finished deleting the local news cache',
-        Level.info);
+        Level.info, appState);
   }
 }

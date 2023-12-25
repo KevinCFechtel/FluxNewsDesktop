@@ -87,7 +87,8 @@ class FluentBodyNewsList extends StatelessWidget {
                                           logThis(
                                               'updateNewsStatusInDB',
                                               'Caught an error in updateNewsStatusInDB function! : ${e.toString()}',
-                                              Level.error);
+                                              Level.error,
+                                              appState);
 
                                           if (context
                                                   .read<FluxNewsState>()
@@ -135,7 +136,8 @@ class FluentBodyNewsList extends StatelessWidget {
                                         logThis(
                                             'updateNewsStatusInDB',
                                             'Caught an error in updateNewsStatusInDB function! : ${e.toString()}',
-                                            Level.error);
+                                            Level.error,
+                                            appState);
 
                                         if (context
                                                 .read<FluxNewsState>()

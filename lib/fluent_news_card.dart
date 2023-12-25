@@ -45,7 +45,8 @@ class FluentNewsCard extends StatelessWidget {
               logThis(
                   'updateNewsStatusInDB',
                   'Caught an error in updateNewsStatusInDB function! : ${e.toString()}',
-                  Level.error);
+                  Level.error,
+                  appState);
 
               if (context.mounted) {
                 if (appState.errorString !=

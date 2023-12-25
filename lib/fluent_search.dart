@@ -69,7 +69,8 @@ class FluentSearch extends StatelessWidget {
                 logThis(
                     'fetchSearchedNews',
                     'Caught an error in fetchSearchedNews function! : ${error.toString()}',
-                    Level.error);
+                    Level.error,
+                    appState);
                 if (appState.errorString !=
                     AppLocalizations.of(context)!.communicateionMinifluxError) {
                   appState.errorString =

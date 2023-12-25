@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:equatable/equatable.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flux_news_desktop/logging.dart';
@@ -11,6 +13,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart'
 import 'package:path/path.dart' as path_package;
 import 'package:flutter_gen/gen_l10n/flux_news_localizations.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
+import 'package:path_provider/path_provider.dart';
 
 import 'news_model.dart';
 
@@ -121,6 +124,7 @@ class FluxNewsState extends ChangeNotifier {
   String errorString = '';
   bool newError = false;
   bool errorOnMinifluxAuth = false;
+  String loggingFilePath = "";
 
   // vars for debugging
   bool debugMode = false;
@@ -160,13 +164,13 @@ class FluxNewsState extends ChangeNotifier {
 
   // init the database connection
   Future<Database> initializeDB() async {
-    logThis('initializeDB', 'Starting initializeDB', Level.info);
+    logThis('initializeDB', 'Starting initializeDB', Level.info, this);
     String path = await getDatabasesPath();
-    logThis('initializeDB', 'Finished initializeDB', Level.info);
+    logThis('initializeDB', 'Finished initializeDB', Level.info, this);
     return openDatabase(
       path_package.join(path, FluxNewsState.databasePathString),
       onCreate: (db, version) async {
-        logThis('initializeDB', 'Starting creating DB', Level.info);
+        logThis('initializeDB', 'Starting creating DB', Level.info, this);
         // create the table news
         await db.execute('DROP TABLE IF EXISTS news');
         await db.execute(
@@ -210,12 +214,12 @@ class FluxNewsState extends ChangeNotifier {
                           attachmentMimeType TEXT)''',
         );
 
-        logThis('initializeDB', 'Finished creating DB', Level.info);
+        logThis('initializeDB', 'Finished creating DB', Level.info, this);
       },
       onUpgrade: (db, oldVersion, newVersion) async {
-        logThis('upgradeDB', 'Starting upgrading DB', Level.info);
+        logThis('upgradeDB', 'Starting upgrading DB', Level.info, this);
         if (oldVersion == 1) {
-          logThis('upgradeDB', 'Upgrading DB from version 1', Level.info);
+          logThis('upgradeDB', 'Upgrading DB from version 1', Level.info, this);
 
           // create the table attachments
           await db.execute('DROP TABLE IF EXISTS attachments');
@@ -234,7 +238,7 @@ class FluxNewsState extends ChangeNotifier {
                      RENAME COLUMN "categorieID" TO "categoryID";''',
           );
         } else if (oldVersion == 2) {
-          logThis('upgradeDB', 'Upgrading DB from version 2', Level.info);
+          logThis('upgradeDB', 'Upgrading DB from version 2', Level.info, this);
 
           await db.execute(
             '''ALTER TABLE "categories" 
@@ -245,7 +249,7 @@ class FluxNewsState extends ChangeNotifier {
                      RENAME COLUMN "categorieID" TO "categoryID";''',
           );
         }
-        logThis('upgradeDB', 'Finished upgrading DB', Level.info);
+        logThis('upgradeDB', 'Finished upgrading DB', Level.info, this);
       },
       version: 3,
     );
@@ -253,18 +257,32 @@ class FluxNewsState extends ChangeNotifier {
 
   // read the persistent saved configuration
   Future<bool> readConfigValues() async {
-    logThis('readConfigValues', 'Starting read config values', Level.info);
-
+    logThis(
+        'readConfigValues', 'Starting read config values', Level.info, this);
+    final directory = await getApplicationDocumentsDirectory();
+    loggingFilePath = directory.path;
+    DateTime yesterday = DateTime.now().subtract(const Duration(days: 1));
+    List<FileSystemEntity> files = Directory(loggingFilePath).listSync();
+    for (FileSystemEntity file in files) {
+      if (file.path.endsWith('.log')) {
+        FileStat stat = file.statSync();
+        if (stat.changed.isBefore(yesterday)) {
+          file.deleteSync();
+        }
+        //file.deleteSync();
+      }
+    }
     storageValues = await storage.readAll();
 
-    logThis('readConfigValues', 'Finished read config values', Level.info);
+    logThis(
+        'readConfigValues', 'Finished read config values', Level.info, this);
 
     return true;
   }
 
   // init the persistent saved configuration
   bool readConfig(BuildContext context) {
-    logThis('readConfig', 'Starting read config', Level.info);
+    logThis('readConfig', 'Starting read config', Level.info, this);
 
     // init the maps for the brightness mode list
     // this maps use the key as the technical string and the value as the display name
@@ -331,7 +349,7 @@ class FluxNewsState extends ChangeNotifier {
       if (key == FluxNewsState.secureStorageSortOrderKey) {
         if (value != '') {
           sortOrder = value;
-          logThis("module", "Value: $value", Level.info);
+          logThis("module", "Value: $value", Level.info, this);
         }
       }
 
@@ -419,7 +437,7 @@ class FluxNewsState extends ChangeNotifier {
         }
       }
     });
-    logThis('readConfig', 'Finished read config', Level.info);
+    logThis('readConfig', 'Finished read config', Level.info, this);
 
     // return true if everything was read
     return true;
@@ -437,7 +455,7 @@ class FluxNewsState extends ChangeNotifier {
         if (selectedNavigation == v) {
           itemNumber = k;
         }
-        //logThis("module", "value: $k Iterated Navigation: $v", Level.info);
+        //logThis("module", "value: $k Iterated Navigation: $v", Level.info, this);
       });
     }
 
@@ -450,7 +468,7 @@ class FluxNewsState extends ChangeNotifier {
       if (index == k) {
         routeString = v;
       }
-      //logThis("module", "value: $k Iterated Navigation: $v", Level.info);
+      //logThis("module", "value: $k Iterated Navigation: $v", Level.info, this);
     });
 
     return routeString;

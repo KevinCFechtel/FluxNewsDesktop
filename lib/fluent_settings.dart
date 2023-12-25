@@ -1,5 +1,7 @@
 import 'dart:io';
 
+import 'package:archive/archive_io.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flux_news_desktop/database_backend.dart';
 import 'package:flux_news_desktop/fluent_theme.dart';
@@ -494,9 +496,25 @@ class FluentSettings extends StatelessWidget {
                         AppLocalizations.of(context)!.exportLogs,
                         //style: Theme.of(context).textTheme.titleMedium,
                       ),
-                      onPressed: () {
-                        if (Platform.isAndroid || Platform.isIOS) {
-                          //FlutterLogs.exportLogs(exportType: ExportType.ALL);
+                      onPressed: () async {
+                        String? outputFile = await FilePicker.platform.saveFile(
+                          dialogTitle:
+                              'Please select the destination for the exported logs:',
+                          fileName: 'FluxNewsLogs.zip',
+                        );
+
+                        if (outputFile != null) {
+                          var encoder = ZipFileEncoder();
+
+                          encoder.create(outputFile);
+                          List<FileSystemEntity> files =
+                              Directory(appState.loggingFilePath).listSync();
+                          for (FileSystemEntity file in files) {
+                            if (file.path.endsWith('.log')) {
+                              encoder.addFile(File(file.path));
+                            }
+                          }
+                          encoder.close();
                         }
                       },
                     ),

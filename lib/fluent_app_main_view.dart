@@ -75,7 +75,7 @@ class FluentNavigationMainView extends StatelessWidget {
           }
         } catch (e) {
           logThis('initConfig', 'Caught an error in initConfig function!',
-              Level.error);
+              Level.error, appState);
 
           if (context.mounted) {
             if (appState.errorString !=
