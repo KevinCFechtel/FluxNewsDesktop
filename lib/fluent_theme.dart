@@ -57,31 +57,50 @@ class FluentAppTheme extends ChangeNotifier {
 
   TextStyle _unreadTextLight = TextStyle(color: Colors.grey[140]);
   TextStyle _unreadTextDark = TextStyle(color: Colors.grey[20]);
-  TextStyle get unreadText =>
-      WidgetsBinding.instance.platformDispatcher.platformBrightness ==
+  TextStyle get unreadText => mode == ThemeMode.system
+      ? WidgetsBinding.instance.platformDispatcher.platformBrightness ==
               Brightness.light
+          ? _unreadTextLight
+          : _unreadTextDark
+      : mode == ThemeMode.light
           ? _unreadTextLight
           : _unreadTextDark;
   set unreadText(TextStyle textStyle) {
-    if (WidgetsBinding.instance.platformDispatcher.platformBrightness ==
-        Brightness.light) {
+    if (mode == ThemeMode.system) {
+      if (WidgetsBinding.instance.platformDispatcher.platformBrightness ==
+          Brightness.light) {
+        _unreadTextLight = textStyle;
+      } else {
+        _unreadTextDark = textStyle;
+      }
+    } else if (mode == ThemeMode.light) {
       _unreadTextLight = textStyle;
     } else {
       _unreadTextDark = textStyle;
     }
+
     notifyListeners();
   }
 
   TextStyle _readTextLight = TextStyle(color: Colors.grey[70]);
-  TextStyle _readTextDark = TextStyle(color: Colors.grey[100]);
-  TextStyle get readText =>
-      WidgetsBinding.instance.platformDispatcher.platformBrightness ==
+  TextStyle _readTextDark = TextStyle(color: Colors.grey[120]);
+  TextStyle get readText => mode == ThemeMode.system
+      ? WidgetsBinding.instance.platformDispatcher.platformBrightness ==
               Brightness.light
+          ? _readTextLight
+          : _readTextDark
+      : mode == ThemeMode.light
           ? _readTextLight
           : _readTextDark;
   set readText(TextStyle textStyle) {
-    if (WidgetsBinding.instance.platformDispatcher.platformBrightness ==
-        Brightness.light) {
+    if (mode == ThemeMode.system) {
+      if (WidgetsBinding.instance.platformDispatcher.platformBrightness ==
+          Brightness.light) {
+        _readTextLight = textStyle;
+      } else {
+        _readTextDark = textStyle;
+      }
+    } else if (mode == ThemeMode.light) {
       _readTextLight = textStyle;
     } else {
       _readTextDark = textStyle;

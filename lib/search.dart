@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flux_news_desktop/fluent_theme.dart';
 import 'package:flux_news_desktop/logging.dart';
 import 'package:flux_news_desktop/search_news_list.dart';
 import 'package:logger/logger.dart';
@@ -16,9 +17,10 @@ class Search extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     FluxNewsState appState = context.watch<FluxNewsState>();
+    FluentAppTheme appTheme = context.watch<FluentAppTheme>();
 
     return FluxNewsSearchStatefulWrapper(onInit: () {
-      initConfig(context, appState);
+      initConfig(context, appState, appTheme);
     }, child: OrientationBuilder(builder: (context, orientation) {
       appState.orientation = orientation;
       return searchLayout(context, appState);
@@ -28,10 +30,19 @@ class Search extends StatelessWidget {
   // initConfig reads the config values from the persistent storage and sets the state
   // accordingly.
   // It also initializes the database connection.
-  Future<void> initConfig(BuildContext context, FluxNewsState appState) async {
+  Future<void> initConfig(BuildContext context, FluxNewsState appState,
+      FluentAppTheme appTheme) async {
     await appState.readConfigValues();
     if (context.mounted) {
       appState.readConfig(context);
+      if (appState.brightnessMode == FluxNewsState.brightnessModeDarkString) {
+        appTheme.mode = ThemeMode.dark;
+      } else if (appState.brightnessMode ==
+          FluxNewsState.brightnessModeLightString) {
+        appTheme.mode = ThemeMode.light;
+      } else {
+        appTheme.mode = ThemeMode.system;
+      }
     }
   }
 

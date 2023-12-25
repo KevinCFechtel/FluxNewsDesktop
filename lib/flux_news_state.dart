@@ -14,9 +14,19 @@ import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 import 'news_model.dart';
 
+const sec_store.MacOsOptions flutterSecureStorageMacOSOptions =
+    sec_store.MacOsOptions(
+  accessibility: sec_store.KeychainAccessibility.unlocked_this_device,
+  groupId: null,
+  // Note: This needs to be true in order for macOS to only write to the Local Items (or Cloud Items) keychain.
+  synchronizable: true,
+);
+
 class FluxNewsState extends ChangeNotifier {
   // init the persistent flutter secure storage
-  final storage = const sec_store.FlutterSecureStorage();
+
+  final storage = const sec_store.FlutterSecureStorage(
+      mOptions: flutterSecureStorageMacOSOptions);
 
   // define static const variables to replace text within code
   static const String applicationName = 'Flux News';
@@ -321,6 +331,7 @@ class FluxNewsState extends ChangeNotifier {
       if (key == FluxNewsState.secureStorageSortOrderKey) {
         if (value != '') {
           sortOrder = value;
+          logThis("module", "Value: $value", Level.info);
         }
       }
 

@@ -1,6 +1,7 @@
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flux_news_desktop/database_backend.dart';
 import 'package:flux_news_desktop/fluent_main_news_list.dart';
+import 'package:flux_news_desktop/fluent_theme.dart';
 import 'package:flux_news_desktop/flux_news_counter_state.dart';
 import 'package:flux_news_desktop/flux_news_state.dart';
 import 'package:flux_news_desktop/logging.dart';
@@ -22,9 +23,10 @@ class FluentNavigationMainView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     FluxNewsState appState = context.watch<FluxNewsState>();
+    FluentAppTheme appTheme = context.watch<FluentAppTheme>();
     return FluxNewsBodyStatefulWrapper(
       onInit: () {
-        initConfig(context, appState);
+        initConfig(context, appState, appTheme);
         appState.categoryList = queryCategoriesFromDB(appState, context);
         appState.newsList = Future<List<News>>.value([]);
       },
@@ -33,7 +35,8 @@ class FluentNavigationMainView extends StatelessWidget {
   }
 
   // helper function for the initState() to use async function on init
-  Future<void> initConfig(BuildContext context, FluxNewsState appState) async {
+  Future<void> initConfig(BuildContext context, FluxNewsState appState,
+      FluentAppTheme appTheme) async {
     // read persistent saved config
     bool completed = await appState.readConfigValues();
 
@@ -46,6 +49,15 @@ class FluentNavigationMainView extends StatelessWidget {
         appState.appBarText = AppLocalizations.of(context)!.allNews;
         // read the saved config
         appState.readConfig(context);
+
+        if (appState.brightnessMode == FluxNewsState.brightnessModeDarkString) {
+          appTheme.mode = ThemeMode.dark;
+        } else if (appState.brightnessMode ==
+            FluxNewsState.brightnessModeLightString) {
+          appTheme.mode = ThemeMode.light;
+        } else {
+          appTheme.mode = ThemeMode.system;
+        }
       }
 
       if (appState.syncOnStart) {
@@ -157,7 +169,7 @@ class FluentCategorieNavigationMainView extends StatelessWidget {
           NavigationView navPane = NavigationView(
             appBar: const NavigationAppBar(
               leading: Icon(FontAwesomeIcons.bookOpen),
-              title: Text(FluxNewsState.applicationName),
+              title: AppBarTitle(),
               actions: AppBarButtons(),
             ),
             transitionBuilder: (child, animation) {
@@ -257,7 +269,7 @@ class FluentCategorieNavigationMainView extends StatelessWidget {
                     navPane = NavigationView(
                       appBar: const NavigationAppBar(
                         leading: Icon(FontAwesomeIcons.bookOpen),
-                        title: Text(FluxNewsState.applicationName),
+                        title: AppBarTitle(),
                         actions: AppBarButtons(),
                       ),
                       transitionBuilder: (child, animation) {
@@ -441,18 +453,17 @@ class AppBarButtons extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
         IconButton(
+          iconButtonMode: IconButtonMode.large,
           onPressed: () async {
             await syncNews(appState, context);
           },
           icon: appState.syncProcess
               ? const SizedBox(
-                  height: 15.0,
-                  width: 15.0,
+                  height: 20.0,
+                  width: 20.0,
                   child: ProgressRing(),
                 )
-              : const Icon(
-                  FluentIcons.refresh,
-                ),
+              : const Icon(FluentIcons.refresh, size: 20.0),
         ),
         IconButton(
           onPressed: () async {
@@ -514,8 +525,8 @@ class AppBarButtons extends StatelessWidget {
             }
           },
           icon: appState.newsStatus == FluxNewsState.unreadNewsStatus
-              ? const Icon(FluentIcons.read)
-              : const Icon(FluentIcons.accept),
+              ? const Icon(FluentIcons.read, size: 20.0)
+              : const Icon(FluentIcons.accept, size: 20.0),
         ),
         IconButton(
           onPressed: () async {
@@ -527,7 +538,7 @@ class AppBarButtons extends StatelessWidget {
               appState.sortOrder = FluxNewsState.sortOrderOldestFirstString;
 
               // save the state persistent
-              appState.storage.write(
+              await appState.storage.write(
                   key: FluxNewsState.secureStorageSortOrderKey,
                   value: FluxNewsState.sortOrderOldestFirstString);
 
@@ -554,7 +565,7 @@ class AppBarButtons extends StatelessWidget {
               appState.sortOrder = FluxNewsState.sortOrderNewestFirstString;
 
               // save the state persistent
-              appState.storage.write(
+              await appState.storage.write(
                   key: FluxNewsState.secureStorageSortOrderKey,
                   value: FluxNewsState.sortOrderNewestFirstString);
 
@@ -578,11 +589,46 @@ class AppBarButtons extends StatelessWidget {
             }
           },
           icon: appState.sortOrder == FluxNewsState.sortOrderNewestFirstString
-              ? const Icon(FluentIcons.sort_lines_ascending)
-              : const Icon(FluentIcons.sort_lines),
+              ? const Icon(FluentIcons.sort_lines_ascending, size: 20.0)
+              : const Icon(FluentIcons.sort_lines, size: 20.0),
         )
       ],
     );
+  }
+}
+
+class AppBarTitle extends StatelessWidget {
+  const AppBarTitle({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    FluxNewsCounterState appCounterState =
+        context.watch<FluxNewsCounterState>();
+    FluxNewsState appState = context.watch<FluxNewsState>();
+
+    // set the app bar title depending on the chosen category to show in list view
+
+    if (appState.multilineAppBarText) {
+      // this is the part where the news count is added as an extra line to the app bar title
+      return Builder(builder: (BuildContext context) {
+        return Text(
+            "${appState.appBarText} - ${AppLocalizations.of(context)!.itemCount}: ${appCounterState.appBarNewsCount}",
+            style: const TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.normal,
+            ));
+      });
+    } else {
+      // this is the part without the news count as an extra line
+      return Text(appState.appBarText,
+          textAlign: TextAlign.start,
+          style: const TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.normal,
+          ));
+    }
   }
 }
 
