@@ -43,474 +43,484 @@ class FluentSettings extends StatelessWidget {
           initConfig(context, appTheme);
         },
         child: ScaffoldPage(
+            padding: EdgeInsets.zero,
             content: SingleChildScrollView(
-          child: Container(
-            padding: const EdgeInsets.all(12),
-            alignment: Alignment.center,
-            // this is the main column of the settings page
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // the first row contains the headline of the settings for the miniflux server
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
+              child: Container(
+                padding: const EdgeInsets.all(12),
+                alignment: Alignment.center,
+                // this is the main column of the settings page
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(AppLocalizations.of(context)!.minifluxSettings,
-                        style: const TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.normal,
-                        )),
-                  ],
-                ),
-                // this list tile contains the url of the miniflux server
-                // it is clickable and opens a dialog to edit the url
-                ListTile(
-                  leading: const Icon(
-                    FluentIcons.link,
-                  ),
-                  title: Text(
-                    '${AppLocalizations.of(context)!.apiUrl}: ${appState.minifluxURL ?? ''}',
-                    //style: Theme.of(context).textTheme.titleMedium,
-                  ),
-                  onPressed: () {
-                    _showURLEditDialog(context, appState);
-                  },
-                ),
-                const Divider(),
-                // this list tile contains the api key of the miniflux server
-                // it is clickable and opens a dialog to edit the api key
-                ListTile(
-                  leading: const Icon(
-                    FluentIcons.return_key,
-                  ),
-                  title: Text(
-                    '${AppLocalizations.of(context)!.apiKey}: ${appState.minifluxAPIKey ?? ''}',
-                    //style: Theme.of(context).textTheme.titleMedium,
-                  ),
-                  onPressed: () {
-                    _showApiKeyEditDialog(context, appState);
-                  },
-                ),
-                const Divider(),
-                ListTile(
-                  leading: const Icon(
-                    FluentIcons.number_symbol,
-                  ),
-                  title: Text(
-                    '${AppLocalizations.of(context)!.minifluxVersion}: ${appState.minifluxVersionString ?? ''}',
-                    //style: Theme.of(context).textTheme.titleMedium,
-                  ),
-                  onPressed: () {
-                    _showURLEditDialog(context, appState);
-                  },
-                ),
-                // it there is an error on the authentication of the miniflux server
-                // there is shown a error message
-                appState.errorOnMinifluxAuth
-                    ? appState.minifluxAPIKey != null
-                        ? Padding(
-                            padding: const EdgeInsets.only(top: 10, bottom: 10),
-                            child: Text(
-                              AppLocalizations.of(context)!.authError,
-                              style: TextStyle(
-                                  color: Colors.red,
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold),
+                    // the first row contains the headline of the settings for the miniflux server
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Text(AppLocalizations.of(context)!.minifluxSettings,
+                            style: const TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.normal,
+                            )),
+                      ],
+                    ),
+                    // this list tile contains the url of the miniflux server
+                    // it is clickable and opens a dialog to edit the url
+                    ListTile(
+                      leading: const Icon(
+                        FluentIcons.link,
+                      ),
+                      title: Text(
+                        '${AppLocalizations.of(context)!.apiUrl}: ${appState.minifluxURL ?? ''}',
+                        //style: Theme.of(context).textTheme.titleMedium,
+                      ),
+                      onPressed: () {
+                        _showURLEditDialog(context, appState);
+                      },
+                    ),
+                    const Divider(),
+                    // this list tile contains the api key of the miniflux server
+                    // it is clickable and opens a dialog to edit the api key
+                    ListTile(
+                      leading: const Icon(
+                        FluentIcons.return_key,
+                      ),
+                      title: Text(
+                        '${AppLocalizations.of(context)!.apiKey}: ${appState.minifluxAPIKey ?? ''}',
+                        //style: Theme.of(context).textTheme.titleMedium,
+                      ),
+                      onPressed: () {
+                        _showApiKeyEditDialog(context, appState);
+                      },
+                    ),
+                    const Divider(),
+                    ListTile(
+                      leading: const Icon(
+                        FluentIcons.number_symbol,
+                      ),
+                      title: Text(
+                        '${AppLocalizations.of(context)!.minifluxVersion}: ${appState.minifluxVersionString ?? ''}',
+                        //style: Theme.of(context).textTheme.titleMedium,
+                      ),
+                      onPressed: () {
+                        _showURLEditDialog(context, appState);
+                      },
+                    ),
+                    // it there is an error on the authentication of the miniflux server
+                    // there is shown a error message
+                    appState.errorOnMinifluxAuth
+                        ? appState.minifluxAPIKey != null
+                            ? Padding(
+                                padding:
+                                    const EdgeInsets.only(top: 10, bottom: 10),
+                                child: Text(
+                                  AppLocalizations.of(context)!.authError,
+                                  style: TextStyle(
+                                      color: Colors.red,
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                              )
+                            : const SizedBox.shrink()
+                        : const SizedBox.shrink(),
+                    // this headline indicate the general settings section
+                    Padding(
+                      padding: const EdgeInsets.only(top: 50.0, bottom: 12),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          Text(AppLocalizations.of(context)!.generalSettings,
+                              style: const TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.normal,
+                              )),
+                        ],
+                      ),
+                    ),
+                    // this row contains the selection of brightness mode
+                    // there are the choices of light, dark and system
+                    Padding(
+                      padding: const EdgeInsets.only(top: 10.0, bottom: 10),
+                      child: Row(
+                        children: [
+                          const Padding(
+                            padding: EdgeInsets.only(left: 17.0),
+                            child: Icon(
+                              FluentIcons.light,
                             ),
-                          )
-                        : const SizedBox.shrink()
-                    : const SizedBox.shrink(),
-                // this headline indicate the general settings section
-                Padding(
-                  padding: const EdgeInsets.only(top: 50.0, bottom: 12),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      Text(AppLocalizations.of(context)!.generalSettings,
-                          style: const TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.normal,
-                          )),
-                    ],
-                  ),
-                ),
-                // this row contains the selection of brightness mode
-                // there are the choices of light, dark and system
-                Padding(
-                  padding: const EdgeInsets.only(top: 10.0, bottom: 10),
-                  child: Row(
-                    children: [
-                      const Padding(
-                        padding: EdgeInsets.only(left: 17.0),
-                        child: Icon(
-                          FluentIcons.light,
-                        ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(left: 12.0),
+                            child: Text(
+                              AppLocalizations.of(context)!.brightnesMode,
+                              style: const TextStyle(fontSize: 16),
+                            ),
+                          ),
+                          const Spacer(),
+                          ComboBox<KeyValueRecordType>(
+                            value: appState.brightnessModeSelection,
+                            items: appState.recordTypesBrightnessMode!
+                                .map<ComboBoxItem<KeyValueRecordType>>(
+                                    (recordType) =>
+                                        ComboBoxItem<KeyValueRecordType>(
+                                            value: recordType,
+                                            child: Text(recordType.value)))
+                                .toList(),
+                            onChanged: (value) {
+                              if (value != null) {
+                                if (value.key ==
+                                    FluxNewsState.brightnessModeDarkString) {
+                                  appTheme.mode = ThemeMode.dark;
+                                } else if (value.key ==
+                                    FluxNewsState.brightnessModeLightString) {
+                                  appTheme.mode = ThemeMode.light;
+                                } else {
+                                  appTheme.mode = ThemeMode.system;
+                                }
+                                appState.brightnessMode = value.key;
+                                appState.brightnessModeSelection = value;
+                                appState.storage.write(
+                                    key: FluxNewsState
+                                        .secureStorageBrightnessModeKey,
+                                    value: value.key);
+                                appState.refreshView();
+                              }
+                            },
+                          ),
+                        ],
                       ),
-                      Padding(
-                        padding: const EdgeInsets.only(left: 12.0),
-                        child: Text(
-                          AppLocalizations.of(context)!.brightnesMode,
-                          style: const TextStyle(fontSize: 16),
-                        ),
+                    ),
+                    const Divider(),
+                    // this row contains the selection of the mark as read on scroll over
+                    // if it is turned on, a news is marked as read if it is scrolled over
+                    Padding(
+                      padding: const EdgeInsets.only(top: 10.0, bottom: 10),
+                      child: Row(
+                        children: [
+                          const Padding(
+                            padding: EdgeInsets.only(
+                              left: 17.0,
+                            ),
+                            child: Icon(
+                              FluentIcons.accept,
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(left: 12.0),
+                            child: Text(
+                              AppLocalizations.of(context)!
+                                  .markAsReadOnScrollover,
+                              style: const TextStyle(fontSize: 16),
+                            ),
+                          ),
+                          const Spacer(),
+                          ToggleSwitch(
+                            checked: appState.markAsReadOnScrollOver,
+                            onChanged: (bool value) {
+                              String stringValue =
+                                  FluxNewsState.secureStorageFalseString;
+                              if (value == true) {
+                                stringValue =
+                                    FluxNewsState.secureStorageTrueString;
+                              }
+                              appState.markAsReadOnScrollOver = value;
+                              appState.storage.write(
+                                  key: FluxNewsState
+                                      .secureStorageMarkAsReadOnScrollOverKey,
+                                  value: stringValue);
+                              appState.refreshView();
+                            },
+                          ),
+                        ],
                       ),
-                      const Spacer(),
-                      ComboBox<KeyValueRecordType>(
-                        value: appState.brightnessModeSelection,
-                        items: appState.recordTypesBrightnessMode!
-                            .map<ComboBoxItem<KeyValueRecordType>>(
-                                (recordType) =>
-                                    ComboBoxItem<KeyValueRecordType>(
-                                        value: recordType,
-                                        child: Text(recordType.value)))
-                            .toList(),
-                        onChanged: (value) {
-                          if (value != null) {
-                            if (value.key ==
-                                FluxNewsState.brightnessModeDarkString) {
-                              appTheme.mode = ThemeMode.dark;
-                            } else if (value.key ==
-                                FluxNewsState.brightnessModeLightString) {
-                              appTheme.mode = ThemeMode.light;
-                            } else {
-                              appTheme.mode = ThemeMode.system;
-                            }
-                            appState.brightnessMode = value.key;
-                            appState.brightnessModeSelection = value;
-                            appState.storage.write(
-                                key: FluxNewsState
-                                    .secureStorageBrightnessModeKey,
-                                value: value.key);
-                            appState.refreshView();
-                          }
-                        },
+                    ),
+                    const Divider(),
+                    // this row contains the selection of the sync on start
+                    Padding(
+                      padding: const EdgeInsets.only(top: 10.0, bottom: 10),
+                      child: Row(
+                        children: [
+                          const Padding(
+                            padding: EdgeInsets.only(left: 17.0),
+                            child: Icon(
+                              FluentIcons.refresh,
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(left: 12.0),
+                            child: Text(
+                              AppLocalizations.of(context)!.syncOnStart,
+                              style: const TextStyle(fontSize: 16),
+                            ),
+                          ),
+                          const Spacer(),
+                          ToggleSwitch(
+                            checked: appState.syncOnStart,
+                            onChanged: (bool value) {
+                              String stringValue =
+                                  FluxNewsState.secureStorageFalseString;
+                              if (value == true) {
+                                stringValue =
+                                    FluxNewsState.secureStorageTrueString;
+                              }
+                              appState.syncOnStart = value;
+                              appState.storage.write(
+                                  key:
+                                      FluxNewsState.secureStorageSyncOnStartKey,
+                                  value: stringValue);
+                              appState.refreshView();
+                            },
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
-                ),
-                const Divider(),
-                // this row contains the selection of the mark as read on scroll over
-                // if it is turned on, a news is marked as read if it is scrolled over
-                Padding(
-                  padding: const EdgeInsets.only(top: 10.0, bottom: 10),
-                  child: Row(
-                    children: [
-                      const Padding(
-                        padding: EdgeInsets.only(
-                          left: 17.0,
-                        ),
-                        child: Icon(
-                          FluentIcons.accept,
-                        ),
+                    ),
+                    const Divider(),
+                    // this row contains the selection if the app bar text is multiline
+                    // is turned on, the app bar text is showing the news count in the second line
+                    Padding(
+                      padding: const EdgeInsets.only(top: 10.0, bottom: 10),
+                      child: Row(
+                        children: [
+                          const Padding(
+                            padding: EdgeInsets.only(left: 17.0),
+                            child: Icon(
+                              FluentIcons.number,
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(left: 12.0),
+                            child: Text(
+                              AppLocalizations.of(context)!
+                                  .multilineAppBarTextSetting,
+                              style: const TextStyle(fontSize: 16),
+                            ),
+                          ),
+                          const Spacer(),
+                          ToggleSwitch(
+                            checked: appState.multilineAppBarText,
+                            onChanged: (bool value) {
+                              String stringValue =
+                                  FluxNewsState.secureStorageFalseString;
+                              if (value == true) {
+                                stringValue =
+                                    FluxNewsState.secureStorageTrueString;
+                              }
+                              appState.multilineAppBarText = value;
+                              appState.storage.write(
+                                  key: FluxNewsState
+                                      .secureStorageMultilineAppBarTextKey,
+                                  value: stringValue);
+                              appState.refreshView();
+                            },
+                          ),
+                        ],
                       ),
-                      Padding(
-                        padding: const EdgeInsets.only(left: 12.0),
-                        child: Text(
-                          AppLocalizations.of(context)!.markAsReadOnScrollover,
-                          style: const TextStyle(fontSize: 16),
-                        ),
+                    ),
+                    const Divider(),
+                    // this row contains the selection if the feed icon is shown
+                    Padding(
+                      padding: const EdgeInsets.only(top: 10.0, bottom: 10),
+                      child: Row(
+                        children: [
+                          const Padding(
+                            padding: EdgeInsets.only(left: 17.0),
+                            child: Icon(
+                              FluentIcons.image_crosshair,
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(left: 12.0),
+                            child: Text(
+                              AppLocalizations.of(context)!
+                                  .showFeedIconsTextSettings,
+                              style: const TextStyle(fontSize: 16),
+                            ),
+                          ),
+                          const Spacer(),
+                          ToggleSwitch(
+                            checked: appState.showFeedIcons,
+                            onChanged: (bool value) {
+                              String stringValue =
+                                  FluxNewsState.secureStorageFalseString;
+                              if (value == true) {
+                                stringValue =
+                                    FluxNewsState.secureStorageTrueString;
+                              }
+                              appState.showFeedIcons = value;
+                              appState.storage.write(
+                                  key: FluxNewsState
+                                      .secureStorageShowFeedIconsTextKey,
+                                  value: stringValue);
+                              appState.refreshView();
+                            },
+                          ),
+                        ],
                       ),
-                      const Spacer(),
-                      ToggleSwitch(
-                        checked: appState.markAsReadOnScrollOver,
-                        onChanged: (bool value) {
-                          String stringValue =
-                              FluxNewsState.secureStorageFalseString;
-                          if (value == true) {
-                            stringValue = FluxNewsState.secureStorageTrueString;
-                          }
-                          appState.markAsReadOnScrollOver = value;
-                          appState.storage.write(
-                              key: FluxNewsState
-                                  .secureStorageMarkAsReadOnScrollOverKey,
-                              value: stringValue);
-                          appState.refreshView();
-                        },
+                    ),
+                    const Divider(),
+                    // this row contains the selection of the amount of saved news
+                    // if the news exceeds the amount, the oldest news were deleted
+                    Padding(
+                      padding: const EdgeInsets.only(top: 10.0, bottom: 10),
+                      child: Row(
+                        children: [
+                          const Padding(
+                            padding: EdgeInsets.only(left: 17.0),
+                            child: Icon(
+                              FluentIcons.save,
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(left: 12.0),
+                            child: Text(
+                              AppLocalizations.of(context)!.amountSaved,
+                              style: const TextStyle(fontSize: 16),
+                            ),
+                          ),
+                          const Spacer(),
+                          ComboBox<int>(
+                            value: appState.amountOfSavedNews,
+                            items: amountOfSavedNewsList
+                                .map<ComboBoxItem<int>>((int value) {
+                              return ComboBoxItem<int>(
+                                value: value,
+                                child: Text(value.toString()),
+                              );
+                            }).toList(),
+                            onChanged: (value) {
+                              if (value != null) {
+                                appState.amountOfSavedNews = value;
+                                appState.storage.write(
+                                    key: FluxNewsState
+                                        .secureStorageAmountOfSavedNewsKey,
+                                    value: value.toString());
+                                appState.refreshView();
+                              }
+                            },
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
-                ),
-                const Divider(),
-                // this row contains the selection of the sync on start
-                Padding(
-                  padding: const EdgeInsets.only(top: 10.0, bottom: 10),
-                  child: Row(
-                    children: [
-                      const Padding(
-                        padding: EdgeInsets.only(left: 17.0),
-                        child: Icon(
-                          FluentIcons.refresh,
-                        ),
+                    ),
+                    const Divider(),
+                    // this row contains the selection of the amount of saved starred news
+                    // if the news exceeds the amount, the oldest news were deleted
+                    Padding(
+                      padding: const EdgeInsets.only(top: 10.0, bottom: 10),
+                      child: Row(
+                        children: [
+                          const Padding(
+                            padding: EdgeInsets.only(left: 17.0),
+                            child: Icon(
+                              FluentIcons.starburst,
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(left: 12.0),
+                            child: Text(
+                              AppLocalizations.of(context)!.amountSavedStarred,
+                              style: const TextStyle(fontSize: 16),
+                            ),
+                          ),
+                          const Spacer(),
+                          ComboBox<int>(
+                            value: appState.amountOfSavedStarredNews,
+                            items: amountOfSavedStarredNewsList
+                                .map<ComboBoxItem<int>>((int value) {
+                              return ComboBoxItem<int>(
+                                value: value,
+                                child: Text(value.toString()),
+                              );
+                            }).toList(),
+                            onChanged: (value) {
+                              if (value != null) {
+                                appState.amountOfSavedStarredNews = value;
+                                appState.storage.write(
+                                    key: FluxNewsState
+                                        .secureStorageAmountOfSavedStarredNewsKey,
+                                    value: value.toString());
+                                appState.refreshView();
+                              }
+                            },
+                          ),
+                        ],
                       ),
-                      Padding(
-                        padding: const EdgeInsets.only(left: 12.0),
-                        child: Text(
-                          AppLocalizations.of(context)!.syncOnStart,
-                          style: const TextStyle(fontSize: 16),
-                        ),
+                    ),
+                    const Divider(),
+                    // this row contains the selection if the debug mode is turned on
+                    Padding(
+                      padding: const EdgeInsets.only(top: 10.0, bottom: 10),
+                      child: Row(
+                        children: [
+                          const Padding(
+                            padding: EdgeInsets.only(left: 17.0),
+                            child: Icon(
+                              FluentIcons.developer_tools,
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(left: 12.0),
+                            child: Text(
+                              AppLocalizations.of(context)!
+                                  .debugModeTextSettings,
+                              style: const TextStyle(fontSize: 16),
+                            ),
+                          ),
+                          const Spacer(),
+                          ToggleSwitch(
+                            checked: appState.debugMode,
+                            onChanged: (bool value) {
+                              String stringValue =
+                                  FluxNewsState.secureStorageFalseString;
+                              if (value == true) {
+                                stringValue =
+                                    FluxNewsState.secureStorageTrueString;
+                              }
+                              appState.debugMode = value;
+                              appState.storage.write(
+                                  key: FluxNewsState.secureStorageDebugModeKey,
+                                  value: stringValue);
+                              appState.refreshView();
+                            },
+                          ),
+                        ],
                       ),
-                      const Spacer(),
-                      ToggleSwitch(
-                        checked: appState.syncOnStart,
-                        onChanged: (bool value) {
-                          String stringValue =
-                              FluxNewsState.secureStorageFalseString;
-                          if (value == true) {
-                            stringValue = FluxNewsState.secureStorageTrueString;
-                          }
-                          appState.syncOnStart = value;
-                          appState.storage.write(
-                              key: FluxNewsState.secureStorageSyncOnStartKey,
-                              value: stringValue);
-                          appState.refreshView();
-                        },
+                    ),
+                    const Divider(),
+                    // this list tile contains the ability to export the collected logs
+                    ListTile(
+                      leading: const Icon(
+                        FluentIcons.import,
                       ),
-                    ],
-                  ),
-                ),
-                const Divider(),
-                // this row contains the selection if the app bar text is multiline
-                // is turned on, the app bar text is showing the news count in the second line
-                Padding(
-                  padding: const EdgeInsets.only(top: 10.0, bottom: 10),
-                  child: Row(
-                    children: [
-                      const Padding(
-                        padding: EdgeInsets.only(left: 17.0),
-                        child: Icon(
-                          FluentIcons.number,
-                        ),
+                      title: Text(
+                        AppLocalizations.of(context)!.exportLogs,
+                        //style: Theme.of(context).textTheme.titleMedium,
                       ),
-                      Padding(
-                        padding: const EdgeInsets.only(left: 12.0),
-                        child: Text(
-                          AppLocalizations.of(context)!
-                              .multilineAppBarTextSetting,
-                          style: const TextStyle(fontSize: 16),
-                        ),
+                      onPressed: () {
+                        if (Platform.isAndroid || Platform.isIOS) {
+                          //FlutterLogs.exportLogs(exportType: ExportType.ALL);
+                        }
+                      },
+                    ),
+                    const Divider(),
+                    // this list tile delete the local news database
+                    ListTile(
+                      leading: Icon(
+                        FluentIcons.delete,
+                        color: Colors.red,
                       ),
-                      const Spacer(),
-                      ToggleSwitch(
-                        checked: appState.multilineAppBarText,
-                        onChanged: (bool value) {
-                          String stringValue =
-                              FluxNewsState.secureStorageFalseString;
-                          if (value == true) {
-                            stringValue = FluxNewsState.secureStorageTrueString;
-                          }
-                          appState.multilineAppBarText = value;
-                          appState.storage.write(
-                              key: FluxNewsState
-                                  .secureStorageMultilineAppBarTextKey,
-                              value: stringValue);
-                          appState.refreshView();
-                        },
-                      ),
-                    ],
-                  ),
-                ),
-                const Divider(),
-                // this row contains the selection if the feed icon is shown
-                Padding(
-                  padding: const EdgeInsets.only(top: 10.0, bottom: 10),
-                  child: Row(
-                    children: [
-                      const Padding(
-                        padding: EdgeInsets.only(left: 17.0),
-                        child: Icon(
-                          FluentIcons.image_crosshair,
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.only(left: 12.0),
-                        child: Text(
-                          AppLocalizations.of(context)!
-                              .showFeedIconsTextSettings,
-                          style: const TextStyle(fontSize: 16),
-                        ),
-                      ),
-                      const Spacer(),
-                      ToggleSwitch(
-                        checked: appState.showFeedIcons,
-                        onChanged: (bool value) {
-                          String stringValue =
-                              FluxNewsState.secureStorageFalseString;
-                          if (value == true) {
-                            stringValue = FluxNewsState.secureStorageTrueString;
-                          }
-                          appState.showFeedIcons = value;
-                          appState.storage.write(
-                              key: FluxNewsState
-                                  .secureStorageShowFeedIconsTextKey,
-                              value: stringValue);
-                          appState.refreshView();
-                        },
-                      ),
-                    ],
-                  ),
-                ),
-                const Divider(),
-                // this row contains the selection of the amount of saved news
-                // if the news exceeds the amount, the oldest news were deleted
-                Padding(
-                  padding: const EdgeInsets.only(top: 10.0, bottom: 10),
-                  child: Row(
-                    children: [
-                      const Padding(
-                        padding: EdgeInsets.only(left: 17.0),
-                        child: Icon(
-                          FluentIcons.save,
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.only(left: 12.0),
-                        child: Text(
-                          AppLocalizations.of(context)!.amountSaved,
-                          style: const TextStyle(fontSize: 16),
-                        ),
-                      ),
-                      const Spacer(),
-                      ComboBox<int>(
-                        value: appState.amountOfSavedNews,
-                        items: amountOfSavedNewsList
-                            .map<ComboBoxItem<int>>((int value) {
-                          return ComboBoxItem<int>(
-                            value: value,
-                            child: Text(value.toString()),
-                          );
-                        }).toList(),
-                        onChanged: (value) {
-                          if (value != null) {
-                            appState.amountOfSavedNews = value;
-                            appState.storage.write(
-                                key: FluxNewsState
-                                    .secureStorageAmountOfSavedNewsKey,
-                                value: value.toString());
-                            appState.refreshView();
-                          }
-                        },
-                      ),
-                    ],
-                  ),
-                ),
-                const Divider(),
-                // this row contains the selection of the amount of saved starred news
-                // if the news exceeds the amount, the oldest news were deleted
-                Padding(
-                  padding: const EdgeInsets.only(top: 10.0, bottom: 10),
-                  child: Row(
-                    children: [
-                      const Padding(
-                        padding: EdgeInsets.only(left: 17.0),
-                        child: Icon(
-                          FluentIcons.starburst,
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.only(left: 12.0),
-                        child: Text(
-                          AppLocalizations.of(context)!.amountSavedStarred,
-                          style: const TextStyle(fontSize: 16),
-                        ),
-                      ),
-                      const Spacer(),
-                      ComboBox<int>(
-                        value: appState.amountOfSavedStarredNews,
-                        items: amountOfSavedStarredNewsList
-                            .map<ComboBoxItem<int>>((int value) {
-                          return ComboBoxItem<int>(
-                            value: value,
-                            child: Text(value.toString()),
-                          );
-                        }).toList(),
-                        onChanged: (value) {
-                          if (value != null) {
-                            appState.amountOfSavedStarredNews = value;
-                            appState.storage.write(
-                                key: FluxNewsState
-                                    .secureStorageAmountOfSavedStarredNewsKey,
-                                value: value.toString());
-                            appState.refreshView();
-                          }
-                        },
-                      ),
-                    ],
-                  ),
-                ),
-                const Divider(),
-                // this row contains the selection if the debug mode is turned on
-                Padding(
-                  padding: const EdgeInsets.only(top: 10.0, bottom: 10),
-                  child: Row(
-                    children: [
-                      const Padding(
-                        padding: EdgeInsets.only(left: 17.0),
-                        child: Icon(
-                          FluentIcons.developer_tools,
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.only(left: 12.0),
-                        child: Text(
-                          AppLocalizations.of(context)!.debugModeTextSettings,
-                          style: const TextStyle(fontSize: 16),
-                        ),
-                      ),
-                      const Spacer(),
-                      ToggleSwitch(
-                        checked: appState.debugMode,
-                        onChanged: (bool value) {
-                          String stringValue =
-                              FluxNewsState.secureStorageFalseString;
-                          if (value == true) {
-                            stringValue = FluxNewsState.secureStorageTrueString;
-                          }
-                          appState.debugMode = value;
-                          appState.storage.write(
-                              key: FluxNewsState.secureStorageDebugModeKey,
-                              value: stringValue);
-                          appState.refreshView();
-                        },
-                      ),
-                    ],
-                  ),
-                ),
-                const Divider(),
-                // this list tile contains the ability to export the collected logs
-                ListTile(
-                  leading: const Icon(
-                    FluentIcons.import,
-                  ),
-                  title: Text(
-                    AppLocalizations.of(context)!.exportLogs,
-                    //style: Theme.of(context).textTheme.titleMedium,
-                  ),
-                  onPressed: () {
-                    if (Platform.isAndroid || Platform.isIOS) {
-                      //FlutterLogs.exportLogs(exportType: ExportType.ALL);
-                    }
-                  },
-                ),
-                const Divider(),
-                // this list tile delete the local news database
-                ListTile(
-                  leading: Icon(
-                    FluentIcons.delete,
-                    color: Colors.red,
-                  ),
-                  title: Text(
-                    AppLocalizations.of(context)!.deleteLocalCache,
-                    /*style: Theme.of(context)
+                      title: Text(
+                        AppLocalizations.of(context)!.deleteLocalCache,
+                        /*style: Theme.of(context)
                       .textTheme
                       .titleMedium!
                       .copyWith(color: Colors.red),*/
-                  ),
-                  onPressed: () {
-                    _showDeleteLocalCacheDialog(context, appState);
-                  },
-                ),
-                const Divider(),
-                // this list tile contains the about dialog
-                /*
+                      ),
+                      onPressed: () {
+                        _showDeleteLocalCacheDialog(context, appState);
+                      },
+                    ),
+                    const Divider(),
+                    // this list tile contains the about dialog
+                    /*
               AboutListTile(
                 icon: const Icon(FluentIcons.info),
                 applicationIcon: const Icon(
@@ -540,10 +550,10 @@ class FluentSettings extends StatelessWidget {
                   ),
                 ],
               ),*/
-              ],
-            ),
-          ),
-        )));
+                  ],
+                ),
+              ),
+            )));
   }
 }
 

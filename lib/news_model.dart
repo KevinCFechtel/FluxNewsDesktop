@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:typed_data';
 
-import 'package:flutter/material.dart';
+import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:flux_news_desktop/flux_news_counter_state.dart';
 import 'package:html/dom.dart' as dom;
@@ -212,14 +212,14 @@ class News {
             String.fromCharCodes(icon!),
             width: size,
             height: size,
-            colorFilter:
-                const ColorFilter.mode(Colors.white70, BlendMode.srcIn),
+            colorFilter: ColorFilter.mode(Colors.grey[30], BlendMode.srcIn),
           );
         } else {
           return SvgPicture.string(
             String.fromCharCodes(icon!),
             width: size,
             height: size,
+            colorFilter: ColorFilter.mode(Colors.grey[140], BlendMode.srcIn),
           );
         }
       } else {
@@ -325,16 +325,14 @@ class Feed {
             String.fromCharCodes(icon!),
             width: size,
             height: size,
-            colorFilter:
-                const ColorFilter.mode(Colors.white70, BlendMode.srcIn),
+            colorFilter: ColorFilter.mode(Colors.grey[30], BlendMode.srcIn),
           );
         } else {
           return SvgPicture.string(
             String.fromCharCodes(icon!),
             width: size,
             height: size,
-            colorFilter:
-                const ColorFilter.mode(Colors.black54, BlendMode.srcIn),
+            colorFilter: ColorFilter.mode(Colors.grey[140], BlendMode.srcIn),
           );
         }
       } else {

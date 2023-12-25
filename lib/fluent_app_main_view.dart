@@ -139,8 +139,10 @@ class FluentCategorieNavigationMainView extends StatelessWidget {
             title: Text(
               AppLocalizations.of(context)!.allNews,
             ),
-            trailing: Text(
-              '${appCounterState.allNewsCount}',
+            infoBadge: InfoBadge(
+              source: Text(
+                '${appCounterState.allNewsCount}',
+              ),
             ),
             body: const FluentMainView(),
             onTap: () {
@@ -156,8 +158,10 @@ class FluentCategorieNavigationMainView extends StatelessWidget {
             title: Text(
               AppLocalizations.of(context)!.bookmarked,
             ),
-            trailing: Text(
-              '${appCounterState.starredCount}',
+            infoBadge: InfoBadge(
+              source: Text(
+                '${appCounterState.starredCount}',
+              ),
             ),
             body: const FluentMainView(),
             onTap: () {
@@ -227,33 +231,20 @@ class FluentCategorieNavigationMainView extends StatelessWidget {
                       if (items.length > 2) {
                         items.add(PaneItemSeparator());
                       }
-                      items.add(PaneItem(
-                        icon: const Icon(FluentIcons.category_classification),
-                        title: Text(
-                          category.title,
-                        ),
-                        infoBadge: Text(
-                          '${category.newsCount}',
-                        ),
-                        body: const FluentMainView(),
-                        onTap: () {
-                          appState.selectedNavigation = routeString;
-                          appState.refreshView();
-                          categoryOnClick(
-                              category, appState, snapshot.data!, context);
-                        },
-                      ));
+                      List<NavigationPaneItem> feedItems = [];
                       for (Feed feed in category.feeds) {
                         String routeString = "/Feed/${feed.feedID}";
-                        items.add(PaneItem(
+                        feedItems.add(PaneItem(
                           icon: appState.showFeedIcons
                               ? feed.getFeedIcon(16.0, context)
                               : const SizedBox.shrink(),
                           title: Text(
                             feed.title,
                           ),
-                          infoBadge: Text(
-                            '${feed.newsCount}',
+                          infoBadge: InfoBadge(
+                            source: Text(
+                              '${feed.newsCount}',
+                            ),
                           ),
                           body: const FluentMainView(),
                           onTap: () {
@@ -264,6 +255,44 @@ class FluentCategorieNavigationMainView extends StatelessWidget {
                           },
                         ));
                       }
+                      items.add(PaneItemExpander(
+                        icon: const Icon(FluentIcons.category_classification),
+                        title: Text(
+                          category.title,
+                        ),
+                        infoBadge: InfoBadge(
+                          source: Text(
+                            '${category.newsCount}',
+                          ),
+                        ),
+                        items: feedItems,
+                        body: const FluentMainView(),
+                        onTap: () {
+                          appState.selectedNavigation = routeString;
+                          appState.refreshView();
+                          categoryOnClick(
+                              category, appState, snapshot.data!, context);
+                        },
+                      ));
+                      /*
+                      items.add(PaneItem(
+                        icon: const Icon(FluentIcons.category_classification),
+                        title: Text(
+                          category.title,
+                        ),
+                        infoBadge: InfoBadge(
+                          source: Text(
+                            '${category.newsCount}',
+                          ),
+                        ),
+                        body: const FluentMainView(),
+                        onTap: () {
+                          appState.selectedNavigation = routeString;
+                          appState.refreshView();
+                          categoryOnClick(
+                              category, appState, snapshot.data!, context);
+                        },
+                      ));*/
                     }
                     items.add(bookmarkedListtile);
                     navPane = NavigationView(

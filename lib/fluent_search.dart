@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flux_news_desktop/fluent_theme.dart';
 import 'package:flux_news_desktop/logging.dart';
 import 'package:flux_news_desktop/fluent_search_news_list.dart';
@@ -46,8 +46,50 @@ class FluentSearch extends StatelessWidget {
     }
   }
 
-  Scaffold searchLayout(BuildContext context, FluxNewsState appState) {
-    return Scaffold(
+  ScaffoldPage searchLayout(BuildContext context, FluxNewsState appState) {
+    return ScaffoldPage(
+        padding: EdgeInsets.zero,
+        header: TextBox(
+          controller: appState.searchController,
+          placeholder: AppLocalizations.of(context)!.searchHint,
+          suffix: IconButton(
+            onPressed: () {
+              appState.searchController.clear();
+              appState.searchNewsList = Future<List<News>>.value([]);
+              appState.refreshView();
+            },
+            icon: const Icon(FluentIcons.clear),
+          ),
+          onSubmitted: (value) {
+            if (value != '') {
+              // fetch the news list from the backend with the search text
+              Future<List<News>> searchNewsListResult =
+                  fetchSearchedNews(http.Client(), appState, value)
+                      .onError((error, stackTrace) {
+                logThis(
+                    'fetchSearchedNews',
+                    'Caught an error in fetchSearchedNews function! : ${error.toString()}',
+                    Level.error);
+                if (appState.errorString !=
+                    AppLocalizations.of(context)!.communicateionMinifluxError) {
+                  appState.errorString =
+                      AppLocalizations.of(context)!.communicateionMinifluxError;
+                  appState.newError = true;
+                  appState.refreshView();
+                }
+                return [];
+              });
+              // set the state with the fetched news list
+              appState.searchNewsList = searchNewsListResult;
+              appState.refreshView();
+            } else {
+              // if search text is empty, set the state with an empty list
+              appState.searchNewsList = Future<List<News>>.value([]);
+              appState.refreshView();
+            }
+          },
+        ),
+        /*
         appBar: AppBar(
           // set the title of the search page to search text field
           title: TextField(
@@ -102,6 +144,16 @@ class FluentSearch extends StatelessWidget {
         ),
         // show the news list
         body: const FluentSearchNewsList());
+        */
+        content: const Row(
+          children: [
+            Flexible(
+              flex: 4,
+              child: FluentSearchNewsList(),
+            ),
+            Flexible(flex: 5, child: Center(child: Text("Platzhalter")))
+          ],
+        ));
   }
 }
 

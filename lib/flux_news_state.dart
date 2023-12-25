@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import 'package:flutter/material.dart';
+import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flux_news_desktop/logging.dart';
 import 'package:intl/intl.dart';
 import 'package:logger/logger.dart';
