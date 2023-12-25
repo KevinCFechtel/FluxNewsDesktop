@@ -477,12 +477,12 @@ class AppBarButtons extends StatelessWidget {
     FluxNewsState appState = context.watch<FluxNewsState>();
     FluxNewsCounterState appCounterState =
         context.watch<FluxNewsCounterState>();
-    return Row(
+    // Todo: Add Commandbar
+    return CommandBar(
       mainAxisAlignment: MainAxisAlignment.end,
       crossAxisAlignment: CrossAxisAlignment.end,
-      children: [
-        IconButton(
-          iconButtonMode: IconButtonMode.large,
+      primaryItems: [
+        CommandBarButton(
           onPressed: () async {
             await syncNews(appState, context);
           },
@@ -494,7 +494,7 @@ class AppBarButtons extends StatelessWidget {
                 )
               : const Icon(FluentIcons.refresh, size: 20.0),
         ),
-        IconButton(
+        CommandBarButton(
           onPressed: () async {
             // switch between all and only unread news view
             // if the current view is unread news change to all news
@@ -557,7 +557,7 @@ class AppBarButtons extends StatelessWidget {
               ? const Icon(FluentIcons.read, size: 20.0)
               : const Icon(FluentIcons.accept, size: 20.0),
         ),
-        IconButton(
+        CommandBarButton(
           onPressed: () async {
             // switch between newest first and oldest first
             // if the current sort order is newest first change to oldest first
