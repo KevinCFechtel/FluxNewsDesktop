@@ -6,7 +6,7 @@ import 'package:flux_news_desktop/flux_news_counter_state.dart';
 import 'package:flux_news_desktop/flux_news_state.dart';
 import 'package:flux_news_desktop/logging.dart';
 import 'package:flux_news_desktop/news_model.dart';
-import 'package:flux_news_desktop/search.dart';
+import 'package:flux_news_desktop/fluent_search.dart';
 import 'package:flux_news_desktop/fluent_settings.dart';
 import 'package:flux_news_desktop/sync_news.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -189,7 +189,7 @@ class FluentCategorieNavigationMainView extends StatelessWidget {
                   PaneItem(
                     icon: const Icon(FluentIcons.search),
                     title: Text(AppLocalizations.of(context)!.search),
-                    body: const Search(),
+                    body: const FluentSearch(),
                     onTap: () {
                       appState.selectedNavigation =
                           FluxNewsState.searchRouteString;
@@ -287,7 +287,7 @@ class FluentCategorieNavigationMainView extends StatelessWidget {
                             PaneItem(
                               icon: const Icon(FluentIcons.search),
                               title: Text(AppLocalizations.of(context)!.search),
-                              body: const Search(),
+                              body: const FluentSearch(),
                               onTap: () {
                                 appState.selectedNavigation =
                                     FluxNewsState.searchRouteString;

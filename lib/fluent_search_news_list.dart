@@ -3,13 +3,12 @@ import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flux_news_desktop/flux_news_state.dart';
 import 'package:flux_news_desktop/fluent_news_card.dart';
 import 'package:flux_news_desktop/news_model.dart';
-import 'package:flux_news_desktop/news_row.dart';
 import 'package:provider/provider.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import 'package:flutter_gen/gen_l10n/flux_news_localizations.dart';
 
-class SearchNewsList extends StatelessWidget {
-  const SearchNewsList({
+class FluentSearchNewsList extends StatelessWidget {
+  const FluentSearchNewsList({
     super.key,
   });
 
@@ -51,7 +50,7 @@ class SearchNewsList extends StatelessWidget {
                                   appState.searchItemPositionsListener,
                               initialScrollIndex: 0,
                               itemBuilder: (context, i) {
-                                return NewsRow(
+                                return FluentNewsCard(
                                     news: snapshot.data![i],
                                     context: context,
                                     searchView: searchView);

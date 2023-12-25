@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flux_news_desktop/fluent_theme.dart';
 import 'package:flux_news_desktop/logging.dart';
-import 'package:flux_news_desktop/search_news_list.dart';
+import 'package:flux_news_desktop/fluent_search_news_list.dart';
 import 'package:logger/logger.dart';
 import 'package:provider/provider.dart';
 import 'package:http/http.dart' as http;
@@ -11,8 +11,8 @@ import 'flux_news_state.dart';
 import 'miniflux_backend.dart';
 import 'news_model.dart';
 
-class Search extends StatelessWidget {
-  const Search({super.key});
+class FluentSearch extends StatelessWidget {
+  const FluentSearch({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -101,7 +101,7 @@ class Search extends StatelessWidget {
           ),
         ),
         // show the news list
-        body: const SearchNewsList());
+        body: const FluentSearchNewsList());
   }
 }
 
