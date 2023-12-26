@@ -34,45 +34,43 @@ class FluentNewsRow extends StatelessWidget {
     return FlyoutTarget(
         key: contextAttachKey,
         controller: contextController,
-        child: Card(
-          // inkwell is used for the onTab and onLongPress functions
-          child: GestureDetector(
-            onTap: () async {
-              // on tab we update the status of the news to read and open the news
-              try {
-                updateNewsStatusInDB(
-                    news.newsID, FluxNewsState.readNewsStatus, appState);
-              } on Exception catch (exception, stacktrace) {
-                logThis(
-                    'updateNewsStatusInDB',
-                    'Caught an error in updateNewsStatusInDB function!',
-                    LogLevel.ERROR,
-                    exception: exception,
-                    stackTrace: stacktrace);
+        child: GestureDetector(
+          onTap: () async {
+            // on tab we update the status of the news to read and open the news
+            try {
+              updateNewsStatusInDB(
+                  news.newsID, FluxNewsState.readNewsStatus, appState);
+            } on Exception catch (exception, stacktrace) {
+              logThis(
+                  'updateNewsStatusInDB',
+                  'Caught an error in updateNewsStatusInDB function!',
+                  LogLevel.ERROR,
+                  exception: exception,
+                  stackTrace: stacktrace);
 
-                if (context.mounted) {
-                  if (appState.errorString !=
-                      AppLocalizations.of(context)!.databaseError) {
-                    appState.errorString =
-                        AppLocalizations.of(context)!.databaseError;
-                    appState.newError = true;
-                    appState.refreshView();
-                  }
+              if (context.mounted) {
+                if (appState.errorString !=
+                    AppLocalizations.of(context)!.databaseError) {
+                  appState.errorString =
+                      AppLocalizations.of(context)!.databaseError;
+                  appState.newError = true;
+                  appState.refreshView();
                 }
               }
-              // update the status to read on the news list and notify the categories
-              // to recalculate the news count
-              news.status = FluxNewsState.readNewsStatus;
+            }
+            // update the status to read on the news list and notify the categories
+            // to recalculate the news count
+            news.status = FluxNewsState.readNewsStatus;
 
-              context.read<FluxNewsCounterState>().listUpdated = true;
-              context.read<FluxNewsCounterState>().refreshView();
-              appState.refreshView();
+            context.read<FluxNewsCounterState>().listUpdated = true;
+            context.read<FluxNewsCounterState>().refreshView();
+            appState.refreshView();
 
-              // there are difference on launching the news url between the platforms
-              // on android and ios it's preferred to check first if the link can be opened
-              // by an installed app, if not then the link is opened in a web-view within the app.
-              // on macos we open directly the web-view within the app.
-              /*
+            // there are difference on launching the news url between the platforms
+            // on android and ios it's preferred to check first if the link can be opened
+            // by an installed app, if not then the link is opened in a web-view within the app.
+            // on macos we open directly the web-view within the app.
+            /*
           if (Platform.isAndroid) {
             AndroidUrlLauncher.launchUrl(context, news.url);
           } else if (Platform.isIOS) {
@@ -95,84 +93,85 @@ class FluentNewsRow extends StatelessWidget {
             );
           }
           */
-            },
-            onSecondaryTapUp: (d) {
-              // This calculates the position of the flyout according to the parent navigator
-              final targetContext = contextAttachKey.currentContext;
-              if (targetContext == null) return;
-              final box = targetContext.findRenderObject() as RenderBox;
-              final position = box.localToGlobal(
-                d.localPosition,
-                ancestor: Navigator.of(context).context.findRenderObject(),
-              );
-              contextController.showFlyout(
-                  barrierColor: Colors.black.withOpacity(0.1),
-                  position: position,
-                  builder: (context) {
-                    return FlyoutContent(
-                      child: SizedBox(
-                        width: 220.0,
-                        height: 150,
-                        child: CommandBar(
-                          direction: Axis.vertical,
-                          isCompact: false,
-                          primaryItems: [
-                            CommandBarButton(
-                              icon: news.starred
-                                  ? const Icon(FluentIcons.favorite_star)
-                                  : const Icon(FluentIcons.favorite_star_fill),
-                              label: news.starred
-                                  ? Text(AppLocalizations.of(context)!
-                                      .deleteBookmark)
-                                  : Text(AppLocalizations.of(context)!
-                                      .addBookmark),
-                              onPressed: () async {
-                                await markAsBookmarkContextFunction(
-                                    news, appState, context, searchView);
-                                if (context.mounted) {
-                                  Navigator.pop(context);
-                                }
-                              },
-                            ),
-                            CommandBarButton(
-                              icon: news.status == FluxNewsState.readNewsStatus
-                                  ? const Icon(FluentIcons.location_fill)
-                                  : const Icon(FluentIcons.location_circle),
-                              label: news.status == FluxNewsState.readNewsStatus
-                                  ? Text(AppLocalizations.of(context)!
-                                      .markAsUnread)
-                                  : Text(
-                                      AppLocalizations.of(context)!.markAsRead),
-                              onPressed: () {
-                                // switch between bookmarked or not bookmarked depending on the previous status
-                                if (news.status ==
-                                    FluxNewsState.readNewsStatus) {
-                                  markNewsAsReadContextAction(news, appState,
-                                      context, searchView, appCounterState);
-                                } else {
-                                  markNewsAsUnreadContextAction(news, appState,
-                                      context, searchView, appCounterState);
-                                }
+          },
+          onSecondaryTapUp: (d) {
+            // This calculates the position of the flyout according to the parent navigator
+            final targetContext = contextAttachKey.currentContext;
+            if (targetContext == null) return;
+            final box = targetContext.findRenderObject() as RenderBox;
+            final position = box.localToGlobal(
+              d.localPosition,
+              ancestor: Navigator.of(context).context.findRenderObject(),
+            );
+            contextController.showFlyout(
+                barrierColor: Colors.black.withOpacity(0.1),
+                position: position,
+                builder: (context) {
+                  return FlyoutContent(
+                    child: SizedBox(
+                      width: 220.0,
+                      height: 160,
+                      child: CommandBar(
+                        direction: Axis.vertical,
+                        isCompact: false,
+                        primaryItems: [
+                          CommandBarButton(
+                            icon: news.starred
+                                ? const Icon(FluentIcons.favorite_star)
+                                : const Icon(FluentIcons.favorite_star_fill),
+                            label: news.starred
+                                ? Text(AppLocalizations.of(context)!
+                                    .deleteBookmark)
+                                : Text(
+                                    AppLocalizations.of(context)!.addBookmark),
+                            onPressed: () async {
+                              await markAsBookmarkContextFunction(
+                                  news, appState, context, searchView);
+                              if (context.mounted) {
                                 Navigator.pop(context);
-                              },
+                              }
+                            },
+                          ),
+                          CommandBarButton(
+                            icon: news.status == FluxNewsState.readNewsStatus
+                                ? const Icon(FluentIcons.location_fill)
+                                : const Icon(FluentIcons.location_circle),
+                            label: news.status == FluxNewsState.readNewsStatus
+                                ? Text(
+                                    AppLocalizations.of(context)!.markAsUnread)
+                                : Text(
+                                    AppLocalizations.of(context)!.markAsRead),
+                            onPressed: () {
+                              // switch between bookmarked or not bookmarked depending on the previous status
+                              if (news.status == FluxNewsState.readNewsStatus) {
+                                markNewsAsReadContextAction(news, appState,
+                                    context, searchView, appCounterState);
+                              } else {
+                                markNewsAsUnreadContextAction(news, appState,
+                                    context, searchView, appCounterState);
+                              }
+                              Navigator.pop(context);
+                            },
+                          ),
+                          CommandBarButton(
+                            icon: const Icon(FluentIcons.save),
+                            label: Text(
+                              AppLocalizations.of(context)!.contextSaveButton,
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
                             ),
-                            CommandBarButton(
-                              icon: const Icon(FluentIcons.save),
-                              label: Text(
-                                AppLocalizations.of(context)!.contextSaveButton,
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                              onPressed: () {
-                                Navigator.pop(context);
-                              },
-                            ),
-                          ],
-                        ),
+                            onPressed: () {
+                              Navigator.pop(context);
+                            },
+                          ),
+                        ],
                       ),
-                    );
-                  });
-            },
+                    ),
+                  );
+                });
+          },
+          child: Card(
+            // inkwell is used for the onTab and onLongPress functions
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -202,87 +201,91 @@ class FluentNewsRow extends StatelessWidget {
                           ? 7
                           : 5
                       : 5,
-                  child: ListTile(
-                    title: Text(
-                      news.title,
-                      style: news.status == FluxNewsState.unreadNewsStatus
-                          ? appTheme.unreadText
-                          : appTheme.readText,
-                    ),
-                    subtitle: Column(
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.only(
-                            top: 2.0,
-                          ),
-                          child: Row(
-                            children: [
-                              news.status == FluxNewsState.unreadNewsStatus
-                                  ? const Padding(
-                                      padding: EdgeInsets.only(right: 15.0),
-                                      child: SizedBox(
-                                          width: 15,
-                                          height: 35,
-                                          child: Icon(
-                                            FluentIcons.location_fill,
-                                          )))
-                                  : const SizedBox.shrink(),
-                              appState.showFeedIcons
-                                  ? Padding(
-                                      padding:
-                                          const EdgeInsets.only(right: 5.0),
-                                      child: news.getFeedIcon(16.0, context))
-                                  : const SizedBox.shrink(),
-                              Padding(
-                                padding: const EdgeInsets.only(left: 0.0),
-                                child: Text(
-                                  news.feedTitle,
-                                  style: news.status ==
-                                          FluxNewsState.unreadNewsStatus
-                                      ? appTheme.unreadText
-                                      : appTheme.readText,
-                                ),
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.only(left: 8.0),
-                                child: Text(
-                                  context
-                                      .read<FluxNewsState>()
-                                      .dateFormat
-                                      .format(news.getPublishingDate()),
-                                  style: news.status ==
-                                          FluxNewsState.unreadNewsStatus
-                                      ? appTheme.unreadText
-                                      : appTheme.readText,
-                                ),
-                              ),
-                              SizedBox(
-                                width: 40,
-                                height: 35,
-                                child: news.starred
-                                    ? Icon(
-                                        FluentIcons.favorite_star_fill,
-                                        color: news.status ==
-                                                FluxNewsState.unreadNewsStatus
-                                            ? appTheme.unreadText.color
-                                            : appTheme.readText.color,
-                                      )
+                  child: AbsorbPointer(
+                    child: ListTile(
+                      title: Text(
+                        news.title,
+                        style: news.status == FluxNewsState.unreadNewsStatus
+                            ? appTheme.unreadText
+                            : appTheme.readText,
+                      ),
+                      subtitle: Column(
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.only(
+                              top: 2.0,
+                            ),
+                            child: Row(
+                              children: [
+                                news.status == FluxNewsState.unreadNewsStatus
+                                    ? const Padding(
+                                        padding: EdgeInsets.only(right: 15.0),
+                                        child: SizedBox(
+                                            width: 15,
+                                            height: 35,
+                                            child: Icon(
+                                              FluentIcons.location_fill,
+                                            )))
                                     : const SizedBox.shrink(),
-                              ),
-                            ],
+                                appState.showFeedIcons
+                                    ? Padding(
+                                        padding:
+                                            const EdgeInsets.only(right: 5.0),
+                                        child: news.getFeedIcon(16.0, context))
+                                    : const SizedBox.shrink(),
+                                Padding(
+                                  padding: const EdgeInsets.only(left: 0.0),
+                                  child: Text(
+                                    news.feedTitle,
+                                    style: news.status ==
+                                            FluxNewsState.unreadNewsStatus
+                                        ? appTheme.unreadText
+                                        : appTheme.readText,
+                                  ),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.only(left: 8.0),
+                                  child: Text(
+                                    context
+                                        .read<FluxNewsState>()
+                                        .dateFormat
+                                        .format(news.getPublishingDate()),
+                                    style: news.status ==
+                                            FluxNewsState.unreadNewsStatus
+                                        ? appTheme.unreadText
+                                        : appTheme.readText,
+                                  ),
+                                ),
+                                SizedBox(
+                                  width: 40,
+                                  height: 35,
+                                  child: news.starred
+                                      ? Icon(
+                                          FluentIcons.favorite_star_fill,
+                                          color: news.status ==
+                                                  FluxNewsState.unreadNewsStatus
+                                              ? appTheme.unreadText.color
+                                              : appTheme.readText.color,
+                                        )
+                                      : const SizedBox.shrink(),
+                                ),
+                              ],
+                            ),
                           ),
-                        ),
-                        // here is the news text, the Opacity decide between read and unread
-                        Padding(
-                          padding: const EdgeInsets.only(top: 2.0, bottom: 10),
-                          child: Text(
-                            news.getText(),
-                            style: news.status == FluxNewsState.unreadNewsStatus
-                                ? appTheme.unreadText
-                                : appTheme.readText,
+                          // here is the news text, the Opacity decide between read and unread
+                          Padding(
+                            padding:
+                                const EdgeInsets.only(top: 2.0, bottom: 10),
+                            child: Text(
+                              news.getText(),
+                              style:
+                                  news.status == FluxNewsState.unreadNewsStatus
+                                      ? appTheme.unreadText
+                                      : appTheme.readText,
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
                 ),

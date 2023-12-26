@@ -47,6 +47,7 @@ class FluentSearch extends StatelessWidget {
   }
 
   ScaffoldPage searchLayout(BuildContext context, FluxNewsState appState) {
+    double width = MediaQuery.of(context).size.width;
     return ScaffoldPage(
         padding: EdgeInsets.zero,
         header: TextBox(
@@ -147,13 +148,17 @@ class FluentSearch extends StatelessWidget {
         // show the news list
         body: const FluentSearchNewsList());
         */
-        content: const Row(
+        content: Row(
           children: [
             Flexible(
-              flex: 4,
-              child: FluentSearchNewsList(),
+              flex: width <= 1600
+                  ? width <= 1300
+                      ? 3
+                      : 2
+                  : 4,
+              child: const FluentSearchNewsList(),
             ),
-            Flexible(flex: 5, child: Center(child: Text("Platzhalter")))
+            const Flexible(flex: 5, child: Center(child: Text("Platzhalter")))
           ],
         ));
   }

@@ -669,13 +669,18 @@ class FluentMainView extends StatelessWidget {
   });
   @override
   Widget build(BuildContext context) {
-    return const Row(
+    double width = MediaQuery.of(context).size.width;
+    return Row(
       children: [
         Flexible(
-          flex: 4,
-          child: FluentBodyNewsList(),
+          flex: width <= 1600
+              ? width <= 1300
+                  ? 3
+                  : 2
+              : 4,
+          child: const FluentBodyNewsList(),
         ),
-        Flexible(flex: 5, child: Center(child: Text("Platzhalter")))
+        const Flexible(flex: 5, child: Center(child: Text("Platzhalter")))
       ],
     );
   }
