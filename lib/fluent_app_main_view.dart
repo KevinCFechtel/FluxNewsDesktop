@@ -130,6 +130,7 @@ class FluentCategorieNavigationMainView extends StatelessWidget {
     FluxNewsCounterState appCounterState =
         context.watch<FluxNewsCounterState>();
     appState.dateFormat = DateFormat(dateFormatString);
+    double width = MediaQuery.of(context).size.width;
 
     var getData = FutureBuilder<Categories>(
         future: appState.categoryList,
@@ -185,7 +186,9 @@ class FluentCategorieNavigationMainView extends StatelessWidget {
             },
             pane: NavigationPane(
                 header: const NavigationHeader(),
-                displayMode: PaneDisplayMode.minimal,
+                displayMode: width >= 2000
+                    ? PaneDisplayMode.open
+                    : PaneDisplayMode.minimal,
                 selected: appState.calculateSelectedFluentNavigationItem(),
                 items: [
                   homeListTile,
@@ -310,7 +313,9 @@ class FluentCategorieNavigationMainView extends StatelessWidget {
                       },
                       pane: NavigationPane(
                           header: const NavigationHeader(),
-                          displayMode: PaneDisplayMode.minimal,
+                          displayMode: width >= 2000
+                              ? PaneDisplayMode.open
+                              : PaneDisplayMode.minimal,
                           selected:
                               appState.calculateSelectedFluentNavigationItem(),
                           items: items,
@@ -479,7 +484,7 @@ class AppBarButtons extends StatelessWidget {
     FluxNewsState appState = context.watch<FluxNewsState>();
     FluxNewsCounterState appCounterState =
         context.watch<FluxNewsCounterState>();
-    // Todo: Add Commandbar
+
     return CommandBar(
       mainAxisAlignment: MainAxisAlignment.end,
       crossAxisAlignment: CrossAxisAlignment.end,
