@@ -510,15 +510,6 @@ class FluentSettings extends StatelessWidget {
                           ZipFileEncoder encoder = ZipFileEncoder();
 
                           encoder.create(outputFile);
-                          /*
-                          List<FileSystemEntity> files =
-                              Directory(appState.loggingFilePath).listSync();
-                          for (FileSystemEntity file in files) {
-                            if (file.path.endsWith('.log')) {
-                              encoder.addFile(File(file.path));
-                            }
-                          }
-                          */
 
                           List<Log> logs = await MyLogger.logs
                               .getByFilter(LogFilter.last24Hours());

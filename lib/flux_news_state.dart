@@ -276,20 +276,6 @@ class FluxNewsState extends ChangeNotifier {
     MyLogger.logs
         .deleteByFilter(filter)
         .then((_) => logThis('initLogging', 'Deleted old logs', LogLevel.INFO));
-    /*
-    final directory = await getApplicationDocumentsDirectory();
-    loggingFilePath = directory.path;
-    DateTime yesterday = DateTime.now().subtract(const Duration(days: 1));
-    List<FileSystemEntity> files = Directory(loggingFilePath).listSync();
-    for (FileSystemEntity file in files) {
-      if (file.path.endsWith('.log')) {
-        FileStat stat = file.statSync();
-        if (stat.changed.isBefore(yesterday)) {
-          file.deleteSync();
-        }
-      }
-    }
-    */
     logThis('initLogging', 'Finished init logging', LogLevel.INFO);
   }
 
