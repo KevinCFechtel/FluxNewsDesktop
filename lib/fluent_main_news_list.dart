@@ -1,9 +1,10 @@
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flux_news_desktop/database_backend.dart';
+import 'package:flux_news_desktop/fluent_news_card.dart';
+import 'package:flux_news_desktop/fluent_news_row.dart';
 import 'package:flux_news_desktop/flux_news_counter_state.dart';
 import 'package:flux_news_desktop/flux_news_state.dart';
 import 'package:flux_news_desktop/logging.dart';
-import 'package:flux_news_desktop/fluent_news_card.dart';
 import 'package:flux_news_desktop/news_model.dart';
 import 'package:my_logger/core/constants.dart';
 import 'package:provider/provider.dart';
@@ -18,6 +19,7 @@ class FluentBodyNewsList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    double width = MediaQuery.of(context).size.width;
     FluxNewsState appState = context.watch<FluxNewsState>();
     bool searchView = false;
     var getData = FutureBuilder<List<News>>(
@@ -55,10 +57,15 @@ class FluentBodyNewsList extends StatelessWidget {
                                     appState.itemPositionsListener,
                                 initialScrollIndex: appState.scrollPosition,
                                 itemBuilder: (context, i) {
-                                  return FluentNewsCard(
-                                      news: snapshot.data![i],
-                                      context: context,
-                                      searchView: searchView);
+                                  return width <= 1600
+                                      ? FluentNewsCard(
+                                          news: snapshot.data![i],
+                                          context: context,
+                                          searchView: searchView)
+                                      : FluentNewsRow(
+                                          news: snapshot.data![i],
+                                          context: context,
+                                          searchView: searchView);
                                 }),
                             // on ScrollNotification set news as read on scroll over if activated
                             onNotification: (ScrollNotification scrollInfo) {
@@ -83,11 +90,13 @@ class FluentBodyNewsList extends StatelessWidget {
                                               snapshot.data![i].newsID,
                                               FluxNewsState.readNewsStatus,
                                               appState);
-                                        } catch (e) {
+                                        } on Exception catch (exception, stacktrace) {
                                           logThis(
                                               'updateNewsStatusInDB',
-                                              'Caught an error in updateNewsStatusInDB function! : ${e.toString()}',
-                                              LogLevel.ERROR);
+                                              'Caught an error in updateNewsStatusInDB function!',
+                                              LogLevel.ERROR,
+                                              exception: exception,
+                                              stackTrace: stacktrace);
 
                                           if (context
                                                   .read<FluxNewsState>()
@@ -131,11 +140,13 @@ class FluentBodyNewsList extends StatelessWidget {
                                             snapshot.data![i].newsID,
                                             FluxNewsState.readNewsStatus,
                                             appState);
-                                      } catch (e) {
+                                      } on Exception catch (exception, stacktrace) {
                                         logThis(
                                             'updateNewsStatusInDB',
-                                            'Caught an error in updateNewsStatusInDB function! : ${e.toString()}',
-                                            LogLevel.ERROR);
+                                            'Caught an error in updateNewsStatusInDB function!',
+                                            LogLevel.ERROR,
+                                            exception: exception,
+                                            stackTrace: stacktrace);
 
                                         if (context
                                                 .read<FluxNewsState>()

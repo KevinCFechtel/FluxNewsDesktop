@@ -74,9 +74,10 @@ class FluentNavigationMainView extends StatelessWidget {
             updateStarredCounter(appState, context);
             await renewAllNewsCount(appState, context);
           }
-        } catch (e) {
+        } on Exception catch (exception, stacktrace) {
           logThis('initConfig', 'Caught an error in initConfig function!',
-              LogLevel.ERROR);
+              LogLevel.ERROR,
+              exception: exception, stackTrace: stacktrace);
 
           if (context.mounted) {
             if (appState.errorString !=
@@ -184,7 +185,7 @@ class FluentCategorieNavigationMainView extends StatelessWidget {
             },
             pane: NavigationPane(
                 header: const NavigationHeader(),
-                displayMode: PaneDisplayMode.auto,
+                displayMode: PaneDisplayMode.minimal,
                 selected: appState.calculateSelectedFluentNavigationItem(),
                 items: [
                   homeListTile,
@@ -309,7 +310,7 @@ class FluentCategorieNavigationMainView extends StatelessWidget {
                       },
                       pane: NavigationPane(
                           header: const NavigationHeader(),
-                          displayMode: PaneDisplayMode.auto,
+                          displayMode: PaneDisplayMode.minimal,
                           selected:
                               appState.calculateSelectedFluentNavigationItem(),
                           items: items,

@@ -12,8 +12,8 @@ import 'package:provider/provider.dart';
 import 'package:flutter_gen/gen_l10n/flux_news_localizations.dart';
 
 // here we define the appearance of the news cards
-class NewsRow extends StatelessWidget {
-  const NewsRow({
+class FluentNewsRow extends StatelessWidget {
+  const FluentNewsRow({
     super.key,
     required this.news,
     required this.context,
@@ -42,11 +42,13 @@ class NewsRow extends StatelessWidget {
               try {
                 updateNewsStatusInDB(
                     news.newsID, FluxNewsState.readNewsStatus, appState);
-              } catch (e) {
+              } on Exception catch (exception, stacktrace) {
                 logThis(
                     'updateNewsStatusInDB',
-                    'Caught an error in updateNewsStatusInDB function! : ${e.toString()}',
-                    LogLevel.ERROR);
+                    'Caught an error in updateNewsStatusInDB function!',
+                    LogLevel.ERROR,
+                    exception: exception,
+                    stackTrace: stacktrace);
 
                 if (context.mounted) {
                   if (appState.errorString !=

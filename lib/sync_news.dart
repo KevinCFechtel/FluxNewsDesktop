@@ -31,7 +31,8 @@ Future<void> syncNews(FluxNewsState appState, BuildContext context) async {
     logThis(
         'authCheck',
         'Caught an error in authCheck function! : ${error.toString()}',
-        LogLevel.ERROR);
+        LogLevel.ERROR,
+        stackTrace: stackTrace);
 
     if (appState.errorString !=
         AppLocalizations.of(context)!.communicateionMinifluxError) {
@@ -56,7 +57,8 @@ Future<void> syncNews(FluxNewsState appState, BuildContext context) async {
       logThis(
           'toggleNewsAsRead',
           'Caught an error in toggleNewsAsRead function! : ${error.toString()}',
-          LogLevel.ERROR);
+          LogLevel.ERROR,
+          stackTrace: stackTrace);
 
       if (appState.errorString !=
           AppLocalizations.of(context)!.communicateionMinifluxError) {
@@ -73,7 +75,8 @@ Future<void> syncNews(FluxNewsState appState, BuildContext context) async {
       logThis(
           'fetchNews',
           'Caught an error in fetchNews function! : ${error.toString()}',
-          LogLevel.ERROR);
+          LogLevel.ERROR,
+          stackTrace: stackTrace);
 
       if (appState.errorString !=
           AppLocalizations.of(context)!.communicateionMinifluxError) {
@@ -93,7 +96,8 @@ Future<void> syncNews(FluxNewsState appState, BuildContext context) async {
       logThis(
           'markNotFetchedNewsAsRead',
           'Caught an error in markNotFetchedNewsAsRead function! : ${error.toString()}',
-          LogLevel.ERROR);
+          LogLevel.ERROR,
+          stackTrace: stackTrace);
 
       if (appState.errorString != AppLocalizations.of(context)!.databaseError) {
         appState.errorString = AppLocalizations.of(context)!.databaseError;
@@ -108,7 +112,8 @@ Future<void> syncNews(FluxNewsState appState, BuildContext context) async {
       logThis(
           'insertNewsInDB',
           'Caught an error in insertNewsInDB function! : ${error.toString()}',
-          LogLevel.ERROR);
+          LogLevel.ERROR,
+          stackTrace: stackTrace);
 
       if (appState.errorString != AppLocalizations.of(context)!.databaseError) {
         appState.errorString = AppLocalizations.of(context)!.databaseError;
@@ -140,7 +145,8 @@ Future<void> syncNews(FluxNewsState appState, BuildContext context) async {
         logThis(
             'renewAllNewsCount',
             'Caught an error in renewAllNewsCount function! : ${error.toString()}',
-            LogLevel.ERROR);
+            LogLevel.ERROR,
+            stackTrace: stackTrace);
       });
     }
     appState.refreshView();
@@ -152,7 +158,8 @@ Future<void> syncNews(FluxNewsState appState, BuildContext context) async {
       logThis(
           'fetchCategoryInformation',
           'Caught an error in fetchCategoryInformation function! : ${error.toString()}',
-          LogLevel.ERROR);
+          LogLevel.ERROR,
+          stackTrace: stackTrace);
 
       if (appState.errorString !=
           AppLocalizations.of(context)!.communicateionMinifluxError) {
@@ -170,7 +177,8 @@ Future<void> syncNews(FluxNewsState appState, BuildContext context) async {
       logThis(
           'insertCategoriesInDB',
           'Caught an error in insertCategoriesInDB function! : ${error.toString()}',
-          LogLevel.ERROR);
+          LogLevel.ERROR,
+          stackTrace: stackTrace);
 
       if (appState.errorString != AppLocalizations.of(context)!.databaseError) {
         appState.errorString = AppLocalizations.of(context)!.databaseError;
@@ -186,7 +194,8 @@ Future<void> syncNews(FluxNewsState appState, BuildContext context) async {
       logThis(
           'fetchStarredNews',
           'Caught an error in fetchStarredNews function! : ${error.toString()}',
-          LogLevel.ERROR);
+          LogLevel.ERROR,
+          stackTrace: stackTrace);
 
       if (appState.errorString !=
           AppLocalizations.of(context)!.communicateionMinifluxError) {
@@ -205,7 +214,8 @@ Future<void> syncNews(FluxNewsState appState, BuildContext context) async {
       logThis(
           'updateStarredNewsInDB',
           'Caught an error in updateStarredNewsInDB function! ${error.toString()}',
-          LogLevel.ERROR);
+          LogLevel.ERROR,
+          stackTrace: stackTrace);
 
       if (appState.errorString != AppLocalizations.of(context)!.databaseError) {
         appState.errorString = AppLocalizations.of(context)!.databaseError;
@@ -220,7 +230,8 @@ Future<void> syncNews(FluxNewsState appState, BuildContext context) async {
       logThis(
           'cleanUnstarredNews',
           'Caught an error in cleanUnstarredNews function! : ${error.toString()}',
-          LogLevel.ERROR);
+          LogLevel.ERROR,
+          stackTrace: stackTrace);
 
       if (appState.errorString != AppLocalizations.of(context)!.databaseError) {
         appState.errorString = AppLocalizations.of(context)!.databaseError;
@@ -234,7 +245,8 @@ Future<void> syncNews(FluxNewsState appState, BuildContext context) async {
       logThis(
           'cleanStarredNews',
           'Caught an error in cleanStarredNews function! : ${error.toString()}',
-          LogLevel.ERROR);
+          LogLevel.ERROR,
+          stackTrace: stackTrace);
 
       if (appState.errorString != AppLocalizations.of(context)!.databaseError) {
         appState.errorString = AppLocalizations.of(context)!.databaseError;
@@ -248,11 +260,10 @@ Future<void> syncNews(FluxNewsState appState, BuildContext context) async {
       if (context.mounted) {
         updateStarredCounter(appState, context);
       }
-    } catch (e) {
-      logThis(
-          'updateStarredCounter',
-          'Caught an error in updateStarredCounter function! : ${e.toString()}',
-          LogLevel.ERROR);
+    } on Exception catch (exception, stackTrace) {
+      logThis('updateStarredCounter',
+          'Caught an error in updateStarredCounter function!', LogLevel.ERROR,
+          exception: exception, stackTrace: stackTrace);
 
       if (context.mounted) {
         if (appState.errorString !=

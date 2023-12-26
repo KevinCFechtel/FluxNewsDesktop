@@ -26,7 +26,8 @@ Future<void> markAsBookmarkContextFunction(News news, FluxNewsState appState,
     logThis(
         'toggleBookmark',
         'Caught an error in toggleBookmark function! : ${error.toString()}',
-        LogLevel.ERROR);
+        LogLevel.ERROR,
+        stackTrace: stackTrace);
 
     if (appState.errorString !=
         AppLocalizations.of(context)!.communicateionMinifluxError) {
@@ -43,11 +44,13 @@ Future<void> markAsBookmarkContextFunction(News news, FluxNewsState appState,
     if (context.mounted) {
       updateStarredCounter(appState, context);
     }
-  } catch (e) {
+  } on Exception catch (exception, stackTrace) {
     logThis(
         'updateNewsStarredStatusInDB',
-        'Caught an error in updateNewsStarredStatusInDB function! : ${e.toString()}',
-        LogLevel.ERROR);
+        'Caught an error in updateNewsStarredStatusInDB function!',
+        LogLevel.ERROR,
+        exception: exception,
+        stackTrace: stackTrace);
 
     if (context.mounted) {
       if (appState.errorString != AppLocalizations.of(context)!.databaseError) {
@@ -80,7 +83,8 @@ Future<void> markAsBookmarkContextFunction(News news, FluxNewsState appState,
           logThis(
               'queryNewsFromDB',
               'Caught an error in queryNewsFromDB function! : ${error.toString()}',
-              LogLevel.ERROR);
+              LogLevel.ERROR,
+              stackTrace: stackTrace);
 
           appState.errorString = AppLocalizations.of(context)!.databaseError;
           return [];
@@ -100,11 +104,10 @@ void markNewsAsReadContextAction(
   // mark a news as unread, update the news unread status in database
   try {
     updateNewsStatusInDB(news.newsID, FluxNewsState.unreadNewsStatus, appState);
-  } catch (e) {
-    logThis(
-        'updateNewsStatusInDB',
-        'Caught an error in updateNewsStatusInDB function! : ${e.toString()}',
-        LogLevel.ERROR);
+  } on Exception catch (exception, stackTrace) {
+    logThis('updateNewsStatusInDB',
+        'Caught an error in updateNewsStatusInDB function!', LogLevel.ERROR,
+        exception: exception, stackTrace: stackTrace);
 
     if (context.mounted) {
       if (appState.errorString != AppLocalizations.of(context)!.databaseError) {
@@ -121,11 +124,10 @@ void markNewsAsReadContextAction(
     // update the news status at the miniflux server
     try {
       toggleOneNewsAsRead(http.Client(), appState, news);
-    } catch (e) {
-      logThis(
-          'toggleOneNewsAsRead',
-          'Caught an error in toggleOneNewsAsRead function! : ${e.toString()}',
-          LogLevel.ERROR);
+    } on Exception catch (exception, stackTrace) {
+      logThis('toggleOneNewsAsRead',
+          'Caught an error in toggleOneNewsAsRead function!', LogLevel.ERROR,
+          exception: exception, stackTrace: stackTrace);
     }
     // update the news list of the main view
     appState.newsList = queryNewsFromDB(appState, appState.feedIDs)
@@ -133,7 +135,8 @@ void markNewsAsReadContextAction(
       logThis(
           'queryNewsFromDB',
           'Caught an error in queryNewsFromDB function! : ${error.toString()}',
-          LogLevel.ERROR);
+          LogLevel.ERROR,
+          stackTrace: stackTrace);
 
       appState.errorString = AppLocalizations.of(context)!.databaseError;
       return [];
@@ -157,11 +160,10 @@ void markNewsAsUnreadContextAction(
   // mark a news as read, update the news read status in database
   try {
     updateNewsStatusInDB(news.newsID, FluxNewsState.readNewsStatus, appState);
-  } catch (e) {
-    logThis(
-        'updateNewsStatusInDB',
-        'Caught an error in updateNewsStatusInDB function! : ${e.toString()}',
-        LogLevel.ERROR);
+  } on Exception catch (exception, stackTrace) {
+    logThis('updateNewsStatusInDB',
+        'Caught an error in updateNewsStatusInDB function!', LogLevel.ERROR,
+        exception: exception, stackTrace: stackTrace);
 
     if (context.mounted) {
       if (appState.errorString != AppLocalizations.of(context)!.databaseError) {
@@ -179,11 +181,10 @@ void markNewsAsUnreadContextAction(
     // update the news status at the miniflux server
     try {
       toggleOneNewsAsRead(http.Client(), appState, news);
-    } catch (e) {
-      logThis(
-          'toggleOneNewsAsRead',
-          'Caught an error in toggleOneNewsAsRead function! : ${e.toString()}',
-          LogLevel.ERROR);
+    } on Exception catch (exception, stackTrace) {
+      logThis('toggleOneNewsAsRead',
+          'Caught an error in toggleOneNewsAsRead function!}', LogLevel.ERROR,
+          exception: exception, stackTrace: stackTrace);
     }
     // update the news list of the main view
     appState.newsList = queryNewsFromDB(appState, appState.feedIDs)
@@ -191,7 +192,8 @@ void markNewsAsUnreadContextAction(
       logThis(
           'queryNewsFromDB',
           'Caught an error in queryNewsFromDB function! : ${error.toString()}',
-          LogLevel.ERROR);
+          LogLevel.ERROR,
+          stackTrace: stackTrace);
 
       appState.errorString = AppLocalizations.of(context)!.databaseError;
       return [];

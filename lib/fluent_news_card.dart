@@ -41,11 +41,13 @@ class FluentNewsCard extends StatelessWidget {
             try {
               updateNewsStatusInDB(
                   news.newsID, FluxNewsState.readNewsStatus, appState);
-            } catch (e) {
+            } on Exception catch (exception, stacktrace) {
               logThis(
                   'updateNewsStatusInDB',
-                  'Caught an error in updateNewsStatusInDB function! : ${e.toString()}',
-                  LogLevel.ERROR);
+                  'Caught an error in updateNewsStatusInDB function!',
+                  LogLevel.ERROR,
+                  exception: exception,
+                  stackTrace: stacktrace);
 
               if (context.mounted) {
                 if (appState.errorString !=
