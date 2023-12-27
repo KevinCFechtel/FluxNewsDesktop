@@ -58,6 +58,7 @@ dependencies:
   archive: ^3.4.9
   file_picker: ^6.1.1
   my_logger: ^1.0.1
+  macos_ui: ^2.0.2
 
 dev_dependencies:
   flutter_test:
@@ -81,7 +82,7 @@ flutter:
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
   # the material Icons class.
-  uses-material-design: false
+  uses-material-design: true
 
   # To add assets to your application, add an assets section, like this:
   # assets:

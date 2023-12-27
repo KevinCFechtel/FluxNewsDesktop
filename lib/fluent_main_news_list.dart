@@ -22,6 +22,7 @@ class FluentBodyNewsList extends StatelessWidget {
     double width = MediaQuery.of(context).size.width;
     FluxNewsState appState = context.watch<FluxNewsState>();
     bool searchView = false;
+    logThis("NewsList", "Rebuild", LogLevel.INFO);
     var getData = FutureBuilder<List<News>>(
       future: appState.newsList,
       builder: (context, snapshot) {
