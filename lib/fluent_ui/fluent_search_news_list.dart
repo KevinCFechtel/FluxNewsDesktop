@@ -1,9 +1,9 @@
 // the list view widget with search result
 import 'package:fluent_ui/fluent_ui.dart';
-import 'package:flux_news_desktop/fluent_news_row.dart';
-import 'package:flux_news_desktop/flux_news_state.dart';
-import 'package:flux_news_desktop/fluent_news_card.dart';
-import 'package:flux_news_desktop/news_model.dart';
+import 'package:flux_news_desktop/fluent_ui/fluent_news_row.dart';
+import 'package:flux_news_desktop/state/flux_news_state.dart';
+import 'package:flux_news_desktop/fluent_ui/fluent_news_card.dart';
+import 'package:flux_news_desktop/models/news_model.dart';
 import 'package:provider/provider.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import 'package:flutter_gen/gen_l10n/flux_news_localizations.dart';
@@ -43,24 +43,15 @@ class FluentSearchNewsList extends StatelessWidget {
                       // otherwise create list view with the news of the search result
                       : Stack(children: [
                           ScrollablePositionedList.builder(
-                              key: const PageStorageKey<String>(
-                                  'NewsSearchList'),
+                              key: const PageStorageKey<String>('NewsSearchList'),
                               itemCount: snapshot.data!.length,
-                              itemScrollController:
-                                  appState.searchItemScrollController,
-                              itemPositionsListener:
-                                  appState.searchItemPositionsListener,
+                              itemScrollController: appState.searchItemScrollController,
+                              itemPositionsListener: appState.searchItemPositionsListener,
                               initialScrollIndex: 0,
                               itemBuilder: (context, i) {
                                 return width <= 1600
-                                    ? FluentNewsCard(
-                                        news: snapshot.data![i],
-                                        context: context,
-                                        searchView: searchView)
-                                    : FluentNewsRow(
-                                        news: snapshot.data![i],
-                                        context: context,
-                                        searchView: searchView);
+                                    ? FluentNewsCard(news: snapshot.data![i], context: context, searchView: searchView)
+                                    : FluentNewsRow(news: snapshot.data![i], context: context, searchView: searchView);
                               }),
                         ]);
             }

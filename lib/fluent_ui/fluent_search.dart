@@ -1,15 +1,15 @@
 import 'package:fluent_ui/fluent_ui.dart';
-import 'package:flux_news_desktop/fluent_theme.dart';
-import 'package:flux_news_desktop/logging.dart';
-import 'package:flux_news_desktop/fluent_search_news_list.dart';
+import 'package:flux_news_desktop/fluent_ui/fluent_theme.dart';
+import 'package:flux_news_desktop/functions/logging.dart';
+import 'package:flux_news_desktop/fluent_ui/fluent_search_news_list.dart';
 import 'package:my_logger/core/constants.dart';
 import 'package:provider/provider.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_gen/gen_l10n/flux_news_localizations.dart';
 
-import 'flux_news_state.dart';
-import 'miniflux_backend.dart';
-import 'news_model.dart';
+import '../state/flux_news_state.dart';
+import '../miniflux_backend/miniflux_backend.dart';
+import '../models/news_model.dart';
 
 class FluentSearch extends StatelessWidget {
   const FluentSearch({super.key});
@@ -30,15 +30,13 @@ class FluentSearch extends StatelessWidget {
   // initConfig reads the config values from the persistent storage and sets the state
   // accordingly.
   // It also initializes the database connection.
-  Future<void> initConfig(BuildContext context, FluxNewsState appState,
-      FluentAppTheme appTheme) async {
+  Future<void> initConfig(BuildContext context, FluxNewsState appState, FluentAppTheme appTheme) async {
     await appState.readConfigValues();
     if (context.mounted) {
       appState.readConfig(context);
       if (appState.brightnessMode == FluxNewsState.brightnessModeDarkString) {
         appTheme.mode = ThemeMode.dark;
-      } else if (appState.brightnessMode ==
-          FluxNewsState.brightnessModeLightString) {
+      } else if (appState.brightnessMode == FluxNewsState.brightnessModeLightString) {
         appTheme.mode = ThemeMode.light;
       } else {
         appTheme.mode = ThemeMode.system;
@@ -65,17 +63,12 @@ class FluentSearch extends StatelessWidget {
             if (value != '') {
               // fetch the news list from the backend with the search text
               Future<List<News>> searchNewsListResult =
-                  fetchSearchedNews(http.Client(), appState, value)
-                      .onError((error, stackTrace) {
-                logThis(
-                    'fetchSearchedNews',
-                    'Caught an error in fetchSearchedNews function! : ${error.toString()}',
+                  fetchSearchedNews(http.Client(), appState, value).onError((error, stackTrace) {
+                logThis('fetchSearchedNews', 'Caught an error in fetchSearchedNews function! : ${error.toString()}',
                     LogLevel.ERROR,
                     stackTrace: stackTrace);
-                if (appState.errorString !=
-                    AppLocalizations.of(context)!.communicateionMinifluxError) {
-                  appState.errorString =
-                      AppLocalizations.of(context)!.communicateionMinifluxError;
+                if (appState.errorString != AppLocalizations.of(context)!.communicateionMinifluxError) {
+                  appState.errorString = AppLocalizations.of(context)!.communicateionMinifluxError;
                   appState.newError = true;
                   appState.refreshView();
                 }
@@ -167,8 +160,7 @@ class FluentSearch extends StatelessWidget {
 class FluxNewsSearchStatefulWrapper extends StatefulWidget {
   final Function onInit;
   final Widget child;
-  const FluxNewsSearchStatefulWrapper(
-      {super.key, required this.onInit, required this.child});
+  const FluxNewsSearchStatefulWrapper({super.key, required this.onInit, required this.child});
   @override
   FluxNewsBodyState createState() => FluxNewsBodyState();
 }

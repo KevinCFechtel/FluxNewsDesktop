@@ -3,10 +3,10 @@ import 'dart:io';
 import 'package:archive/archive_io.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:fluent_ui/fluent_ui.dart';
-import 'package:flux_news_desktop/database_backend.dart';
-import 'package:flux_news_desktop/fluent_theme.dart';
-import 'package:flux_news_desktop/flux_news_counter_state.dart';
-import 'package:flux_news_desktop/news_model.dart';
+import 'package:flux_news_desktop/database/database_backend.dart';
+import 'package:flux_news_desktop/fluent_ui/fluent_theme.dart';
+import 'package:flux_news_desktop/state/flux_news_counter_state.dart';
+import 'package:flux_news_desktop/models/news_model.dart';
 import 'package:intl/intl.dart';
 import 'package:my_logger/logger.dart';
 import 'package:path_provider/path_provider.dart';
@@ -14,29 +14,15 @@ import 'package:provider/provider.dart';
 import 'package:flutter_gen/gen_l10n/flux_news_localizations.dart';
 import 'package:http/http.dart' as http;
 
-import 'flux_news_state.dart';
-import 'miniflux_backend.dart';
+import '../state/flux_news_state.dart';
+import '../miniflux_backend/miniflux_backend.dart';
 
 class FluentSettings extends StatelessWidget {
   const FluentSettings({super.key});
 
   // define the selection lists for the settings of saved news and starred news
-  static const List<int> amountOfSavedNewsList = <int>[
-    50,
-    100,
-    200,
-    500,
-    1000,
-    2000
-  ];
-  static const List<int> amountOfSavedStarredNewsList = <int>[
-    50,
-    100,
-    200,
-    500,
-    1000,
-    2000
-  ];
+  static const List<int> amountOfSavedNewsList = <int>[50, 100, 200, 500, 1000, 2000];
+  static const List<int> amountOfSavedStarredNewsList = <int>[50, 100, 200, 500, 1000, 2000];
 
   @override
   Widget build(BuildContext context) {
@@ -115,14 +101,10 @@ class FluentSettings extends StatelessWidget {
                     appState.errorOnMinifluxAuth
                         ? appState.minifluxAPIKey != null
                             ? Padding(
-                                padding:
-                                    const EdgeInsets.only(top: 10, bottom: 10),
+                                padding: const EdgeInsets.only(top: 10, bottom: 10),
                                 child: Text(
                                   AppLocalizations.of(context)!.authError,
-                                  style: TextStyle(
-                                      color: Colors.red,
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.bold),
+                                  style: TextStyle(color: Colors.red, fontSize: 20, fontWeight: FontWeight.bold),
                                 ),
                               )
                             : const SizedBox.shrink()
@@ -164,29 +146,22 @@ class FluentSettings extends StatelessWidget {
                           ComboBox<KeyValueRecordType>(
                             value: appState.brightnessModeSelection,
                             items: appState.recordTypesBrightnessMode!
-                                .map<ComboBoxItem<KeyValueRecordType>>(
-                                    (recordType) =>
-                                        ComboBoxItem<KeyValueRecordType>(
-                                            value: recordType,
-                                            child: Text(recordType.value)))
+                                .map<ComboBoxItem<KeyValueRecordType>>((recordType) =>
+                                    ComboBoxItem<KeyValueRecordType>(value: recordType, child: Text(recordType.value)))
                                 .toList(),
                             onChanged: (value) {
                               if (value != null) {
-                                if (value.key ==
-                                    FluxNewsState.brightnessModeDarkString) {
+                                if (value.key == FluxNewsState.brightnessModeDarkString) {
                                   appTheme.mode = ThemeMode.dark;
-                                } else if (value.key ==
-                                    FluxNewsState.brightnessModeLightString) {
+                                } else if (value.key == FluxNewsState.brightnessModeLightString) {
                                   appTheme.mode = ThemeMode.light;
                                 } else {
                                   appTheme.mode = ThemeMode.system;
                                 }
                                 appState.brightnessMode = value.key;
                                 appState.brightnessModeSelection = value;
-                                appState.storage.write(
-                                    key: FluxNewsState
-                                        .secureStorageBrightnessModeKey,
-                                    value: value.key);
+                                appState.storage
+                                    .write(key: FluxNewsState.secureStorageBrightnessModeKey, value: value.key);
                                 appState.refreshView();
                               }
                             },
@@ -212,8 +187,7 @@ class FluentSettings extends StatelessWidget {
                           Padding(
                             padding: const EdgeInsets.only(left: 12.0),
                             child: Text(
-                              AppLocalizations.of(context)!
-                                  .markAsReadOnScrollover,
+                              AppLocalizations.of(context)!.markAsReadOnScrollover,
                               style: const TextStyle(fontSize: 16),
                             ),
                           ),
@@ -221,17 +195,13 @@ class FluentSettings extends StatelessWidget {
                           ToggleSwitch(
                             checked: appState.markAsReadOnScrollOver,
                             onChanged: (bool value) {
-                              String stringValue =
-                                  FluxNewsState.secureStorageFalseString;
+                              String stringValue = FluxNewsState.secureStorageFalseString;
                               if (value == true) {
-                                stringValue =
-                                    FluxNewsState.secureStorageTrueString;
+                                stringValue = FluxNewsState.secureStorageTrueString;
                               }
                               appState.markAsReadOnScrollOver = value;
-                              appState.storage.write(
-                                  key: FluxNewsState
-                                      .secureStorageMarkAsReadOnScrollOverKey,
-                                  value: stringValue);
+                              appState.storage
+                                  .write(key: FluxNewsState.secureStorageMarkAsReadOnScrollOverKey, value: stringValue);
                               appState.refreshView();
                             },
                           ),
@@ -261,17 +231,13 @@ class FluentSettings extends StatelessWidget {
                           ToggleSwitch(
                             checked: appState.syncOnStart,
                             onChanged: (bool value) {
-                              String stringValue =
-                                  FluxNewsState.secureStorageFalseString;
+                              String stringValue = FluxNewsState.secureStorageFalseString;
                               if (value == true) {
-                                stringValue =
-                                    FluxNewsState.secureStorageTrueString;
+                                stringValue = FluxNewsState.secureStorageTrueString;
                               }
                               appState.syncOnStart = value;
-                              appState.storage.write(
-                                  key:
-                                      FluxNewsState.secureStorageSyncOnStartKey,
-                                  value: stringValue);
+                              appState.storage
+                                  .write(key: FluxNewsState.secureStorageSyncOnStartKey, value: stringValue);
                               appState.refreshView();
                             },
                           ),
@@ -294,8 +260,7 @@ class FluentSettings extends StatelessWidget {
                           Padding(
                             padding: const EdgeInsets.only(left: 12.0),
                             child: Text(
-                              AppLocalizations.of(context)!
-                                  .multilineAppBarTextSetting,
+                              AppLocalizations.of(context)!.multilineAppBarTextSetting,
                               style: const TextStyle(fontSize: 16),
                             ),
                           ),
@@ -303,17 +268,13 @@ class FluentSettings extends StatelessWidget {
                           ToggleSwitch(
                             checked: appState.multilineAppBarText,
                             onChanged: (bool value) {
-                              String stringValue =
-                                  FluxNewsState.secureStorageFalseString;
+                              String stringValue = FluxNewsState.secureStorageFalseString;
                               if (value == true) {
-                                stringValue =
-                                    FluxNewsState.secureStorageTrueString;
+                                stringValue = FluxNewsState.secureStorageTrueString;
                               }
                               appState.multilineAppBarText = value;
-                              appState.storage.write(
-                                  key: FluxNewsState
-                                      .secureStorageMultilineAppBarTextKey,
-                                  value: stringValue);
+                              appState.storage
+                                  .write(key: FluxNewsState.secureStorageMultilineAppBarTextKey, value: stringValue);
                               appState.refreshView();
                             },
                           ),
@@ -335,8 +296,7 @@ class FluentSettings extends StatelessWidget {
                           Padding(
                             padding: const EdgeInsets.only(left: 12.0),
                             child: Text(
-                              AppLocalizations.of(context)!
-                                  .showFeedIconsTextSettings,
+                              AppLocalizations.of(context)!.showFeedIconsTextSettings,
                               style: const TextStyle(fontSize: 16),
                             ),
                           ),
@@ -344,17 +304,13 @@ class FluentSettings extends StatelessWidget {
                           ToggleSwitch(
                             checked: appState.showFeedIcons,
                             onChanged: (bool value) {
-                              String stringValue =
-                                  FluxNewsState.secureStorageFalseString;
+                              String stringValue = FluxNewsState.secureStorageFalseString;
                               if (value == true) {
-                                stringValue =
-                                    FluxNewsState.secureStorageTrueString;
+                                stringValue = FluxNewsState.secureStorageTrueString;
                               }
                               appState.showFeedIcons = value;
-                              appState.storage.write(
-                                  key: FluxNewsState
-                                      .secureStorageShowFeedIconsTextKey,
-                                  value: stringValue);
+                              appState.storage
+                                  .write(key: FluxNewsState.secureStorageShowFeedIconsTextKey, value: stringValue);
                               appState.refreshView();
                             },
                           ),
@@ -384,8 +340,7 @@ class FluentSettings extends StatelessWidget {
                           const Spacer(),
                           ComboBox<int>(
                             value: appState.amountOfSavedNews,
-                            items: amountOfSavedNewsList
-                                .map<ComboBoxItem<int>>((int value) {
+                            items: amountOfSavedNewsList.map<ComboBoxItem<int>>((int value) {
                               return ComboBoxItem<int>(
                                 value: value,
                                 child: Text(value.toString()),
@@ -395,9 +350,7 @@ class FluentSettings extends StatelessWidget {
                               if (value != null) {
                                 appState.amountOfSavedNews = value;
                                 appState.storage.write(
-                                    key: FluxNewsState
-                                        .secureStorageAmountOfSavedNewsKey,
-                                    value: value.toString());
+                                    key: FluxNewsState.secureStorageAmountOfSavedNewsKey, value: value.toString());
                                 appState.refreshView();
                               }
                             },
@@ -428,8 +381,7 @@ class FluentSettings extends StatelessWidget {
                           const Spacer(),
                           ComboBox<int>(
                             value: appState.amountOfSavedStarredNews,
-                            items: amountOfSavedStarredNewsList
-                                .map<ComboBoxItem<int>>((int value) {
+                            items: amountOfSavedStarredNewsList.map<ComboBoxItem<int>>((int value) {
                               return ComboBoxItem<int>(
                                 value: value,
                                 child: Text(value.toString()),
@@ -439,8 +391,7 @@ class FluentSettings extends StatelessWidget {
                               if (value != null) {
                                 appState.amountOfSavedStarredNews = value;
                                 appState.storage.write(
-                                    key: FluxNewsState
-                                        .secureStorageAmountOfSavedStarredNewsKey,
+                                    key: FluxNewsState.secureStorageAmountOfSavedStarredNewsKey,
                                     value: value.toString());
                                 appState.refreshView();
                               }
@@ -464,8 +415,7 @@ class FluentSettings extends StatelessWidget {
                           Padding(
                             padding: const EdgeInsets.only(left: 12.0),
                             child: Text(
-                              AppLocalizations.of(context)!
-                                  .debugModeTextSettings,
+                              AppLocalizations.of(context)!.debugModeTextSettings,
                               style: const TextStyle(fontSize: 16),
                             ),
                           ),
@@ -473,16 +423,12 @@ class FluentSettings extends StatelessWidget {
                           ToggleSwitch(
                             checked: appState.debugMode,
                             onChanged: (bool value) {
-                              String stringValue =
-                                  FluxNewsState.secureStorageFalseString;
+                              String stringValue = FluxNewsState.secureStorageFalseString;
                               if (value == true) {
-                                stringValue =
-                                    FluxNewsState.secureStorageTrueString;
+                                stringValue = FluxNewsState.secureStorageTrueString;
                               }
                               appState.debugMode = value;
-                              appState.storage.write(
-                                  key: FluxNewsState.secureStorageDebugModeKey,
-                                  value: stringValue);
+                              appState.storage.write(key: FluxNewsState.secureStorageDebugModeKey, value: stringValue);
                               appState.refreshView();
                             },
                           ),
@@ -501,8 +447,7 @@ class FluentSettings extends StatelessWidget {
                       ),
                       onPressed: () async {
                         String? outputFile = await FilePicker.platform.saveFile(
-                          dialogTitle:
-                              'Please select the destination for the exported logs:',
+                          dialogTitle: 'Please select the destination for the exported logs:',
                           fileName: 'FluxNewsLogs.zip',
                         );
 
@@ -511,18 +456,14 @@ class FluentSettings extends StatelessWidget {
 
                           encoder.create(outputFile);
 
-                          List<Log> logs = await MyLogger.logs
-                              .getByFilter(LogFilter.last24Hours());
+                          List<Log> logs = await MyLogger.logs.getByFilter(LogFilter.last24Hours());
                           DateTime now = DateTime.now();
                           DateFormat formatter = DateFormat('yyyy-MM-dd');
                           String formattedDate = formatter.format(now);
-                          final directory =
-                              await getApplicationDocumentsDirectory();
-                          File logFile = File(
-                              '${directory.path}/FluxNewsLogs-$formattedDate.log');
+                          final directory = await getApplicationDocumentsDirectory();
+                          File logFile = File('${directory.path}/FluxNewsLogs-$formattedDate.log');
                           for (Log log in logs) {
-                            logFile.writeAsStringSync(log.toString(),
-                                mode: FileMode.append);
+                            logFile.writeAsStringSync(log.toString(), mode: FileMode.append);
                           }
                           encoder.addFile(logFile);
                           encoder.close();
@@ -597,8 +538,7 @@ Future<void> initConfig(BuildContext context, FluentAppTheme appTheme) async {
     appState.readConfig(context);
     if (appState.brightnessMode == FluxNewsState.brightnessModeDarkString) {
       appTheme.mode = ThemeMode.dark;
-    } else if (appState.brightnessMode ==
-        FluxNewsState.brightnessModeLightString) {
+    } else if (appState.brightnessMode == FluxNewsState.brightnessModeLightString) {
       appTheme.mode = ThemeMode.light;
     } else {
       appTheme.mode = ThemeMode.system;
@@ -640,8 +580,7 @@ Future _showURLEditDialog(BuildContext context, FluxNewsState appState) {
             ]),
             actions: <Widget>[
               Button(
-                onPressed: () =>
-                    Navigator.pop(context, FluxNewsState.cancelContextString),
+                onPressed: () => Navigator.pop(context, FluxNewsState.cancelContextString),
                 child: Text(AppLocalizations.of(context)!.cancel),
               ),
               FilledButton(
@@ -654,21 +593,15 @@ Future _showURLEditDialog(BuildContext context, FluxNewsState appState) {
                     });
                   } else {
                     newText = controller.text;
-                    if (appState.minifluxAPIKey != null &&
-                        appState.minifluxAPIKey != '') {
-                      bool authCheck = await checkMinifluxCredentials(
-                              http.Client(),
-                              newText,
-                              appState.minifluxAPIKey!,
-                              appState)
-                          .onError((error, stackTrace) => false);
+                    if (appState.minifluxAPIKey != null && appState.minifluxAPIKey != '') {
+                      bool authCheck =
+                          await checkMinifluxCredentials(http.Client(), newText, appState.minifluxAPIKey!, appState)
+                              .onError((error, stackTrace) => false);
 
                       appState.errorOnMinifluxAuth = !authCheck;
                       appState.refreshView();
                     }
-                    appState.storage.write(
-                        key: FluxNewsState.secureStorageMinifluxURLKey,
-                        value: newText);
+                    appState.storage.write(key: FluxNewsState.secureStorageMinifluxURLKey, value: newText);
                     appState.minifluxURL = newText;
                     if (context.mounted) {
                       Navigator.pop(context);
@@ -709,8 +642,7 @@ Future _showApiKeyEditDialog(BuildContext context, FluxNewsState appState) {
           ),
           actions: <Widget>[
             Button(
-              onPressed: () =>
-                  Navigator.pop(context, FluxNewsState.cancelContextString),
+              onPressed: () => Navigator.pop(context, FluxNewsState.cancelContextString),
               child: Text(AppLocalizations.of(context)!.cancel),
             ),
             FilledButton(
@@ -719,19 +651,15 @@ Future _showApiKeyEditDialog(BuildContext context, FluxNewsState appState) {
                 if (controller.text != '') {
                   newText = controller.text;
                 }
-                if (appState.minifluxURL != null &&
-                    appState.minifluxURL != '' &&
-                    newText != null) {
-                  bool authCheck = await checkMinifluxCredentials(http.Client(),
-                          appState.minifluxURL!, newText, appState)
-                      .onError((error, stackTrace) => false);
+                if (appState.minifluxURL != null && appState.minifluxURL != '' && newText != null) {
+                  bool authCheck =
+                      await checkMinifluxCredentials(http.Client(), appState.minifluxURL!, newText, appState)
+                          .onError((error, stackTrace) => false);
                   appState.errorOnMinifluxAuth = !authCheck;
                   appState.refreshView();
                 }
 
-                appState.storage.write(
-                    key: FluxNewsState.secureStorageMinifluxAPIKey,
-                    value: newText);
+                appState.storage.write(key: FluxNewsState.secureStorageMinifluxAPIKey, value: newText);
                 appState.minifluxAPIKey = newText;
                 if (context.mounted) {
                   Navigator.pop(context);
@@ -748,8 +676,7 @@ Future _showApiKeyEditDialog(BuildContext context, FluxNewsState appState) {
 // this method shows a dialog to enter the miniflux api key
 // the api key is saved in the secure storage
 // if the url is set, the connection is tested
-Future _showDeleteLocalCacheDialog(
-    BuildContext context, FluxNewsState appState) {
+Future _showDeleteLocalCacheDialog(BuildContext context, FluxNewsState appState) {
   TextEditingController controller = TextEditingController();
   if (appState.minifluxAPIKey != null) {
     controller.text = appState.minifluxAPIKey!;
@@ -758,23 +685,20 @@ Future _showDeleteLocalCacheDialog(
       context: context,
       builder: (BuildContext context) {
         return ContentDialog(
-          title:
-              Text(AppLocalizations.of(context)!.deleteLocalCacheDialogTitle),
+          title: Text(AppLocalizations.of(context)!.deleteLocalCacheDialogTitle),
           content: Wrap(children: [
             Text(AppLocalizations.of(context)!.deleteLocalCacheDialogContent),
           ]),
           actions: <Widget>[
             Button(
-              onPressed: () =>
-                  Navigator.pop(context, FluxNewsState.cancelContextString),
+              onPressed: () => Navigator.pop(context, FluxNewsState.cancelContextString),
               child: Text(AppLocalizations.of(context)!.cancel),
             ),
             FilledButton(
               onPressed: () async {
                 deleteLocalNewsCache(appState, context);
                 appState.newsList = Future<List<News>>.value([]);
-                appState.categoryList =
-                    Future<Categories>.value(Categories(categories: []));
+                appState.categoryList = Future<Categories>.value(Categories(categories: []));
                 context.read<FluxNewsCounterState>().allNewsCount = 0;
                 context.read<FluxNewsCounterState>().appBarNewsCount = 0;
                 context.read<FluxNewsCounterState>().starredCount = 0;
@@ -794,8 +718,7 @@ Future _showDeleteLocalCacheDialog(
 class FluxNewsSettingsStatefulWrapper extends StatefulWidget {
   final Function onInit;
   final Widget child;
-  const FluxNewsSettingsStatefulWrapper(
-      {super.key, required this.onInit, required this.child});
+  const FluxNewsSettingsStatefulWrapper({super.key, required this.onInit, required this.child});
   @override
   FluxNewsBodyState createState() => FluxNewsBodyState();
 }

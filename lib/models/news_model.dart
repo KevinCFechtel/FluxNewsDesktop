@@ -3,13 +3,13 @@ import 'dart:typed_data';
 
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:flux_news_desktop/flux_news_counter_state.dart';
+import 'package:flux_news_desktop/state/flux_news_counter_state.dart';
 import 'package:html/dom.dart' as dom;
 import 'package:html/parser.dart';
 import 'package:provider/provider.dart';
 import 'package:sqflite_common/utils/utils.dart';
 
-import 'flux_news_state.dart';
+import '../state/flux_news_state.dart';
 
 // define the model
 class News {
@@ -67,8 +67,7 @@ class News {
     );
 
     if (json['enclosures'] != null) {
-      news.attachments = List<Attachment>.from(
-          json['enclosures'].map((i) => Attachment.fromJson(i)));
+      news.attachments = List<Attachment>.from(json['enclosures'].map((i) => Attachment.fromJson(i)));
     }
 
     return news;
@@ -142,11 +141,7 @@ class News {
   }
 
   Attachment getFirstImageAttachment() {
-    Attachment imageAttachment = Attachment(
-        attachmentID: -1,
-        newsID: -1,
-        attachmentURL: "",
-        attachmentMimeType: "");
+    Attachment imageAttachment = Attachment(attachmentID: -1, newsID: -1, attachmentURL: "", attachmentMimeType: "");
 
     if (attachments != null) {
       for (var attachment in attachments!) {
@@ -197,13 +192,10 @@ class News {
   // if the icon is a png image it is processed by the Image.memory widget
   Widget getFeedIcon(double size, BuildContext context) {
     bool darkModeEnabled = false;
-    if (context.read<FluxNewsState>().brightnessMode ==
-        FluxNewsState.brightnessModeDarkString) {
+    if (context.read<FluxNewsState>().brightnessMode == FluxNewsState.brightnessModeDarkString) {
       darkModeEnabled = true;
-    } else if (context.read<FluxNewsState>().brightnessMode ==
-        FluxNewsState.brightnessModeSystemString) {
-      darkModeEnabled =
-          MediaQuery.of(context).platformBrightness == Brightness.dark;
+    } else if (context.read<FluxNewsState>().brightnessMode == FluxNewsState.brightnessModeSystemString) {
+      darkModeEnabled = MediaQuery.of(context).platformBrightness == Brightness.dark;
     }
     if (icon != null) {
       if (iconMimeType == 'image/svg+xml') {
@@ -256,11 +248,7 @@ class NewsList {
 
 // define the model for a feed
 class Feed {
-  Feed(
-      {required this.feedID,
-      required this.title,
-      required this.siteUrl,
-      this.feedIconID});
+  Feed({required this.feedID, required this.title, required this.siteUrl, this.feedIconID});
 
   // define the properties
   int feedID = 0;
@@ -310,13 +298,10 @@ class Feed {
   // if the icon is a png image it is processed by the Image.memory widget
   Widget getFeedIcon(double size, BuildContext context) {
     bool darkModeEnabled = false;
-    if (context.read<FluxNewsState>().brightnessMode ==
-        FluxNewsState.brightnessModeDarkString) {
+    if (context.read<FluxNewsState>().brightnessMode == FluxNewsState.brightnessModeDarkString) {
       darkModeEnabled = true;
-    } else if (context.read<FluxNewsState>().brightnessMode ==
-        FluxNewsState.brightnessModeSystemString) {
-      darkModeEnabled =
-          MediaQuery.of(context).platformBrightness == Brightness.dark;
+    } else if (context.read<FluxNewsState>().brightnessMode == FluxNewsState.brightnessModeSystemString) {
+      darkModeEnabled = MediaQuery.of(context).platformBrightness == Brightness.dark;
     }
     if (icon != null) {
       if (iconMimeType == 'image/svg+xml') {
@@ -372,8 +357,7 @@ class FeedIcon {
 
 // define the model for a category
 class Category {
-  Category({required this.categoryID, required this.title, List<Feed>? feeds})
-      : feeds = feeds ?? [];
+  Category({required this.categoryID, required this.title, List<Feed>? feeds}) : feeds = feeds ?? [];
 
   // define the properties
   int categoryID = 0;
@@ -425,8 +409,7 @@ class Categories {
   // the news count of a category is the sum of the news count of each feed
   // the news count is stored in the appBarNewsCount variable if the category is currently displayed
   // the appState listener are notified to update the news count in the app bar
-  Future<void> renewNewsCount(
-      FluxNewsState appState, BuildContext context) async {
+  Future<void> renewNewsCount(FluxNewsState appState, BuildContext context) async {
     FluxNewsCounterState appCounterState = context.read<FluxNewsCounterState>();
     appState.db ??= await appState.initializeDB();
     if (appState.db != null) {
@@ -440,9 +423,8 @@ class Categories {
         int? categoryNewsCount = 0;
         for (Feed feed in category.feeds) {
           int? feedNewsCount;
-          feedNewsCount = firstIntValue(await appState.db!.rawQuery(
-              'SELECT COUNT(*) FROM news WHERE feedID = ? AND status LIKE ?',
-              [feed.feedID, status]));
+          feedNewsCount = firstIntValue(await appState.db!
+              .rawQuery('SELECT COUNT(*) FROM news WHERE feedID = ? AND status LIKE ?', [feed.feedID, status]));
           feedNewsCount ??= 0;
           categoryNewsCount ??= 0;
           categoryNewsCount = categoryNewsCount + feedNewsCount;

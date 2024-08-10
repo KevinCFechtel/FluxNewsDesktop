@@ -1,22 +1,20 @@
 import 'package:equatable/equatable.dart';
 import 'package:fluent_ui/fluent_ui.dart';
-import 'package:flux_news_desktop/logging.dart';
+import 'package:flux_news_desktop/functions/logging.dart';
 import 'package:intl/intl.dart';
 import 'package:my_logger/core/constants.dart';
 import 'package:my_logger/logger.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
-import 'package:flutter_secure_storage/flutter_secure_storage.dart'
-    as sec_store;
+import 'package:flutter_secure_storage/flutter_secure_storage.dart' as sec_store;
 
 import 'package:path/path.dart' as path_package;
 import 'package:flutter_gen/gen_l10n/flux_news_localizations.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
-import 'news_model.dart';
+import '../models/news_model.dart';
 
-const sec_store.MacOsOptions flutterSecureStorageMacOSOptions =
-    sec_store.MacOsOptions(
+const sec_store.MacOsOptions flutterSecureStorageMacOSOptions = sec_store.MacOsOptions(
   accessibility: sec_store.KeychainAccessibility.unlocked_this_device,
   groupId: null,
   // Note: This needs to be true in order for macOS to only write to the Local Items (or Cloud Items) keychain.
@@ -26,15 +24,13 @@ const sec_store.MacOsOptions flutterSecureStorageMacOSOptions =
 class FluxNewsState extends ChangeNotifier {
   // init the persistent flutter secure storage
 
-  final storage = const sec_store.FlutterSecureStorage(
-      mOptions: flutterSecureStorageMacOSOptions);
+  final storage = const sec_store.FlutterSecureStorage(mOptions: flutterSecureStorageMacOSOptions);
 
   // define static const variables to replace text within code
   static const String applicationName = 'Flux News';
   static const String applicationVersion = '1.3.2';
   static const String applicationLegalese = '\u{a9} 2023 Kevin Fechtel';
-  static const String applicationProjectUrl =
-      ' https://github.com/KevinCFechtel/FluxNews';
+  static const String applicationProjectUrl = ' https://github.com/KevinCFechtel/FluxNews';
   static const String miniFluxProjectUrl = ' https://miniflux.app';
   static const String databasePathString = 'news_database.db';
   static const String rootRouteString = '/';
@@ -60,17 +56,13 @@ class FluxNewsState extends ChangeNotifier {
   static const String secureStorageMinifluxVersionKey = 'minifluxVersionKey';
   static const String secureStorageBrightnessModeKey = 'brightnessMode';
   static const String secureStorageSortOrderKey = 'sortOrder';
-  static const String secureStorageSavedScrollPositionKey =
-      'savedScrollPosition';
-  static const String secureStorageMarkAsReadOnScrollOverKey =
-      'markAsReadOnScrollOver';
+  static const String secureStorageSavedScrollPositionKey = 'savedScrollPosition';
+  static const String secureStorageMarkAsReadOnScrollOverKey = 'markAsReadOnScrollOver';
   static const String secureStorageSyncOnStartKey = 'syncOnStart';
   static const String secureStorageNewsStatusKey = 'newsStatus';
   static const String secureStorageAmountOfSavedNewsKey = 'amountOfSavedNews';
-  static const String secureStorageAmountOfSavedStarredNewsKey =
-      'amountOfSavedStarredNews';
-  static const String secureStorageMultilineAppBarTextKey =
-      'multilineAppBarText';
+  static const String secureStorageAmountOfSavedStarredNewsKey = 'amountOfSavedStarredNews';
+  static const String secureStorageMultilineAppBarTextKey = 'multilineAppBarText';
   static const String secureStorageShowFeedIconsTextKey = 'showFeedIcons';
   static const String secureStorageDebugModeKey = 'debugMode';
   static const String secureStorageTrueString = 'true';
@@ -103,17 +95,14 @@ class FluxNewsState extends ChangeNotifier {
   late Offset tapPosition;
   int scrollPosition = 0;
   final ItemScrollController itemScrollController = ItemScrollController();
-  final ItemPositionsListener itemPositionsListener =
-      ItemPositionsListener.create();
+  final ItemPositionsListener itemPositionsListener = ItemPositionsListener.create();
   int macNavigationPosition = 0;
 
   // vars for search view
   Future<List<News>> searchNewsList = Future<List<News>>.value([]);
   final TextEditingController searchController = TextEditingController();
-  final ItemScrollController searchItemScrollController =
-      ItemScrollController();
-  final ItemPositionsListener searchItemPositionsListener =
-      ItemPositionsListener.create();
+  final ItemScrollController searchItemScrollController = ItemScrollController();
+  final ItemPositionsListener searchItemPositionsListener = ItemPositionsListener.create();
 
   // var for formatting the date depending on locale settings
   DateFormat dateFormat = DateFormat('M/d/yy HH:mm');
@@ -266,16 +255,13 @@ class FluxNewsState extends ChangeNotifier {
 
   Future<void> initLogging() async {
     LogConfig config = MyLogger.config
-      ..outputFormat =
-          "{{time}} {{level}} [{{class}}:{{method}}] -> {{message}}"
+      ..outputFormat = "{{time}} {{level}} [{{class}}:{{method}}] -> {{message}}"
       ..timestampFormat = TimestampFormat.TIME_FORMAT_FULL_3;
 
     MyLogger.applyConfig(config);
     final dateTime = DateTime.now().subtract(const Duration(days: 1));
     final filter = LogFilter(endDateTime: dateTime);
-    MyLogger.logs
-        .deleteByFilter(filter)
-        .then((_) => logThis('initLogging', 'Deleted old logs', LogLevel.INFO));
+    MyLogger.logs.deleteByFilter(filter).then((_) => logThis('initLogging', 'Deleted old logs', LogLevel.INFO));
     logThis('initLogging', 'Finished init logging', LogLevel.INFO);
   }
 
@@ -287,15 +273,9 @@ class FluxNewsState extends ChangeNotifier {
     // this maps use the key as the technical string and the value as the display name
     if (context.mounted) {
       recordTypesBrightnessMode = <KeyValueRecordType>[
-        KeyValueRecordType(
-            key: FluxNewsState.brightnessModeSystemString,
-            value: AppLocalizations.of(context)!.system),
-        KeyValueRecordType(
-            key: FluxNewsState.brightnessModeDarkString,
-            value: AppLocalizations.of(context)!.dark),
-        KeyValueRecordType(
-            key: FluxNewsState.brightnessModeLightString,
-            value: AppLocalizations.of(context)!.light),
+        KeyValueRecordType(key: FluxNewsState.brightnessModeSystemString, value: AppLocalizations.of(context)!.system),
+        KeyValueRecordType(key: FluxNewsState.brightnessModeDarkString, value: AppLocalizations.of(context)!.dark),
+        KeyValueRecordType(key: FluxNewsState.brightnessModeLightString, value: AppLocalizations.of(context)!.light),
       ];
     } else {
       recordTypesBrightnessMode = <KeyValueRecordType>[];
