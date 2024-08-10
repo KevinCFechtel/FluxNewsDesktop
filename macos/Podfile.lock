@@ -2,9 +2,6 @@ PODS:
   - flutter_secure_storage_macos (6.1.1):
     - FlutterMacOS
   - FlutterMacOS (1.0.0)
-  - FMDB (2.7.5):
-    - FMDB/standard (= 2.7.5)
-  - FMDB/standard (2.7.5)
   - macos_window_utils (1.0.0):
     - FlutterMacOS
   - path_provider_foundation (0.0.1):
@@ -12,9 +9,9 @@ PODS:
     - FlutterMacOS
   - screen_retriever (0.0.1):
     - FlutterMacOS
-  - sqflite (0.0.2):
+  - sqflite (0.0.3):
+    - Flutter
     - FlutterMacOS
-    - FMDB (>= 2.7.5)
   - system_date_time_format (0.0.1):
     - FlutterMacOS
   - system_theme (0.0.1):
@@ -28,14 +25,10 @@ DEPENDENCIES:
   - macos_window_utils (from `Flutter/ephemeral/.symlinks/plugins/macos_window_utils/macos`)
   - path_provider_foundation (from `Flutter/ephemeral/.symlinks/plugins/path_provider_foundation/darwin`)
   - screen_retriever (from `Flutter/ephemeral/.symlinks/plugins/screen_retriever/macos`)
-  - sqflite (from `Flutter/ephemeral/.symlinks/plugins/sqflite/macos`)
+  - sqflite (from `Flutter/ephemeral/.symlinks/plugins/sqflite/darwin`)
   - system_date_time_format (from `Flutter/ephemeral/.symlinks/plugins/system_date_time_format/macos`)
   - system_theme (from `Flutter/ephemeral/.symlinks/plugins/system_theme/macos`)
   - window_manager (from `Flutter/ephemeral/.symlinks/plugins/window_manager/macos`)
-
-SPEC REPOS:
-  trunk:
-    - FMDB
 
 EXTERNAL SOURCES:
   flutter_secure_storage_macos:
@@ -49,7 +42,7 @@ EXTERNAL SOURCES:
   screen_retriever:
     :path: Flutter/ephemeral/.symlinks/plugins/screen_retriever/macos
   sqflite:
-    :path: Flutter/ephemeral/.symlinks/plugins/sqflite/macos
+    :path: Flutter/ephemeral/.symlinks/plugins/sqflite/darwin
   system_date_time_format:
     :path: Flutter/ephemeral/.symlinks/plugins/system_date_time_format/macos
   system_theme:
@@ -58,17 +51,16 @@ EXTERNAL SOURCES:
     :path: Flutter/ephemeral/.symlinks/plugins/window_manager/macos
 
 SPEC CHECKSUMS:
-  flutter_secure_storage_macos: d56e2d218c1130b262bef8b4a7d64f88d7f9c9ea
+  flutter_secure_storage_macos: 59459653abe1adb92abbc8ea747d79f8d19866c9
   FlutterMacOS: 8f6f14fa908a6fb3fba0cd85dbd81ec4b251fb24
-  FMDB: 2ce00b547f966261cd18927a3ddb07cb6f3db82a
   macos_window_utils: 933f91f64805e2eb91a5bd057cf97cd097276663
-  path_provider_foundation: 29f094ae23ebbca9d3d0cec13889cd9060c0e943
+  path_provider_foundation: 2b6b4c569c0fb62ec74538f866245ac84301af46
   screen_retriever: 59634572a57080243dd1bf715e55b6c54f241a38
-  sqflite: a5789cceda41d54d23f31d6de539d65bb14100ea
+  sqflite: 673a0e54cc04b7d6dba8d24fb8095b31c3a99eec
   system_date_time_format: 4f3982edee40a537cf15c817d1e939b9dbfa457d
   system_theme: c7b9f6659a5caa26c9bc2284da096781e9a6fcbc
   window_manager: 3a1844359a6295ab1e47659b1a777e36773cd6e8
 
 PODFILE CHECKSUM: 16208599a12443d53889ba2270a4985981cfb204
 
-COCOAPODS: 1.14.3
+COCOAPODS: 1.15.2
