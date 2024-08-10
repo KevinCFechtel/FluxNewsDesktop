@@ -125,8 +125,8 @@ class FluentNewsCard extends StatelessWidget {
                           ),
                           CommandBarButton(
                             icon: news.status == FluxNewsState.readNewsStatus
-                                ? const Icon(FluentIcons.location_fill)
-                                : const Icon(FluentIcons.location_circle),
+                                ? const Text("New", style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold))
+                                : const Icon(FluentIcons.accept),
                             label: news.status == FluxNewsState.readNewsStatus
                                 ? Text(AppLocalizations.of(context)!.markAsUnread)
                                 : Text(AppLocalizations.of(context)!.markAsRead),
@@ -147,8 +147,11 @@ class FluentNewsCard extends StatelessWidget {
                               maxLines: 2,
                               overflow: TextOverflow.ellipsis,
                             ),
-                            onPressed: () {
-                              Navigator.pop(context);
+                            onPressed: () async {
+                              await saveNewsInThirdPartyContextAction(news, appState, context);
+                              if (context.mounted) {
+                                Navigator.pop(context);
+                              }
                             },
                           ),
                         ],
@@ -222,9 +225,18 @@ class FluentNewsCard extends StatelessWidget {
                                     news.status == FluxNewsState.unreadNewsStatus
                                         ? const Padding(
                                             padding: EdgeInsets.only(right: 15.0),
-                                            child:
-                                                SizedBox(width: 15, height: 35, child: Icon(FluentIcons.location_fill)))
-                                        : const SizedBox.shrink(),
+                                            child: SizedBox(
+                                                width: 25,
+                                                height: 35,
+                                                child: Center(
+                                                    child: Text("New",
+                                                        style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold)))))
+                                        : Padding(
+                                            padding: const EdgeInsets.only(right: 15.0),
+                                            child: SizedBox(
+                                                width: 25,
+                                                height: 35,
+                                                child: Icon(FluentIcons.accept, color: Colors.grey[120]))),
                                     appState.showFeedIcons
                                         ? Padding(
                                             padding: const EdgeInsets.only(right: 5.0),
@@ -267,7 +279,7 @@ class FluentNewsCard extends StatelessWidget {
                               Padding(
                                 padding: const EdgeInsets.only(top: 2.0, bottom: 10),
                                 child: Text(
-                                  news.getText(),
+                                  news.getText(appState),
                                   style: news.status == FluxNewsState.unreadNewsStatus
                                       ? appTheme.unreadText
                                       : appTheme.readText,

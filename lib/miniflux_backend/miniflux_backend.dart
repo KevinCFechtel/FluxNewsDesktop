@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:typed_data';
 
 import 'package:http/http.dart';
 import 'package:my_logger/core/constants.dart';
@@ -50,6 +49,17 @@ Future<NewsList> fetchNews(http.Client client, FluxNewsState appState) async {
   int offset = 0;
   // set the offset counter (multiplier) to 1 for the first request.
   int offsetCounter = 1;
+  // init the string for the request
+  String requestString = '';
+  // decide if the sort order is ascending or descending
+  String sortOrder = FluxNewsState.minifluxAscString;
+  if (appState.sortOrder != null) {
+    if (appState.sortOrder == FluxNewsState.sortOrderNewestFirstString) {
+      sortOrder = FluxNewsState.minifluxDescString;
+    } else {
+      sortOrder = FluxNewsState.minifluxAscString;
+    }
+  }
   // check if the miniflux url and api key is set.
   if (appState.minifluxURL != null && appState.minifluxAPIKey != null) {
     // define the header for the request.
@@ -66,46 +76,75 @@ Future<NewsList> fetchNews(http.Client client, FluxNewsState appState) async {
     // of news provided by a response.
     // this is a kind of pagination.
     while (listSize == FluxNewsState.amountOfNewlyCaughtNews) {
-      // request the unread news with the parameter, how many news should be provided by
-      // one response (limit) and the amount of news which should be skipped, because
-      // they were already transferred (offset).
-      final response = await client.get(
-          Uri.parse(
-              '${appState.minifluxURL!}entries?status=unread&order=published_at&direction=asc&limit=${FluxNewsState.amountOfNewlyCaughtNews}&offset=$offset'),
-          headers: header);
-      // only the response code 200 ist ok
-      if (response.statusCode == 200) {
-        // parse the body to the temp news list
-        tempNewsList = NewsList.fromJson(jsonDecode(utf8.decode(response.bodyBytes)));
-        if (appState.debugMode) {
-          logThis('fetchNews', '${tempNewsList.news.length} news fetched', LogLevel.INFO);
-        }
-        // add the temp news list to the returning news list
-        newsList.news.addAll(tempNewsList.news);
-        // add the news count to the returning news list (this is the same count for every iteration)
-        newsList.newsCount = tempNewsList.newsCount;
-        // update the list size to the count of the provided news
-        listSize = tempNewsList.news.length;
-        // update the offset to the maximum of provided news for each request,
-        // multiplied by a incrementing counter
-        offset = FluxNewsState.amountOfNewlyCaughtNews * offsetCounter;
-        // increment the offset counter for the next run
-        offsetCounter++;
-        if (appState.debugMode) {
-          if (listSize == FluxNewsState.amountOfNewlyCaughtNews) {
-            logThis('fetchNews', '${tempNewsList.newsCount - listSize} news remaining', LogLevel.INFO);
-          } else {
-            logThis('fetchNews', '0 news remaining', LogLevel.INFO);
+      if (!appState.longSyncAborted) {
+        requestString =
+            '${appState.minifluxURL!}entries?status=unread&order=published_at&direction=$sortOrder&limit=${FluxNewsState.amountOfNewlyCaughtNews}&offset=$offset';
+        // request the unread news with the parameter, how many news should be provided by
+        // one response (limit) and the amount of news which should be skipped, because
+        // they were already transferred (offset).
+        final response = await client.get(Uri.parse(requestString), headers: header);
+        // only the response code 200 ist ok
+        if (response.statusCode == 200) {
+          // parse the body to the temp news list
+          tempNewsList = NewsList.fromJson(jsonDecode(utf8.decode(response.bodyBytes)));
+          if (appState.debugMode) {
+            logThis('fetchNews', '${tempNewsList.news.length} news fetched', LogLevel.INFO);
           }
+          // add the temp news list to the returning news list
+          newsList.news.addAll(tempNewsList.news);
+          // check if the execution time will took very long
+          if (tempNewsList.newsCount > FluxNewsState.amountForLongNewsSync) {
+            if (tempNewsList.newsCount > FluxNewsState.amountForTooManyNews && appState.amountOfSyncedNews == 0) {
+              // remove the native splash after updating the list view
+              appState.tooManyNews = true;
+              appState.longSyncAborted = true;
+              appState.refreshView();
+            } else {
+              if (appState.amountOfSyncedNews > FluxNewsState.amountForLongNewsSync ||
+                  appState.amountOfSyncedNews == 0) {
+                if (!appState.longSync && !appState.longSyncAlerted) {
+                  // remove the native splash after updating the list view
+                  appState.longSync = true;
+                  appState.refreshView();
+                }
+              }
+            }
+          }
+          // add the news count to the returning news list (this is the same count for every iteration)
+          newsList.newsCount = tempNewsList.newsCount;
+          // update the list size to the count of the provided news
+          listSize = tempNewsList.news.length;
+          // update the offset to the maximum of provided news for each request,
+          // multiplied by a incrementing counter
+          offset = FluxNewsState.amountOfNewlyCaughtNews * offsetCounter;
+          // increment the offset counter for the next run
+          offsetCounter++;
+          if (appState.debugMode) {
+            if (listSize == FluxNewsState.amountOfNewlyCaughtNews) {
+              logThis('fetchNews', '${tempNewsList.newsCount - offset} news remaining', LogLevel.INFO);
+            } else {
+              logThis('fetchNews', '0 news remaining', LogLevel.INFO);
+            }
+          }
+          if (offset >= appState.amountOfSyncedNews && appState.amountOfSyncedNews != 0) {
+            logThis('fetchNews', 'Reached limit of news to sync', LogLevel.INFO);
+            break;
+          }
+        } else {
+          logThis('fetchNews', 'Got unexpected response from miniflux server: ${response.statusCode} for unread news',
+              LogLevel.ERROR);
+
+          // if the status is not 200, throw a exception
+          throw FluxNewsState.httpUnexpectedResponseErrorString;
         }
       } else {
-        logThis('fetchNews', 'Got unexpected response from miniflux server: ${response.statusCode} for unread news',
-            LogLevel.ERROR);
-
-        // if the status is not 200, throw a exception
-        throw FluxNewsState.httpUnexpectedResponseErrorString;
+        listSize = 0;
+        if (appState.debugMode) {
+          logThis('fetchNews', 'Aborted fetching news from miniflux server', LogLevel.INFO);
+        }
       }
     }
+    client.close();
     if (appState.debugMode) {
       logThis('fetchNews', 'Finished fetching news from miniflux server', LogLevel.INFO);
     }
@@ -135,16 +174,24 @@ Future<NewsList> fetchStarredNews(http.Client client, FluxNewsState appState) as
   int listSize = FluxNewsState.amountOfNewlyCaughtNews;
   int offset = 0;
   int offsetCounter = 1;
+  String requestString = '';
+  String sortOrder = FluxNewsState.minifluxAscString;
+  if (appState.sortOrder != null) {
+    if (appState.sortOrder == FluxNewsState.sortOrderNewestFirstString) {
+      sortOrder = FluxNewsState.minifluxDescString;
+    } else {
+      sortOrder = FluxNewsState.minifluxAscString;
+    }
+  }
   if (appState.minifluxURL != null && appState.minifluxAPIKey != null) {
     final header = {
       FluxNewsState.httpMinifluxAuthHeaderString: appState.minifluxAPIKey!,
       FluxNewsState.httpMinifluxAcceptHeaderString: FluxNewsState.httpContentTypeString,
     };
     while (listSize == FluxNewsState.amountOfNewlyCaughtNews) {
-      final response = await client.get(
-          Uri.parse(
-              '${appState.minifluxURL!}entries?starred=true&order=published_at&direction=asc&limit=${FluxNewsState.amountOfNewlyCaughtNews}&offset=$offset'),
-          headers: header);
+      requestString =
+          '${appState.minifluxURL!}entries?starred=true&order=published_at&direction=$sortOrder&limit=${FluxNewsState.amountOfNewlyCaughtNews}&offset=$offset';
+      final response = await client.get(Uri.parse(requestString), headers: header);
       if (response.statusCode == 200) {
         tempNewsList = NewsList.fromJson(jsonDecode(utf8.decode(response.bodyBytes)));
         if (appState.debugMode) {
@@ -162,6 +209,10 @@ Future<NewsList> fetchStarredNews(http.Client client, FluxNewsState appState) as
             logThis('fetchStarredNews', '0 news remaining', LogLevel.INFO);
           }
         }
+        if (offset >= appState.amountOfSyncedNews && appState.amountOfSyncedNews != 0) {
+          logThis('fetchStarredNews', 'Reached limit of news to sync', LogLevel.INFO);
+          break;
+        }
       } else {
         logThis('fetchStarredNews',
             'Got unexpected response from miniflux server: ${response.statusCode} for starred news', LogLevel.ERROR);
@@ -169,6 +220,7 @@ Future<NewsList> fetchStarredNews(http.Client client, FluxNewsState appState) as
         throw FluxNewsState.httpUnexpectedResponseErrorString;
       }
     }
+    client.close();
     if (appState.debugMode) {
       logThis('fetchStarredNews', 'Finished fetching starred news from miniflux server', LogLevel.INFO);
     }
@@ -205,6 +257,17 @@ Future<List<News>> fetchSearchedNews(http.Client client, FluxNewsState appState,
   int offset = 0;
   // set the offset counter (multiplier) to 1 for the first request.
   int offsetCounter = 1;
+  // init the string for the request
+  String requestString = '';
+  // decide if the sort order is ascending or descending
+  String sortOrder = FluxNewsState.minifluxAscString;
+  if (appState.sortOrder != null) {
+    if (appState.sortOrder == FluxNewsState.sortOrderNewestFirstString) {
+      sortOrder = FluxNewsState.minifluxDescString;
+    } else {
+      sortOrder = FluxNewsState.minifluxAscString;
+    }
+  }
   // check if the miniflux url and api key is set.
   if (appState.minifluxURL != null && appState.minifluxAPIKey != null) {
     // define the header for the request.
@@ -221,42 +284,60 @@ Future<List<News>> fetchSearchedNews(http.Client client, FluxNewsState appState,
     // of news provided by a response.
     // this is a kind of pagination.
     while (listSize == FluxNewsState.amountOfNewlyCaughtNews) {
-      // request the unread news with the parameter, how many news should be provided by
-      // one response (limit) and the amount of news which should be skipped, because
-      // they were already transferred (offset).
-      final response = await client.get(
-          Uri.parse(
-              '${appState.minifluxURL!}entries?search=$searchString&order=published_at&direction=asc&limit=${FluxNewsState.amountOfNewlyCaughtNews}&offset=$offset'),
-          headers: header);
-      // only the response code 200 ist ok
-      if (response.statusCode == 200) {
-        tempNewsList = NewsList.fromJson(jsonDecode(utf8.decode(response.bodyBytes)));
-        if (appState.debugMode) {
-          logThis('fetchSearchedNews', '${tempNewsList.news.length} news fetched', LogLevel.INFO);
-        }
-        // add the news of the response to the news list
-        newList.addAll(tempNewsList.news);
-        // update the list size to the count of the provided news
-        listSize = tempNewsList.news.length;
-        // update the offset to the maximum of provided news for each request,
-        // multiplied by a incrementing counter
-        offset = FluxNewsState.amountOfNewlyCaughtNews * offsetCounter;
-        // increment the offset counter for the next run
-        offsetCounter++;
-        if (appState.debugMode) {
-          if (listSize == FluxNewsState.amountOfNewlyCaughtNews) {
-            logThis('fetchSearchedNews', '${tempNewsList.newsCount - listSize} news remaining', LogLevel.INFO);
-          } else {
-            logThis('fetchSearchedNews', '0 news remaining', LogLevel.INFO);
+      if (!appState.longSyncAborted) {
+        // request the unread news with the parameter, how many news should be provided by
+        // one response (limit) and the amount of news which should be skipped, because
+        // they were already transferred (offset).
+        requestString =
+            '${appState.minifluxURL!}entries?search=$searchString&order=published_at&direction=$sortOrder&limit=${FluxNewsState.amountOfNewlyCaughtNews}&offset=$offset';
+        final response = await client.get(Uri.parse(requestString), headers: header);
+        // only the response code 200 ist ok
+        if (response.statusCode == 200) {
+          tempNewsList = NewsList.fromJson(jsonDecode(utf8.decode(response.bodyBytes)));
+          if (appState.debugMode) {
+            logThis('fetchSearchedNews', '${tempNewsList.news.length} news fetched', LogLevel.INFO);
           }
+          // add the news of the response to the news list
+          newList.addAll(tempNewsList.news);
+          // check if the execution time will took very long
+          if (tempNewsList.newsCount > FluxNewsState.amountForLongNewsSync) {
+            if (tempNewsList.newsCount > FluxNewsState.amountForTooManyNews) {
+              appState.tooManyNews = true;
+              appState.longSyncAborted = true;
+              appState.refreshView();
+            }
+          }
+          // update the list size to the count of the provided news
+          listSize = tempNewsList.news.length;
+          // update the offset to the maximum of provided news for each request,
+          // multiplied by a incrementing counter
+          offset = FluxNewsState.amountOfNewlyCaughtNews * offsetCounter;
+          // increment the offset counter for the next run
+          offsetCounter++;
+          if (appState.debugMode) {
+            if (listSize == FluxNewsState.amountOfNewlyCaughtNews) {
+              logThis('fetchSearchedNews', '${tempNewsList.newsCount - offset} news remaining', LogLevel.INFO);
+            } else {
+              logThis('fetchSearchedNews', '0 news remaining', LogLevel.INFO);
+            }
+          }
+          if (offset >= appState.amountOfSearchedNews && appState.amountOfSearchedNews != 0) {
+            logThis('fetchSearchedNews', 'Reached limit of news to search', LogLevel.INFO);
+            break;
+          }
+        } else {
+          logThis(
+              'fetchSearchedNews',
+              'Got unexpected response from miniflux server: ${response.statusCode} for search string $searchString',
+              LogLevel.ERROR);
+          // if the status is not 200, throw a exception
+          throw FluxNewsState.httpUnexpectedResponseErrorString;
         }
       } else {
-        logThis(
-            'fetchSearchedNews',
-            'Got unexpected response from miniflux server: ${response.statusCode} for search string $searchString',
-            LogLevel.ERROR);
-        // if the status is not 200, throw a exception
-        throw FluxNewsState.httpUnexpectedResponseErrorString;
+        listSize = 0;
+        if (appState.debugMode) {
+          logThis('fetchSearchedNews', 'Aborted fetching searched news from miniflux server', LogLevel.INFO);
+        }
       }
     }
     // read the feed icon
@@ -264,33 +345,24 @@ Future<List<News>> fetchSearchedNews(http.Client client, FluxNewsState appState,
     // if not, initialize the database
     appState.db ??= await appState.initializeDB();
     if (appState.db != null) {
+      List<Feed> feedList = [];
+      List<Map<String, Object?>> queryResult = await appState.db!
+          .rawQuery('SELECT feedID, title, site_url, NULL AS icon, iconMimeType, newsCount, categoryID FROM feeds');
+      for (Feed feed in queryResult.map((e) => Feed.fromMap(e)).toList()) {
+        feed.icon = appState.readFeedIconFile(feed.feedID);
+        feedList.add(feed);
+      }
       // for each news in the list, get the feed icon from the database
       for (News news in newList) {
-        // get the feed icon from the database
-        List<Map<String, Object?>> queryResult =
-            await appState.db!.rawQuery('SELECT * FROM feeds WHERE feedID = ?', [news.feedID]);
-        // if the query result is not empty, set the icon and the icon mime type
-        news.icon = queryResult.map((e) {
-          if (e['icon'] != null) {
-            return e['icon'] as Uint8List;
-          } else {
-            return null;
-          }
-        }).first;
+        // get the feed icon and the feed icon mime type
+        news.getFeedInfo(feedList);
 
-        // get the feed icon mime type from the database
-        news.iconMimeType = queryResult.map((e) {
-          if (e['iconMimeType'] != null) {
-            return e['iconMimeType'] as String;
-          } else {
-            return null;
-          }
-        }).first;
         if (appState.debugMode) {
           logThis('fetchSearchedNews', 'Got the feed icon from the database for feed ${news.feedID}', LogLevel.INFO);
         }
       }
     }
+    client.close();
     if (appState.debugMode) {
       logThis('fetchSearchedNews', 'Finished fetching searched news from miniflux server', LogLevel.INFO);
     }
@@ -353,6 +425,7 @@ Future<void> toggleNewsAsRead(http.Client client, FluxNewsState appState) async 
             }
           }
         }
+        client.close();
       }
     }
   }
@@ -388,6 +461,7 @@ Future<void> toggleOneNewsAsRead(http.Client client, FluxNewsState appState, New
       // if the response code is not 204, throw a error
       throw FluxNewsState.httpUnexpectedResponseErrorString;
     }
+    client.close();
   }
   if (appState.debugMode) {
     logThis('toggleOneNewsAsRead', 'Finished toggle one news as read at miniflux server', LogLevel.INFO);
@@ -427,6 +501,7 @@ Future<void> toggleBookmark(http.Client client, FluxNewsState appState, News new
           logThis('toggleBookmark', 'Updated bookmark status of news ${news.newsID} in database', LogLevel.INFO);
         }
       }
+      client.close();
     }
   }
   if (appState.debugMode) {
@@ -437,7 +512,8 @@ Future<void> toggleBookmark(http.Client client, FluxNewsState appState, News new
 // mark a news as bookmarked at the miniflux server
 Future<void> saveNewsToThirdPartyService(http.Client client, FluxNewsState appState, News news) async {
   if (appState.debugMode) {
-    logThis('toggleBookmark', 'Starting toggle bookmark at miniflux server', LogLevel.INFO);
+    logThis(
+        'saveNewsToThirdPartyService', 'Starting saving news to third party service at miniflux server', LogLevel.INFO);
   }
   // first check if the miniflux url and api key is set
   if (appState.minifluxURL != null && appState.minifluxAPIKey != null) {
@@ -446,23 +522,41 @@ Future<void> saveNewsToThirdPartyService(http.Client client, FluxNewsState appSt
       final header = {
         FluxNewsState.httpMinifluxAuthHeaderString: appState.minifluxAPIKey!,
       };
-      // toggle the bookmark status of the news at the miniflux server
-      final response = await client.put(
+      // saving news to third party service on miniflux server
+      final response = await client.post(
         Uri.parse('${appState.minifluxURL!}entries/${news.newsID}/save'),
         headers: header,
       );
       if (response.statusCode != 202) {
-        logThis(
-            'toggleBookmark',
-            'Got unexpected response from miniflux server: ${response.statusCode} for news ${news.newsID}',
-            LogLevel.ERROR);
-        // if the response code is not 204, throw an error
-        throw FluxNewsState.httpUnexpectedResponseErrorString;
+        if (response.statusCode == 400) {
+          final errorMessage = jsonDecode(response.body) as Map<String, dynamic>;
+          if (errorMessage['error_message'] == 'no third-party integration enabled') {
+            if (appState.debugMode) {
+              logThis('saveNewsToThirdPartyService', 'no third-party integration enabled', LogLevel.INFO);
+            }
+          } else {
+            logThis(
+                'saveNewsToThirdPartyService',
+                'Got unexpected response from miniflux server: ${response.body} for news ${news.newsID}',
+                LogLevel.ERROR);
+            // if the response body is not 'no third-party integration enabled', throw an error
+            throw FluxNewsState.httpUnexpectedResponseErrorString;
+          }
+        } else {
+          logThis(
+              'saveNewsToThirdPartyService',
+              'Got unexpected response from miniflux server: ${response.statusCode} for news ${news.newsID}',
+              LogLevel.ERROR);
+          // if the response code is not 202, throw an error
+          throw FluxNewsState.httpUnexpectedResponseErrorString;
+        }
       }
+      client.close();
     }
   }
   if (appState.debugMode) {
-    logThis('toggleBookmark', 'Finished toggle bookmark at miniflux server', LogLevel.INFO);
+    logThis(
+        'saveNewsToThirdPartyService', 'Finished saving news to third party service at miniflux server', LogLevel.INFO);
   }
 }
 
@@ -566,6 +660,7 @@ Future<Categories> fetchCategoryInformation(http.Client client, FluxNewsState ap
           category.feeds = feedList;
         }
       }
+      client.close();
     }
   }
   if (appState.debugMode) {
@@ -613,6 +708,7 @@ Future<FeedIcon?> getFeedIcon(http.Client client, FluxNewsState appState, int fe
         // if the response code is 200, decode the response body and create a new FeedIcon object
         feedIcon = FeedIcon.fromJson(jsonDecode(utf8.decode(response.bodyBytes)));
       }
+      client.close();
     }
   }
   if (appState.debugMode) {
@@ -641,7 +737,7 @@ Future<bool> checkMinifluxCredentials(
       response = await client.get(Uri.parse('${miniFluxUrl}version'), headers: header);
       if (response.statusCode == 200) {
         Version minifluxVersion = Version.fromJson(jsonDecode(utf8.decode(response.bodyBytes)));
-        appState.minifluxVersionInt = int.parse(minifluxVersion.version.replaceAll(".", ""));
+        appState.minifluxVersionInt = int.parse(minifluxVersion.version.replaceAll(RegExp(r'\D'), ''));
         appState.minifluxVersionString = minifluxVersion.version;
         appState.storage.write(key: FluxNewsState.secureStorageMinifluxVersionKey, value: minifluxVersion.version);
         appState.refreshView();
@@ -657,7 +753,7 @@ Future<bool> checkMinifluxCredentials(
 
         response = await client.get(Uri.parse('${minifluxBaseURL}version'), headers: header);
         if (response.statusCode == 200) {
-          appState.minifluxVersionInt = int.parse(response.body.replaceAll(".", ""));
+          appState.minifluxVersionInt = int.parse(response.body.replaceAll(RegExp(r'\D'), ''));
           appState.minifluxVersionString = response.body;
           appState.storage.write(key: FluxNewsState.secureStorageMinifluxVersionKey, value: response.body);
           appState.refreshView();
@@ -672,6 +768,7 @@ Future<bool> checkMinifluxCredentials(
       if (appState.debugMode) {
         logThis('checkMinifluxCredentials', 'Finished checking miniflux credentials', LogLevel.INFO);
       }
+      client.close();
       // if the response code is 200, the credentials are valid
       return true;
     } else {
@@ -682,7 +779,7 @@ Future<bool> checkMinifluxCredentials(
           'checkMinifluxCredentials',
           'Got unexpected response from miniflux server: ${response.statusCode} for checking credentials',
           LogLevel.ERROR);
-
+      client.close();
       // if the response code is not 200, the credentials are invalid
       return false;
     }

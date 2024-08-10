@@ -174,6 +174,31 @@ void markNewsAsUnreadContextAction(
   }
 }
 
+Future<void> saveNewsInThirdPartyContextAction(News news, FluxNewsState appState, BuildContext context) async {
+  await saveNewsToThirdPartyService(http.Client(), appState, news).onError((error, stackTrace) {
+    logThis('saveNewsToThirdPartyService',
+        'Caught an error in saveNewsToThirdPartyService function! : ${error.toString()}', LogLevel.ERROR);
+
+    if (!appState.newError) {
+      appState.errorString = AppLocalizations.of(context)!.communicateionMinifluxError;
+      appState.newError = true;
+      appState.refreshView();
+    }
+  });
+  if (context.mounted) {
+    await displayInfoBar(context, builder: (context, close) {
+      return InfoBar(
+        title: Text(AppLocalizations.of(context)!.successfullSaveToThirdParty),
+        action: IconButton(
+          icon: const Icon(FluentIcons.clear),
+          onPressed: close,
+        ),
+        severity: InfoBarSeverity.info,
+      );
+    });
+  }
+}
+
 // this function is needed because after the news are fetched from the database,
 // the list of news need some time to be generated.
 // only after the list is generated, we can set the scroll position of the list

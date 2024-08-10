@@ -23,6 +23,22 @@ class FluentSettings extends StatelessWidget {
   // define the selection lists for the settings of saved news and starred news
   static const List<int> amountOfSavedNewsList = <int>[50, 100, 200, 500, 1000, 2000];
   static const List<int> amountOfSavedStarredNewsList = <int>[50, 100, 200, 500, 1000, 2000];
+  static const List<int> amountOfNewsToSync = <int>[0, 1000, 2000, 5000, 9999];
+  static const List<int> amountOfNewsToSearch = <int>[0, 1000, 2000, 5000, 9999];
+  static const List<int> amountOfCharactersToTruncate = <int>[100, 200, 300, 400, 500, 600, 700, 800, 900, 1000];
+  static const List<int> amountOfCharactersToTruncateLimit = <int>[
+    0,
+    100,
+    200,
+    300,
+    400,
+    500,
+    600,
+    700,
+    800,
+    900,
+    1000
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -111,7 +127,7 @@ class FluentSettings extends StatelessWidget {
                         : const SizedBox.shrink(),
                     // this headline indicate the general settings section
                     Padding(
-                      padding: const EdgeInsets.only(top: 50.0, bottom: 12),
+                      padding: const EdgeInsets.only(top: 50.0),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
@@ -254,7 +270,7 @@ class FluentSettings extends StatelessWidget {
                           const Padding(
                             padding: EdgeInsets.only(left: 17.0),
                             child: Icon(
-                              FluentIcons.number,
+                              FluentIcons.number_symbol,
                             ),
                           ),
                           Padding(
@@ -290,7 +306,7 @@ class FluentSettings extends StatelessWidget {
                           const Padding(
                             padding: EdgeInsets.only(left: 17.0),
                             child: Icon(
-                              FluentIcons.image_crosshair,
+                              FluentIcons.picture_center,
                             ),
                           ),
                           Padding(
@@ -368,7 +384,7 @@ class FluentSettings extends StatelessWidget {
                           const Padding(
                             padding: EdgeInsets.only(left: 17.0),
                             child: Icon(
-                              FluentIcons.starburst,
+                              FluentIcons.favorite_star_fill,
                             ),
                           ),
                           Padding(
@@ -401,6 +417,308 @@ class FluentSettings extends StatelessWidget {
                       ),
                     ),
                     const Divider(),
+                    // this row contains the selection of the amount of synced news
+                    // there are the choices of all, 1000, 2000, 5000 and 10000
+                    Padding(
+                      padding: const EdgeInsets.only(top: 10.0, bottom: 10),
+                      child: Row(
+                        children: [
+                          const Padding(
+                            padding: EdgeInsets.only(left: 17.0),
+                            child: Icon(
+                              FluentIcons.sync,
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(left: 12.0),
+                            child: Text(
+                              AppLocalizations.of(context)!.amountOfSyncedNews,
+                              style: const TextStyle(fontSize: 16),
+                            ),
+                          ),
+                          const Spacer(),
+                          ComboBox<int>(
+                            value: appState.amountOfSyncedNews,
+                            items: amountOfNewsToSync.map<ComboBoxItem<int>>((int value) {
+                              return ComboBoxItem<int>(
+                                value: value,
+                                child: value == 0 ? Text(AppLocalizations.of(context)!.all) : Text(value.toString()),
+                              );
+                            }).toList(),
+                            onChanged: (value) {
+                              if (value != null) {
+                                appState.amountOfSyncedNews = value;
+                                appState.storage.write(
+                                    key: FluxNewsState.secureStorageAmountOfSyncedNewsKey, value: value.toString());
+                                appState.refreshView();
+                              }
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+                    const Divider(),
+                    // this row contains the selection of the amount of searched news
+                    // there are the choices of all, 1000, 2000, 5000 and 10000
+                    Padding(
+                      padding: const EdgeInsets.only(top: 10.0, bottom: 10),
+                      child: Row(
+                        children: [
+                          const Padding(
+                            padding: EdgeInsets.only(left: 17.0),
+                            child: Icon(
+                              FluentIcons.search,
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(left: 12.0),
+                            child: Text(
+                              AppLocalizations.of(context)!.amountOfSearchedNews,
+                              style: const TextStyle(fontSize: 16),
+                            ),
+                          ),
+                          const Spacer(),
+                          ComboBox<int>(
+                            value: appState.amountOfSearchedNews,
+                            items: amountOfNewsToSearch.map<ComboBoxItem<int>>((int value) {
+                              return ComboBoxItem<int>(
+                                value: value,
+                                child: value == 0 ? Text(AppLocalizations.of(context)!.all) : Text(value.toString()),
+                              );
+                            }).toList(),
+                            onChanged: (value) {
+                              if (value != null) {
+                                appState.amountOfSearchedNews = value;
+                                appState.storage.write(
+                                    key: FluxNewsState.secureStorageAmountOfSearchedNewsKey, value: value.toString());
+                                appState.refreshView();
+                              }
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+                    const Divider(),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 20.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          Text(AppLocalizations.of(context)!.truncateSettings,
+                              style: const TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.normal,
+                              )),
+                        ],
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 15.0, bottom: 10),
+                      child: Row(
+                        children: [
+                          const Padding(
+                            padding: EdgeInsets.only(
+                              left: 17.0,
+                            ),
+                            child: Icon(
+                              FluentIcons.cut,
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(left: 12.0),
+                            child: Text(
+                              AppLocalizations.of(context)!.activateTruncate,
+                              style: const TextStyle(fontSize: 16),
+                            ),
+                          ),
+                          const Spacer(),
+                          ToggleSwitch(
+                            checked: appState.activateTruncate,
+                            onChanged: (bool value) {
+                              String stringValue = FluxNewsState.secureStorageFalseString;
+                              if (value == true) {
+                                stringValue = FluxNewsState.secureStorageTrueString;
+                              }
+                              appState.activateTruncate = value;
+                              appState.storage
+                                  .write(key: FluxNewsState.secureStorageActivateTruncateKey, value: stringValue);
+                              appState.refreshView();
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+                    const Divider(),
+                    appState.activateTruncate
+                        ? Padding(
+                            padding: const EdgeInsets.only(top: 12.0, left: 20.0),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                Text(AppLocalizations.of(context)!.truncateMode,
+                                    style: const TextStyle(
+                                      fontSize: 17,
+                                      fontWeight: FontWeight.normal,
+                                    )),
+                              ],
+                            ),
+                          )
+                        : const SizedBox.shrink(),
+                    appState.activateTruncate
+                        ? Padding(
+                            padding: const EdgeInsets.only(top: 15.0, bottom: 10, left: 40),
+                            child: RadioButton(
+                                content: Text(
+                                  AppLocalizations.of(context)!.truncateModeAll,
+                                  style: const TextStyle(fontSize: 16),
+                                ),
+                                checked: appState.truncateMode == 0 ? true : false,
+                                onChanged: (checked) {
+                                  if (checked) {
+                                    appState.truncateMode = 0;
+                                  }
+                                  appState.storage.write(key: FluxNewsState.secureStorageTruncateModeKey, value: "0");
+                                  appState.refreshView();
+                                }),
+                          )
+                        : const SizedBox.shrink(),
+                    appState.activateTruncate
+                        ? Padding(
+                            padding: const EdgeInsets.only(top: 15.0, bottom: 10, left: 40),
+                            child: RadioButton(
+                                content: Text(
+                                  AppLocalizations.of(context)!.truncateModeScraper,
+                                  style: const TextStyle(fontSize: 16),
+                                ),
+                                checked: appState.truncateMode == 1 ? true : false,
+                                onChanged: (checked) {
+                                  if (checked) {
+                                    appState.truncateMode = 1;
+                                  }
+                                  appState.storage.write(key: FluxNewsState.secureStorageTruncateModeKey, value: "1");
+                                  appState.refreshView();
+                                }),
+                          )
+                        : const SizedBox.shrink(),
+                    appState.activateTruncate
+                        ? Padding(
+                            padding: const EdgeInsets.only(top: 15.0, bottom: 10, left: 40),
+                            child: RadioButton(
+                                content: Text(
+                                  AppLocalizations.of(context)!.truncateModeManual,
+                                  style: const TextStyle(fontSize: 16),
+                                ),
+                                checked: appState.truncateMode == 2 ? true : false,
+                                onChanged: (checked) {
+                                  if (checked) {
+                                    appState.truncateMode = 2;
+                                  }
+                                  appState.storage.write(key: FluxNewsState.secureStorageTruncateModeKey, value: "2");
+                                  appState.refreshView();
+                                }),
+                          )
+                        : const SizedBox.shrink(),
+
+                    appState.activateTruncate ? const Divider() : const SizedBox.shrink(),
+                    appState.activateTruncate
+                        ? Padding(
+                            padding: const EdgeInsets.only(top: 10.0, bottom: 10),
+                            child: Row(
+                              children: [
+                                const Padding(
+                                  padding: EdgeInsets.only(left: 17.0),
+                                  child: Icon(
+                                    FluentIcons.cut,
+                                  ),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.only(left: 12.0),
+                                  child: Text(
+                                    AppLocalizations.of(context)!.charactersToTruncate,
+                                    style: const TextStyle(fontSize: 16),
+                                  ),
+                                ),
+                                const Spacer(),
+                                ComboBox<int>(
+                                  value: appState.charactersToTruncate,
+                                  items: amountOfCharactersToTruncate.map<ComboBoxItem<int>>((int value) {
+                                    return ComboBoxItem<int>(
+                                      value: value,
+                                      child: Text(value.toString()),
+                                    );
+                                  }).toList(),
+                                  onChanged: (value) {
+                                    if (value != null) {
+                                      appState.charactersToTruncate = value;
+                                      appState.storage.write(
+                                          key: FluxNewsState.secureStorageCharactersToTruncateKey,
+                                          value: value.toString());
+                                      appState.refreshView();
+                                    }
+                                  },
+                                ),
+                              ],
+                            ),
+                          )
+                        : const SizedBox.shrink(),
+                    appState.activateTruncate ? const Divider() : const SizedBox.shrink(),
+                    appState.activateTruncate
+                        ? Padding(
+                            padding: const EdgeInsets.only(top: 10.0, bottom: 10),
+                            child: Row(
+                              children: [
+                                const Padding(
+                                  padding: EdgeInsets.only(left: 17.0),
+                                  child: Icon(
+                                    FluentIcons.cut,
+                                  ),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.only(left: 12.0),
+                                  child: Text(
+                                    AppLocalizations.of(context)!.charactersToTruncateLimit,
+                                    style: const TextStyle(fontSize: 16),
+                                  ),
+                                ),
+                                const Spacer(),
+                                ComboBox<int>(
+                                  value: appState.charactersToTruncateLimit,
+                                  items: amountOfCharactersToTruncateLimit.map<ComboBoxItem<int>>((int value) {
+                                    return ComboBoxItem<int>(
+                                      value: value,
+                                      child: value == 0
+                                          ? Text(AppLocalizations.of(context)!.always)
+                                          : Text(value.toString()),
+                                    );
+                                  }).toList(),
+                                  onChanged: (value) {
+                                    if (value != null) {
+                                      appState.charactersToTruncateLimit = value;
+                                      appState.storage.write(
+                                          key: FluxNewsState.secureStorageCharactersToTruncateLimitKey,
+                                          value: value.toString());
+                                      appState.refreshView();
+                                    }
+                                  },
+                                ),
+                              ],
+                            ),
+                          )
+                        : const SizedBox.shrink(),
+                    appState.activateTruncate ? const Divider() : const SizedBox.shrink(),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 20.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          Text(AppLocalizations.of(context)!.debugSettings,
+                              style: const TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.normal,
+                              )),
+                        ],
+                      ),
+                    ),
                     // this row contains the selection if the debug mode is turned on
                     Padding(
                       padding: const EdgeInsets.only(top: 10.0, bottom: 10),

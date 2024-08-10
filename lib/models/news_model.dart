@@ -28,7 +28,9 @@ class News {
       required this.feedTitle,
       this.attachments,
       this.attachmentURL,
-      this.attachmentMimeType});
+      this.attachmentMimeType,
+      this.crawler,
+      this.manualTruncate});
   // define the properties
   int newsID = 0;
   int feedID = 0;
@@ -48,6 +50,8 @@ class News {
   List<Attachment>? attachments;
   String? attachmentURL = '';
   String? attachmentMimeType = '';
+  bool? crawler = false;
+  bool? manualTruncate = false;
 
   // define the method to convert the json to the model
   factory News.fromJson(Map<String, dynamic> json) {
@@ -107,10 +111,11 @@ class News {
         starred = res['starred'] == 1 ? true : false,
         feedTitle = res['feedTitle'],
         syncStatus = res['syncStatus'],
-        icon = res['icon'],
         iconMimeType = res['iconMimeType'],
         attachmentURL = res['attachmentURL'],
-        attachmentMimeType = res['attachmentMimeType'];
+        attachmentMimeType = res['attachmentMimeType'],
+        crawler = res['crawler'] == 1 ? true : false,
+        manualTruncate = res['manualTruncate'] == 1 ? true : false;
 
   // define the method to extract the text from the html content
   // the text is first searched in the raw text
@@ -118,7 +123,7 @@ class News {
   // if this result is less than 50 chars, the text is searched in the p tags
   // if no text is found the empty string is returned
   // if there is no raw text the text is searched in the p tags
-  String getText() {
+  String getText(FluxNewsState appState) {
     final document = parse(content);
     String? text = '';
     text = parse(document.body?.text).documentElement?.text;
@@ -137,6 +142,34 @@ class News {
       }
     }
     text ??= '';
+    if (appState.activateTruncate) {
+      switch (appState.truncateMode) {
+        case 0:
+          if (appState.charactersToTruncateLimit == 0 || appState.charactersToTruncateLimit < text.length) {
+            text = truncateText(text, appState.charactersToTruncate);
+          }
+          break;
+        case 1:
+          if (crawler != null) {
+            if (crawler == true) {
+              if (appState.charactersToTruncateLimit == 0 || appState.charactersToTruncateLimit < text.length) {
+                text = truncateText(text, appState.charactersToTruncate);
+              }
+            }
+          }
+          break;
+        case 2:
+          if (manualTruncate != null) {
+            if (manualTruncate == true) {
+              if (appState.charactersToTruncateLimit == 0 || appState.charactersToTruncateLimit < text.length) {
+                text = truncateText(text, appState.charactersToTruncate);
+              }
+            }
+          }
+          break;
+      }
+    }
+
     return text;
   }
 
@@ -145,7 +178,7 @@ class News {
 
     if (attachments != null) {
       for (var attachment in attachments!) {
-        if (attachment.attachmentMimeType.startsWith("image")) {
+        if (attachment.attachmentMimeType.startsWith("image") && imageAttachment.attachmentID == -1) {
           imageAttachment = attachment;
         }
       }
@@ -167,6 +200,7 @@ class News {
       if (attrib != null) {
         if (attrib.startsWith('http')) {
           imageUrl = attrib;
+          break;
         }
       }
     }
@@ -225,6 +259,23 @@ class News {
       return SizedBox.fromSize(size: Size(size, size));
     }
   }
+
+  void saveFeedIcon(List<Feed> feeds) {
+    for (Feed feed in feeds) {
+      if (feed.feedID == feedID) {
+        icon = feed.icon;
+      }
+    }
+  }
+
+  void getFeedInfo(List<Feed> feeds) {
+    for (Feed feed in feeds) {
+      if (feed.feedID == feedID) {
+        icon = feed.icon;
+        iconMimeType = feed.iconMimeType;
+      }
+    }
+  }
 }
 
 // define the model for the news list
@@ -248,7 +299,13 @@ class NewsList {
 
 // define the model for a feed
 class Feed {
-  Feed({required this.feedID, required this.title, required this.siteUrl, this.feedIconID});
+  Feed(
+      {required this.feedID,
+      required this.title,
+      required this.siteUrl,
+      this.feedIconID,
+      this.crawler,
+      this.manualTruncate});
 
   // define the properties
   int feedID = 0;
@@ -258,6 +315,8 @@ class Feed {
   int newsCount = 0;
   Uint8List? icon;
   String iconMimeType = '';
+  bool? crawler = false;
+  bool? manualTruncate = false;
 
   // define the method to convert the model from json
   factory Feed.fromJson(Map<String, dynamic> json) {
@@ -266,6 +325,7 @@ class Feed {
       title: json['title'],
       siteUrl: json['site_url'],
       feedIconID: json['icon']?['icon_id'],
+      crawler: json['crawler'],
     );
   }
 
@@ -275,9 +335,10 @@ class Feed {
       'feedID': feedID,
       'title': title,
       'site_url': siteUrl,
-      'icon': icon,
       'iconMimeType': iconMimeType,
       'newsCount': newsCount,
+      'crawler': crawler,
+      'manualTruncate': manualTruncate,
     };
   }
 
@@ -286,9 +347,10 @@ class Feed {
       : feedID = res['feedID'],
         title = res['title'],
         siteUrl = res['site_url'],
-        icon = res['icon'],
         iconMimeType = res['iconMimeType'],
-        newsCount = res['newsCount'];
+        newsCount = res['newsCount'],
+        crawler = res['crawler'] == 1 ? true : false,
+        manualTruncate = res['manualTruncate'] == 1 ? true : false;
 
   // define the method to get the feed icon as a widget
   // the icon could be a svg or a png image
@@ -518,4 +580,23 @@ class Version {
       os: json['os'],
     );
   }
+}
+
+// this is a helper function to get the actual tab position
+// this position is used to open the context menu of the news card here
+String truncateText(String text, int characterLimit) {
+  String truncatedText = '';
+  int characterCount = 0;
+  final words = text.split(' ');
+  for (String word in words) {
+    characterCount = characterCount + word.length;
+    truncatedText = truncatedText + word;
+    if (characterCount < characterLimit) {
+      truncatedText = '$truncatedText ';
+    } else {
+      truncatedText = '$truncatedText...';
+      break;
+    }
+  }
+  return truncatedText;
 }

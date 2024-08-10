@@ -1,9 +1,13 @@
+import 'dart:io';
+import 'dart:typed_data';
+
 import 'package:equatable/equatable.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flux_news_desktop/functions/logging.dart';
 import 'package:intl/intl.dart';
 import 'package:my_logger/core/constants.dart';
 import 'package:my_logger/logger.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 import 'package:flutter_secure_storage/flutter_secure_storage.dart' as sec_store;
@@ -37,7 +41,7 @@ class FluxNewsState extends ChangeNotifier {
   static const String bookmarkedRouteString = '/bookmarked';
   static const String settingsRouteString = '/settings';
   static const String searchRouteString = '/search';
-  static const int amountOfNewlyCaughtNews = 100;
+  static const int amountOfNewlyCaughtNews = 1000;
   static const String unreadNewsStatus = 'unread';
   static const String readNewsStatus = 'read';
   static const String syncedSyncStatus = 'synced';
@@ -46,6 +50,8 @@ class FluxNewsState extends ChangeNotifier {
   static const String databaseAllString = '%';
   static const String databaseDescString = 'DESC';
   static const String databaseAscString = 'ASC';
+  static const String minifluxDescString = 'desc';
+  static const String minifluxAscString = 'asc';
   static const String brightnessModeSystemString = 'System';
   static const String brightnessModeDarkString = 'Dark';
   static const String brightnessModeLightString = 'Light';
@@ -55,6 +61,8 @@ class FluxNewsState extends ChangeNotifier {
   static const String secureStorageMinifluxAPIKey = 'minifluxAPIKey';
   static const String secureStorageMinifluxVersionKey = 'minifluxVersionKey';
   static const String secureStorageBrightnessModeKey = 'brightnessMode';
+  static const String secureStorageAmountOfSyncedNewsKey = 'amountOfSyncedNews';
+  static const String secureStorageAmountOfSearchedNewsKey = 'amountOfSearchedNews';
   static const String secureStorageSortOrderKey = 'sortOrder';
   static const String secureStorageSavedScrollPositionKey = 'savedScrollPosition';
   static const String secureStorageMarkAsReadOnScrollOverKey = 'markAsReadOnScrollOver';
@@ -64,6 +72,10 @@ class FluxNewsState extends ChangeNotifier {
   static const String secureStorageAmountOfSavedStarredNewsKey = 'amountOfSavedStarredNews';
   static const String secureStorageMultilineAppBarTextKey = 'multilineAppBarText';
   static const String secureStorageShowFeedIconsTextKey = 'showFeedIcons';
+  static const String secureStorageActivateTruncateKey = 'activateTruncate';
+  static const String secureStorageTruncateModeKey = 'truncateMode';
+  static const String secureStorageCharactersToTruncateKey = 'charactersToTruncate';
+  static const String secureStorageCharactersToTruncateLimitKey = 'charactersToTruncateLimit';
   static const String secureStorageDebugModeKey = 'debugMode';
   static const String secureStorageTrueString = 'true';
   static const String secureStorageFalseString = 'false';
@@ -79,9 +91,18 @@ class FluxNewsState extends ChangeNotifier {
   static const String logTag = 'FluxNews';
   static const String logsWriteDirectoryName = "FluxNewsLogs";
   static const String logsExportDirectoryName = "FluxNewsLogs/Exported";
+  static const String feedIconFilePath = "/FeedIcons/";
   static const int minifluxSaveMinVersion = 2047;
+  static const int amountForTooManyNews = 10000;
+  static const int amountForLongNewsSync = 2000;
+  static const String apiVersionPath = "v1/";
   static const String urlValidationRegex =
-      r'https:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)\/v1\/';
+      r'https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,256}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)';
+
+  static const String feedElementType = 'feed';
+  static const String categoryElementType = 'category';
+  static const String allNewsElementType = 'all';
+  static const String bookmarkedNewsElementType = 'bookmarked';
 
   // vars for lists of main view
   late Future<List<News>> newsList;
@@ -89,6 +110,7 @@ class FluxNewsState extends ChangeNotifier {
   List<int>? feedIDs;
   String selectedNavigation = "";
   Map<int, String> navigationRouteStrings = {};
+  String selectedCategoryElementType = 'all';
 
   // vars for main view
   bool syncProcess = false;
@@ -96,7 +118,6 @@ class FluxNewsState extends ChangeNotifier {
   int scrollPosition = 0;
   final ItemScrollController itemScrollController = ItemScrollController();
   final ItemPositionsListener itemPositionsListener = ItemPositionsListener.create();
-  int macNavigationPosition = 0;
 
   // vars for search view
   Future<List<News>> searchNewsList = Future<List<News>>.value([]);
@@ -112,6 +133,10 @@ class FluxNewsState extends ChangeNotifier {
   bool newError = false;
   bool errorOnMinifluxAuth = false;
   String loggingFilePath = "";
+  bool tooManyNews = false;
+  bool longSync = false;
+  bool longSyncAlerted = false;
+  bool longSyncAborted = false;
 
   // vars for debugging
   bool debugMode = false;
@@ -124,6 +149,7 @@ class FluxNewsState extends ChangeNotifier {
   String? minifluxAPIKey;
   String? minifluxVersionString;
   int minifluxVersionInt = 0;
+  bool insecureMinifluxURL = false;
 
   // vars for settings
   Map<String, String> storageValues = {};
@@ -133,11 +159,17 @@ class FluxNewsState extends ChangeNotifier {
   int savedScrollPosition = 0;
   int amountOfSavedNews = 1000;
   int amountOfSavedStarredNews = 1000;
+  int amountOfSyncedNews = 0;
+  int amountOfSearchedNews = 0;
   bool markAsReadOnScrollOver = false;
   bool syncOnStart = false;
   bool multilineAppBarText = false;
   bool showFeedIcons = false;
   List<KeyValueRecordType>? recordTypesBrightnessMode;
+  bool activateTruncate = false;
+  int truncateMode = 0;
+  int charactersToTruncate = 100;
+  int charactersToTruncateLimit = 0;
 
   // vars for app bar text
   String appBarText = '';
@@ -146,11 +178,19 @@ class FluxNewsState extends ChangeNotifier {
   bool isTablet = false;
   Orientation orientation = Orientation.portrait;
 
+  // the directory for Saving pictures
+  Directory? externalDirectory;
+
   // the database connection as a variable
   Database? db;
 
   // init the database connection
   Future<Database> initializeDB() async {
+    if (Platform.isMacOS) {
+      externalDirectory = await getApplicationDocumentsDirectory();
+    } else {
+      externalDirectory = await getExternalStorageDirectory();
+    }
     logThis('initializeDB', 'Starting initializeDB', LogLevel.INFO);
     String path = await getDatabasesPath();
     logThis('initializeDB', 'Finished initializeDB', LogLevel.INFO);
@@ -235,10 +275,25 @@ class FluxNewsState extends ChangeNotifier {
             '''ALTER TABLE "feeds" 
                      RENAME COLUMN "categorieID" TO "categoryID";''',
           );
+        } else if (oldVersion == 3) {
+          logThis('upgradeDB', 'Upgrading DB from version 3', LogLevel.INFO);
+
+          // create the table feeds
+          await db.execute('DROP TABLE IF EXISTS feeds');
+          await db.execute(
+            '''CREATE TABLE feeds(feedID INTEGER PRIMARY KEY, 
+                          title TEXT, 
+                          site_url TEXT, 
+                          iconMimeType TEXT,
+                          newsCount INTEGER,
+                          crawler INTEGER,
+                          manualTruncate INTEGER,
+                          categoryID INTEGER)''',
+          );
         }
         logThis('upgradeDB', 'Finished upgrading DB', LogLevel.INFO);
       },
-      version: 3,
+      version: 4,
     );
   }
 
@@ -307,7 +362,7 @@ class FluxNewsState extends ChangeNotifier {
       // assign the miniflux server version from persistent saved config
       if (key == FluxNewsState.secureStorageMinifluxVersionKey) {
         if (value != '') {
-          minifluxVersionInt = int.parse(value.replaceAll(".", ""));
+          minifluxVersionInt = int.parse(value.replaceAll(RegExp(r'\D'), ''));
           minifluxVersionString = value;
         }
       }
@@ -320,6 +375,28 @@ class FluxNewsState extends ChangeNotifier {
             if (value == recordSet.key) {
               brightnessModeSelection = recordSet;
             }
+          }
+        }
+      }
+
+      // assign the amount of synced news selection from persistent saved config
+      if (key == FluxNewsState.secureStorageAmountOfSyncedNewsKey) {
+        if (value != '') {
+          if (int.tryParse(value) != null) {
+            amountOfSyncedNews = int.parse(value);
+          } else {
+            amountOfSyncedNews = 0;
+          }
+        }
+      }
+
+      // assign the amount of searched news selection from persistent saved config
+      if (key == FluxNewsState.secureStorageAmountOfSearchedNewsKey) {
+        if (value != '') {
+          if (int.tryParse(value) != null) {
+            amountOfSearchedNews = int.parse(value);
+          } else {
+            amountOfSearchedNews = 0;
           }
         }
       }
@@ -404,6 +481,42 @@ class FluxNewsState extends ChangeNotifier {
         }
       }
 
+      // assign the truncate mode from persistent saved config
+      if (key == FluxNewsState.secureStorageTruncateModeKey) {
+        if (value != '') {
+          truncateMode = int.parse(value);
+        }
+      }
+
+      // assign the truncate mode from persistent saved config
+      if (key == FluxNewsState.secureStorageCharactersToTruncateKey) {
+        if (value != '') {
+          charactersToTruncate = int.parse(value);
+        }
+      }
+
+      // assign the truncate mode from persistent saved config
+      if (key == FluxNewsState.secureStorageCharactersToTruncateLimitKey) {
+        if (value != '') {
+          if (int.tryParse(value) != null) {
+            charactersToTruncateLimit = int.parse(value);
+          } else {
+            charactersToTruncateLimit = 0;
+          }
+        }
+      }
+
+      // assign the mark as read on scroll over selection from persistent saved config
+      if (key == FluxNewsState.secureStorageActivateTruncateKey) {
+        if (value != '') {
+          if (value == FluxNewsState.secureStorageTrueString) {
+            activateTruncate = true;
+          } else {
+            activateTruncate = false;
+          }
+        }
+      }
+
       // assign the debug mode selection from persistent saved config
       if (key == FluxNewsState.secureStorageDebugModeKey) {
         if (value != '') {
@@ -419,6 +532,63 @@ class FluxNewsState extends ChangeNotifier {
 
     // return true if everything was read
     return true;
+  }
+
+  Future<void> saveFeedIconFile(int feedID, Uint8List? bytes) async {
+    String filename = "${FluxNewsState.feedIconFilePath}$feedID";
+    await saveFile(filename, bytes);
+  }
+
+  Uint8List? readFeedIconFile(int feedID) {
+    String filename = "${FluxNewsState.feedIconFilePath}$feedID";
+    return readFile(filename);
+  }
+
+  void deleteFeedIconFile(int feedID) {
+    String filename = "${FluxNewsState.feedIconFilePath}$feedID";
+    deleteFile(filename);
+  }
+
+  Future<void> saveFile(String filename, Uint8List? bytes) async {
+    if (externalDirectory != null && bytes != null) {
+      // Create an image name
+      var filePath = externalDirectory!.path + filename;
+
+      // Save to filesystem
+      final file = File(filePath);
+      await file.create(recursive: true);
+      await file.writeAsBytes(bytes);
+    }
+  }
+
+  Uint8List? readFile(String filename) {
+    if (externalDirectory != null) {
+      // Create an image name
+      var filePath = externalDirectory!.path + filename;
+
+      // Save to filesystem
+      final file = File(filePath);
+      if (file.existsSync()) {
+        return file.readAsBytesSync();
+      } else {
+        return null;
+      }
+    } else {
+      return null;
+    }
+  }
+
+  void deleteFile(String filename) {
+    if (externalDirectory != null) {
+      // Create an image name
+      var filePath = externalDirectory!.path + filename;
+
+      // Save to filesystem
+      final file = File(filePath);
+      if (file.existsSync()) {
+        file.deleteSync();
+      }
+    }
   }
 
   // notify the listeners of FluxNewsState to refresh views

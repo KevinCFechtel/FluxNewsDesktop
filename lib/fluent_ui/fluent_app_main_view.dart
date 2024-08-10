@@ -134,8 +134,11 @@ class FluentCategorieNavigationMainView extends StatelessWidget {
               AppLocalizations.of(context)!.allNews,
             ),
             infoBadge: InfoBadge(
-              source: Text(
-                '${appCounterState.allNewsCount}',
+              source: Padding(
+                padding: const EdgeInsets.fromLTRB(10, 1, 10, 0),
+                child: Text(
+                  '${appCounterState.allNewsCount}',
+                ),
               ),
             ),
             body: const FluentMainView(),
@@ -153,8 +156,11 @@ class FluentCategorieNavigationMainView extends StatelessWidget {
               AppLocalizations.of(context)!.bookmarked,
             ),
             infoBadge: InfoBadge(
-              source: Text(
-                '${appCounterState.starredCount}',
+              source: Padding(
+                padding: const EdgeInsets.fromLTRB(10, 1, 10, 0),
+                child: Text(
+                  '${appCounterState.starredCount}',
+                ),
               ),
             ),
             body: const FluentMainView(),
@@ -232,10 +238,24 @@ class FluentCategorieNavigationMainView extends StatelessWidget {
                             feed.title,
                           ),
                           infoBadge: InfoBadge(
-                            source: Text(
-                              '${feed.newsCount}',
+                            source: Padding(
+                              padding: const EdgeInsets.fromLTRB(10, 1, 10, 0),
+                              child: Text(
+                                '${feed.newsCount}',
+                              ),
                             ),
                           ),
+                          trailing: appState.truncateMode == 2
+                              ? ToggleButton(
+                                  checked: feed.manualTruncate != null ? feed.manualTruncate! : false,
+                                  onChanged: (value) async {
+                                    feed.manualTruncate = value;
+                                    await updateManualTruncateStatusOfFeedInDB(feed.feedID, value, appState);
+                                    appState.refreshView();
+                                  },
+                                  child: const Icon(FluentIcons.cut),
+                                )
+                              : const SizedBox.shrink(),
                           body: const FluentMainView(),
                           onTap: () {
                             appState.selectedNavigation = routeString;
@@ -250,10 +270,14 @@ class FluentCategorieNavigationMainView extends StatelessWidget {
                           category.title,
                         ),
                         infoBadge: InfoBadge(
-                          source: Text(
-                            '${category.newsCount}',
+                          source: Padding(
+                            padding: const EdgeInsets.fromLTRB(10, 1, 10, 0),
+                            child: Text(
+                              '${category.newsCount}',
+                            ),
                           ),
                         ),
+                        trailing: const Icon(FluentIcons.chevron_up),
                         items: feedItems,
                         body: const FluentMainView(),
                         onTap: () {
@@ -330,6 +354,7 @@ class FluentCategorieNavigationMainView extends StatelessWidget {
   }
 
   Future<void> feedOnClick(Feed feed, FluxNewsState appState, Categories categories, BuildContext context) async {
+    appState.selectedCategoryElementType = FluxNewsState.feedElementType;
     // on tab we want to show only the news of this feed in the news list.
     // set the feed id of the selected feed in the feedIDs filter
     appState.feedIDs = [feed.feedID];
@@ -353,6 +378,7 @@ class FluentCategorieNavigationMainView extends StatelessWidget {
   // we want all the news of this category in the news view.
   Future<void> categoryOnClick(
       Category category, FluxNewsState appState, Categories categories, BuildContext context) async {
+    appState.selectedCategoryElementType = FluxNewsState.categoryElementType;
     // add the according feeds of this category as a filter
     appState.feedIDs = category.getFeedIDs();
     // reload the news list with the new filter
@@ -374,6 +400,7 @@ class FluentCategorieNavigationMainView extends StatelessWidget {
   // if the "All News" ListTile is clicked,
   // we want all the news in the news view.
   Future<void> allNewsOnClick(FluxNewsState appState, BuildContext context) async {
+    appState.selectedCategoryElementType = FluxNewsState.allNewsElementType;
     // empty the feedIds which are used as a filter if a specific category is selected
     appState.feedIDs = null;
     // reload the news list with the new filter (empty)
@@ -397,6 +424,7 @@ class FluentCategorieNavigationMainView extends StatelessWidget {
   // if the "Bookmarked" ListTile is clicked,
   // we want all the bookmarked news in the news view.
   Future<void> bookmarkedOnClick(FluxNewsState appState, BuildContext context) async {
+    appState.selectedCategoryElementType = FluxNewsState.bookmarkedNewsElementType;
     // set the feedIDs filter to -1 to only load bookmarked news
     // -1 is a impossible feed id of a regular miniflux feed,
     // so we use it to decide between all news (feedIds = null)
@@ -455,19 +483,8 @@ class AppBarButtons extends StatelessWidget {
     return CommandBar(
       mainAxisAlignment: MainAxisAlignment.end,
       crossAxisAlignment: CrossAxisAlignment.end,
-      primaryItems: [
-        CommandBarButton(
-          onPressed: () async {
-            await syncNews(appState, context);
-          },
-          icon: appState.syncProcess
-              ? const SizedBox(
-                  height: 20.0,
-                  width: 20.0,
-                  child: ProgressRing(),
-                )
-              : const Icon(FluentIcons.refresh, size: 20.0),
-        ),
+      overflowBehavior: CommandBarOverflowBehavior.wrap,
+      secondaryItems: [
         CommandBarButton(
           onPressed: () async {
             // switch between all and only unread news view
@@ -515,10 +532,20 @@ class AppBarButtons extends StatelessWidget {
               appCounterState.refreshView();
               appState.refreshView();
             }
+            Navigator.pop(context);
           },
+          label: Text(AppLocalizations.of(context)!.newsReadFilter),
           icon: appState.newsStatus == FluxNewsState.unreadNewsStatus
-              ? const Icon(FluentIcons.read, size: 20.0)
-              : const Icon(FluentIcons.accept, size: 20.0),
+              ? const SizedBox(
+                  height: 25.0,
+                  width: 25.0,
+                  child: Center(child: Text("New", style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold))))
+              : const Padding(
+                  padding: EdgeInsets.only(
+                    left: 5.0,
+                  ),
+                  child: Icon(FluentIcons.accept, size: 20.0),
+                ),
         ),
         CommandBarButton(
           onPressed: () async {
@@ -568,11 +595,62 @@ class AppBarButtons extends StatelessWidget {
               appCounterState.refreshView();
               appState.refreshView();
             }
+            if (context.mounted) {
+              Navigator.pop(context);
+            }
           },
+          label: Text(AppLocalizations.of(context)!.sortOrderOfNews),
           icon: appState.sortOrder == FluxNewsState.sortOrderNewestFirstString
-              ? const Icon(FluentIcons.sort_lines_ascending, size: 20.0)
-              : const Icon(FluentIcons.sort_lines, size: 20.0),
-        )
+              ? const Icon(FluentIcons.sort_lines, size: 20.0)
+              : const Icon(FluentIcons.sort_lines_ascending, size: 20.0),
+        ),
+        CommandBarButton(
+          onPressed: () {
+            // mark news as read
+            markNewsAsReadInDB(appState);
+            // refresh news list with the all news state
+            appState.newsList = queryNewsFromDB(appState, appState.feedIDs).whenComplete(() {
+              waitUntilNewsListBuild(appState).whenComplete(
+                () {
+                  context.read<FluxNewsState>().itemScrollController.jumpTo(index: 0);
+                },
+              );
+            });
+
+            // notify the categories to update the news count
+            appCounterState.listUpdated = true;
+            appCounterState.refreshView();
+            appState.refreshView();
+            Navigator.pop(context);
+          },
+          label: appState.selectedCategoryElementType == FluxNewsState.feedElementType
+              ? Text(AppLocalizations.of(context)!.markFeedAsRead)
+              : appState.selectedCategoryElementType == FluxNewsState.categoryElementType
+                  ? Text(AppLocalizations.of(context)!.markCategoryAsRead)
+                  : appState.selectedCategoryElementType == FluxNewsState.bookmarkedNewsElementType
+                      ? Text(AppLocalizations.of(context)!.markBookmarkedAsRead)
+                      : Text(AppLocalizations.of(context)!.markAllAsRead),
+          icon: const SizedBox(
+            height: 20.0,
+            width: 20.0,
+            child: Icon(FluentIcons.check_list),
+          ),
+        ),
+      ],
+      primaryItems: [
+        CommandBarButton(
+          onPressed: () async {
+            await syncNews(appState, context);
+          },
+          label: Text(AppLocalizations.of(context)!.sync),
+          icon: appState.syncProcess
+              ? const SizedBox(
+                  height: 20.0,
+                  width: 20.0,
+                  child: ProgressRing(),
+                )
+              : const Icon(FluentIcons.refresh, size: 20.0),
+        ),
       ],
     );
   }
