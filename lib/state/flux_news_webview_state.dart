@@ -6,11 +6,15 @@ class FluxNewsWebViewState extends ChangeNotifier {
   WebViewController controller = WebViewController();
   bool isLoaded = false;
 
-  Future<bool> loadWebPage(String url) async {
+  Future<void> loadWebPage(String url) async {
     controller.loadRequest(Uri.parse(url));
     isLoaded = true;
     notifyListeners();
-    return true;
+  }
+
+  void closeWebview() {
+    isLoaded = false;
+    notifyListeners();
   }
 
   // notify the listeners of FluxNewsState to refresh views

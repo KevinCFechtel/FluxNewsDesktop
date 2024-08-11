@@ -45,115 +45,46 @@ class FluentSearch extends StatelessWidget {
   }
 
   ScaffoldPage searchLayout(BuildContext context, FluxNewsState appState) {
-    double width = MediaQuery.of(context).size.width;
     return ScaffoldPage(
-        padding: EdgeInsets.zero,
-        header: TextBox(
-          controller: appState.searchController,
-          placeholder: AppLocalizations.of(context)!.searchHint,
-          suffix: IconButton(
-            onPressed: () {
-              appState.searchController.clear();
-              appState.searchNewsList = Future<List<News>>.value([]);
-              appState.refreshView();
-            },
-            icon: const Icon(FluentIcons.clear),
-          ),
-          onSubmitted: (value) {
-            if (value != '') {
-              // fetch the news list from the backend with the search text
-              Future<List<News>> searchNewsListResult =
-                  fetchSearchedNews(http.Client(), appState, value).onError((error, stackTrace) {
-                logThis('fetchSearchedNews', 'Caught an error in fetchSearchedNews function! : ${error.toString()}',
-                    LogLevel.ERROR,
-                    stackTrace: stackTrace);
-                if (appState.errorString != AppLocalizations.of(context)!.communicateionMinifluxError) {
-                  appState.errorString = AppLocalizations.of(context)!.communicateionMinifluxError;
-                  appState.newError = true;
-                  appState.refreshView();
-                }
-                return [];
-              });
-              // set the state with the fetched news list
-              appState.searchNewsList = searchNewsListResult;
-              appState.refreshView();
-            } else {
-              // if search text is empty, set the state with an empty list
-              appState.searchNewsList = Future<List<News>>.value([]);
-              appState.refreshView();
-            }
+      padding: EdgeInsets.zero,
+      header: TextBox(
+        controller: appState.searchController,
+        placeholder: AppLocalizations.of(context)!.searchHint,
+        suffix: IconButton(
+          onPressed: () {
+            appState.searchController.clear();
+            appState.searchNewsList = Future<List<News>>.value([]);
+            appState.refreshView();
           },
+          icon: const Icon(FluentIcons.clear),
         ),
-        /*
-        appBar: AppBar(
-          // set the title of the search page to search text field
-          title: TextField(
-            controller: appState.searchController,
-            style: Theme.of(context).textTheme.bodyLarge,
-            decoration: InputDecoration(
-              hintText: AppLocalizations.of(context)!.searchHint,
-              hintStyle: Theme.of(context).textTheme.bodyLarge,
-              border:
-                  UnderlineInputBorder(borderRadius: BorderRadius.circular(2)),
-              suffixIcon: IconButton(
-                onPressed: () {
-                  appState.searchController.clear();
-                  appState.searchNewsList = Future<List<News>>.value([]);
-                  appState.refreshView();
-                },
-                icon: const Icon(Icons.clear),
-              ),
-            ),
-
-            // on change of the search text field, fetch the news list
-            onSubmitted: (value) async {
-              if (value != '') {
-                // fetch the news list from the backend with the search text
-                Future<List<News>> searchNewsListResult =
-                    fetchSearchedNews(http.Client(), appState, value)
-                        .onError((error, stackTrace) {
-                  logThis(
-                      'fetchSearchedNews',
-                      'Caught an error in fetchSearchedNews function! : ${error.toString()}',
-                      LogLevel.ERROR,
-                    stackTrace: stackTrace);
-                  if (appState.errorString !=
-                      AppLocalizations.of(context)!
-                          .communicateionMinifluxError) {
-                    appState.errorString = AppLocalizations.of(context)!
-                        .communicateionMinifluxError;
-                    appState.newError = true;
-                    appState.refreshView();
-                  }
-                  return [];
-                });
-                // set the state with the fetched news list
-                appState.searchNewsList = searchNewsListResult;
-                appState.refreshView();
-              } else {
-                // if search text is empty, set the state with an empty list
-                appState.searchNewsList = Future<List<News>>.value([]);
+        onSubmitted: (value) {
+          if (value != '') {
+            // fetch the news list from the backend with the search text
+            Future<List<News>> searchNewsListResult =
+                fetchSearchedNews(http.Client(), appState, value).onError((error, stackTrace) {
+              logThis('fetchSearchedNews', 'Caught an error in fetchSearchedNews function! : ${error.toString()}',
+                  LogLevel.ERROR,
+                  stackTrace: stackTrace);
+              if (appState.errorString != AppLocalizations.of(context)!.communicateionMinifluxError) {
+                appState.errorString = AppLocalizations.of(context)!.communicateionMinifluxError;
+                appState.newError = true;
                 appState.refreshView();
               }
-            },
-          ),
-        ),
-        // show the news list
-        body: const FluentSearchNewsList());
-        */
-        content: Row(
-          children: [
-            Flexible(
-              flex: width <= 1600
-                  ? width <= 1300
-                      ? 3
-                      : 2
-                  : 4,
-              child: const FluentSearchNewsList(),
-            ),
-            const Flexible(flex: 5, child: Center(child: Text("Platzhalter")))
-          ],
-        ));
+              return [];
+            });
+            // set the state with the fetched news list
+            appState.searchNewsList = searchNewsListResult;
+            appState.refreshView();
+          } else {
+            // if search text is empty, set the state with an empty list
+            appState.searchNewsList = Future<List<News>>.value([]);
+            appState.refreshView();
+          }
+        },
+      ),
+      content: const FluentSearchNewsList(),
+    );
   }
 }
 

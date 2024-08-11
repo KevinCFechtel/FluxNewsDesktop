@@ -2,7 +2,6 @@ import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flux_news_desktop/database/database_backend.dart';
 import 'package:flux_news_desktop/fluent_ui/fluent_main_news_list.dart';
 import 'package:flux_news_desktop/fluent_ui/fluent_theme.dart';
-import 'package:flux_news_desktop/fluent_ui/fluent_web_view.dart';
 import 'package:flux_news_desktop/state/flux_news_counter_state.dart';
 import 'package:flux_news_desktop/state/flux_news_state.dart';
 import 'package:flux_news_desktop/functions/logging.dart';
@@ -312,7 +311,7 @@ class FluentCategorieNavigationMainView extends StatelessWidget {
                       appBar: const NavigationAppBar(
                         leading: Icon(FontAwesomeIcons.bookOpen),
                         title: AppBarTitle(),
-                        actions: AppBarButtons(),
+                        actions: Center(child: AppBarButtons()),
                       ),
                       transitionBuilder: (child, animation) {
                         return SuppressPageTransition(
@@ -478,13 +477,13 @@ class AppBarButtons extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    double width = MediaQuery.of(context).size.width;
     FluxNewsState appState = context.watch<FluxNewsState>();
     FluxNewsCounterState appCounterState = context.watch<FluxNewsCounterState>();
 
     return CommandBar(
       mainAxisAlignment: MainAxisAlignment.end,
-      crossAxisAlignment: CrossAxisAlignment.end,
-      overflowBehavior: CommandBarOverflowBehavior.wrap,
+      crossAxisAlignment: CrossAxisAlignment.center,
       secondaryItems: [
         CommandBarButton(
           onPressed: () async {
@@ -643,7 +642,7 @@ class AppBarButtons extends StatelessWidget {
           onPressed: () async {
             await syncNews(appState, context);
           },
-          label: Text(AppLocalizations.of(context)!.sync),
+          label: width > 1600 ? Text(AppLocalizations.of(context)!.sync) : const SizedBox.shrink(),
           icon: appState.syncProcess
               ? const SizedBox(
                   height: 20.0,
@@ -666,10 +665,11 @@ class AppBarTitle extends StatelessWidget {
   Widget build(BuildContext context) {
     FluxNewsCounterState appCounterState = context.watch<FluxNewsCounterState>();
     FluxNewsState appState = context.watch<FluxNewsState>();
+    double width = MediaQuery.of(context).size.width;
 
     // set the app bar title depending on the chosen category to show in list view
 
-    if (appState.multilineAppBarText) {
+    if (appState.multilineAppBarText && width > 1300) {
       // this is the part where the news count is added as an extra line to the app bar title
       return Builder(builder: (BuildContext context) {
         return Text(
@@ -697,22 +697,7 @@ class FluentMainView extends StatelessWidget {
   });
   @override
   Widget build(BuildContext context) {
-    double width = MediaQuery.of(context).size.width;
-    return Row(
-      children: [
-        width <= 1300
-            ? const SizedBox(
-                width: 400,
-                child: FluentBodyNewsList(),
-              )
-            : width > 1600
-                ? const SizedBox(width: 800, child: FluentBodyNewsList())
-                : const SizedBox(width: 500, child: FluentBodyNewsList()),
-        const Expanded(
-          child: WebViewMainView(),
-        ),
-      ],
-    );
+    return const FluentBodyNewsList();
   }
 }
 

@@ -2,6 +2,7 @@ import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter_acrylic/flutter_acrylic.dart' as flutter_acrylic;
 import 'package:flux_news_desktop/fluent_ui/fluent_app_main_view.dart';
 import 'package:flux_news_desktop/fluent_ui/fluent_theme.dart';
+import 'package:flux_news_desktop/fluent_ui/fluent_web_view.dart';
 import 'package:flux_news_desktop/state/flux_news_counter_state.dart';
 import 'package:flux_news_desktop/state/flux_news_state.dart';
 import 'package:flux_news_desktop/state/flux_news_webview_state.dart';
@@ -44,6 +45,7 @@ class FluxNewsDesktop extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
+    double width = MediaQuery.of(context).size.width;
     return ChangeNotifierProvider(
         create: (context) => FluxNewsState(),
         builder: (context, child) {
@@ -83,7 +85,22 @@ class FluxNewsDesktop extends StatelessWidget {
                                 Locale('en', ''),
                                 Locale('de', ''),
                               ],
-                              home: const FluentNavigationMainView(),
+                              home: Row(children: [
+                                width <= 1300
+                                    ? const SizedBox(
+                                        height: double.infinity,
+                                        width: 400,
+                                        child: FluentNavigationMainView(),
+                                      )
+                                    : width > 1600
+                                        ? const SizedBox(
+                                            height: double.infinity, width: 800, child: FluentNavigationMainView())
+                                        : const SizedBox(
+                                            height: double.infinity, width: 500, child: FluentNavigationMainView()),
+                                const Expanded(
+                                  child: WebViewMainView(),
+                                ),
+                              ]),
                             );
                           });
                     });
