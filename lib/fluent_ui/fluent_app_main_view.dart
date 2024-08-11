@@ -9,12 +9,14 @@ import 'package:flux_news_desktop/models/news_model.dart';
 import 'package:flux_news_desktop/fluent_ui/fluent_search.dart';
 import 'package:flux_news_desktop/fluent_ui/fluent_settings.dart';
 import 'package:flux_news_desktop/functions/sync_news.dart';
+import 'package:flux_news_desktop/state/flux_news_webview_state.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:my_logger/core/constants.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_gen/gen_l10n/flux_news_localizations.dart';
 import 'package:system_date_time_format/system_date_time_format.dart';
+import 'package:webview_flutter/webview_flutter.dart';
 
 class FluentNavigationMainView extends StatelessWidget {
   const FluentNavigationMainView({
@@ -696,6 +698,7 @@ class FluentMainView extends StatelessWidget {
   });
   @override
   Widget build(BuildContext context) {
+    FluxNewsWebViewState webViewState = context.watch<FluxNewsWebViewState>();
     double width = MediaQuery.of(context).size.width;
     return Row(
       children: [
@@ -707,7 +710,12 @@ class FluentMainView extends StatelessWidget {
               : 4,
           child: const FluentBodyNewsList(),
         ),
-        const Flexible(flex: 5, child: Center(child: Text("Platzhalter")))
+        SizedBox(
+          width: 900,
+          child: WebViewWidget(
+            controller: webViewState.controller,
+          ),
+        ),
       ],
     );
   }

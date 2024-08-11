@@ -7,6 +7,7 @@ import 'package:flux_news_desktop/state/flux_news_state.dart';
 import 'package:flux_news_desktop/functions/logging.dart';
 import 'package:flux_news_desktop/models/news_model.dart';
 import 'package:flux_news_desktop/functions/news_widget_functions.dart';
+import 'package:flux_news_desktop/state/flux_news_webview_state.dart';
 import 'package:my_logger/core/constants.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_gen/gen_l10n/flux_news_localizations.dart';
@@ -28,6 +29,7 @@ class FluentNewsRow extends StatelessWidget {
     final contextController = FlyoutController();
     final contextAttachKey = GlobalKey();
     FluentAppTheme appTheme = context.watch<FluentAppTheme>();
+    FluxNewsWebViewState webAppState = context.read<FluxNewsWebViewState>();
     FluxNewsState appState = context.watch<FluxNewsState>();
     FluxNewsCounterState appCounterState = context.watch<FluxNewsCounterState>();
     return FlyoutTarget(
@@ -56,6 +58,7 @@ class FluentNewsRow extends StatelessWidget {
 
             context.read<FluxNewsCounterState>().listUpdated = true;
             context.read<FluxNewsCounterState>().refreshView();
+            await webAppState.loadWebPage(news.url);
             appState.refreshView();
 
             // there are difference on launching the news url between the platforms

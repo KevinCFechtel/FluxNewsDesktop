@@ -16,6 +16,9 @@ PODS:
     - FlutterMacOS
   - system_theme (0.0.1):
     - FlutterMacOS
+  - webview_flutter_wkwebview (0.0.1):
+    - Flutter
+    - FlutterMacOS
   - window_manager (0.2.0):
     - FlutterMacOS
 
@@ -28,6 +31,7 @@ DEPENDENCIES:
   - sqflite (from `Flutter/ephemeral/.symlinks/plugins/sqflite/darwin`)
   - system_date_time_format (from `Flutter/ephemeral/.symlinks/plugins/system_date_time_format/macos`)
   - system_theme (from `Flutter/ephemeral/.symlinks/plugins/system_theme/macos`)
+  - webview_flutter_wkwebview (from `Flutter/ephemeral/.symlinks/plugins/webview_flutter_wkwebview/darwin`)
   - window_manager (from `Flutter/ephemeral/.symlinks/plugins/window_manager/macos`)
 
 EXTERNAL SOURCES:
@@ -47,6 +51,8 @@ EXTERNAL SOURCES:
     :path: Flutter/ephemeral/.symlinks/plugins/system_date_time_format/macos
   system_theme:
     :path: Flutter/ephemeral/.symlinks/plugins/system_theme/macos
+  webview_flutter_wkwebview:
+    :path: Flutter/ephemeral/.symlinks/plugins/webview_flutter_wkwebview/darwin
   window_manager:
     :path: Flutter/ephemeral/.symlinks/plugins/window_manager/macos
 
@@ -59,6 +65,7 @@ SPEC CHECKSUMS:
   sqflite: 673a0e54cc04b7d6dba8d24fb8095b31c3a99eec
   system_date_time_format: 4f3982edee40a537cf15c817d1e939b9dbfa457d
   system_theme: c7b9f6659a5caa26c9bc2284da096781e9a6fcbc
+  webview_flutter_wkwebview: 0982481e3d9c78fd5c6f62a002fcd24fc791f1e4
   window_manager: 3a1844359a6295ab1e47659b1a777e36773cd6e8
 
 PODFILE CHECKSUM: 16208599a12443d53889ba2270a4985981cfb204

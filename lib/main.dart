@@ -4,6 +4,7 @@ import 'package:flux_news_desktop/fluent_ui/fluent_app_main_view.dart';
 import 'package:flux_news_desktop/fluent_ui/fluent_theme.dart';
 import 'package:flux_news_desktop/state/flux_news_counter_state.dart';
 import 'package:flux_news_desktop/state/flux_news_state.dart';
+import 'package:flux_news_desktop/state/flux_news_webview_state.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:system_date_time_format/system_date_time_format.dart';
 import 'package:system_theme/system_theme.dart';
@@ -50,37 +51,41 @@ class FluxNewsDesktop extends StatelessWidget {
               create: (context) => FluxNewsCounterState(),
               builder: (context, child) {
                 return ChangeNotifierProvider(
-                    create: (context) => FluentAppTheme(),
+                    create: (context) => FluxNewsWebViewState(),
                     builder: (context, child) {
-                      final appTheme = context.watch<FluentAppTheme>();
+                      return ChangeNotifierProvider(
+                          create: (context) => FluentAppTheme(),
+                          builder: (context, child) {
+                            final appTheme = context.watch<FluentAppTheme>();
 
-                      return FluentApp(
-                        title: FluxNewsState.applicationName,
-                        themeMode: appTheme.mode,
-                        debugShowCheckedModeBanner: false,
-                        color: appTheme.color,
-                        darkTheme: FluentThemeData(
-                          brightness: Brightness.dark,
-                          accentColor: appTheme.color,
-                          visualDensity: VisualDensity.standard,
-                          focusTheme: FocusThemeData(
-                            glowFactor: is10footScreen(context) ? 2.0 : 0.0,
-                          ),
-                        ),
-                        theme: FluentThemeData(
-                          accentColor: appTheme.color,
-                          visualDensity: VisualDensity.standard,
-                          focusTheme: FocusThemeData(
-                            glowFactor: is10footScreen(context) ? 2.0 : 0.0,
-                          ),
-                        ),
-                        localizationsDelegates: AppLocalizations.localizationsDelegates,
-                        supportedLocales: const [
-                          Locale('en', ''),
-                          Locale('de', ''),
-                        ],
-                        home: const FluentNavigationMainView(),
-                      );
+                            return FluentApp(
+                              title: FluxNewsState.applicationName,
+                              themeMode: appTheme.mode,
+                              debugShowCheckedModeBanner: false,
+                              color: appTheme.color,
+                              darkTheme: FluentThemeData(
+                                brightness: Brightness.dark,
+                                accentColor: appTheme.color,
+                                visualDensity: VisualDensity.standard,
+                                focusTheme: FocusThemeData(
+                                  glowFactor: is10footScreen(context) ? 2.0 : 0.0,
+                                ),
+                              ),
+                              theme: FluentThemeData(
+                                accentColor: appTheme.color,
+                                visualDensity: VisualDensity.standard,
+                                focusTheme: FocusThemeData(
+                                  glowFactor: is10footScreen(context) ? 2.0 : 0.0,
+                                ),
+                              ),
+                              localizationsDelegates: AppLocalizations.localizationsDelegates,
+                              supportedLocales: const [
+                                Locale('en', ''),
+                                Locale('de', ''),
+                              ],
+                              home: const FluentNavigationMainView(),
+                            );
+                          });
                     });
               });
         });
