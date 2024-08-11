@@ -58,8 +58,7 @@ class FluentAppTheme extends ChangeNotifier {
   TextStyle _unreadTextLight = TextStyle(color: Colors.grey[140]);
   TextStyle _unreadTextDark = TextStyle(color: Colors.grey[20]);
   TextStyle get unreadText => mode == ThemeMode.system
-      ? WidgetsBinding.instance.platformDispatcher.platformBrightness ==
-              Brightness.light
+      ? WidgetsBinding.instance.platformDispatcher.platformBrightness == Brightness.light
           ? _unreadTextLight
           : _unreadTextDark
       : mode == ThemeMode.light
@@ -67,8 +66,7 @@ class FluentAppTheme extends ChangeNotifier {
           : _unreadTextDark;
   set unreadText(TextStyle textStyle) {
     if (mode == ThemeMode.system) {
-      if (WidgetsBinding.instance.platformDispatcher.platformBrightness ==
-          Brightness.light) {
+      if (WidgetsBinding.instance.platformDispatcher.platformBrightness == Brightness.light) {
         _unreadTextLight = textStyle;
       } else {
         _unreadTextDark = textStyle;
@@ -85,8 +83,7 @@ class FluentAppTheme extends ChangeNotifier {
   TextStyle _readTextLight = TextStyle(color: Colors.grey[70]);
   TextStyle _readTextDark = TextStyle(color: Colors.grey[120]);
   TextStyle get readText => mode == ThemeMode.system
-      ? WidgetsBinding.instance.platformDispatcher.platformBrightness ==
-              Brightness.light
+      ? WidgetsBinding.instance.platformDispatcher.platformBrightness == Brightness.light
           ? _readTextLight
           : _readTextDark
       : mode == ThemeMode.light
@@ -94,8 +91,7 @@ class FluentAppTheme extends ChangeNotifier {
           : _readTextDark;
   set readText(TextStyle textStyle) {
     if (mode == ThemeMode.system) {
-      if (WidgetsBinding.instance.platformDispatcher.platformBrightness ==
-          Brightness.light) {
+      if (WidgetsBinding.instance.platformDispatcher.platformBrightness == Brightness.light) {
         _readTextLight = textStyle;
       } else {
         _readTextDark = textStyle;
@@ -121,12 +117,35 @@ class FluentAppTheme extends ChangeNotifier {
     _locale = locale;
     notifyListeners();
   }
+
+  Color _backgroundColorLight = Colors.grey[20];
+  Color _backgroundColorDark = Colors.grey[170];
+  Color get backgroundColor => mode == ThemeMode.system
+      ? WidgetsBinding.instance.platformDispatcher.platformBrightness == Brightness.light
+          ? _backgroundColorLight
+          : _backgroundColorDark
+      : mode == ThemeMode.light
+          ? _backgroundColorLight
+          : _backgroundColorDark;
+  set backgroundColor(Color color) {
+    if (mode == ThemeMode.system) {
+      if (WidgetsBinding.instance.platformDispatcher.platformBrightness == Brightness.light) {
+        _backgroundColorLight = color;
+      } else {
+        _backgroundColorDark = color;
+      }
+    } else if (mode == ThemeMode.light) {
+      _backgroundColorLight = color;
+    } else {
+      _backgroundColorDark = color;
+    }
+
+    notifyListeners();
+  }
 }
 
 AccentColor get systemAccentColor {
-  if ((defaultTargetPlatform == TargetPlatform.windows ||
-          defaultTargetPlatform == TargetPlatform.android) &&
-      !kIsWeb) {
+  if ((defaultTargetPlatform == TargetPlatform.windows || defaultTargetPlatform == TargetPlatform.android) && !kIsWeb) {
     return AccentColor.swatch({
       'darkest': SystemTheme.accentColor.darkest,
       'darker': SystemTheme.accentColor.darker,

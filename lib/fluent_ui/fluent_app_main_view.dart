@@ -645,11 +645,11 @@ class AppBarButtons extends StatelessWidget {
           label: width > 1600 ? Text(AppLocalizations.of(context)!.sync) : const SizedBox.shrink(),
           icon: appState.syncProcess
               ? const SizedBox(
-                  height: 20.0,
-                  width: 20.0,
+                  height: 15.0,
+                  width: 15.0,
                   child: ProgressRing(),
                 )
-              : const Icon(FluentIcons.refresh, size: 20.0),
+              : const Icon(FluentIcons.refresh, size: 15.0),
         ),
       ],
     );

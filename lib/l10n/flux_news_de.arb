@@ -79,5 +79,6 @@
     "manualTruncate": "Nachrichtentext abschneiden",
     "successfullSaveToThirdParty": "Die Nachricht wurde erfolgreich gespeichert!",
     "newsReadFilter": "Nachrichtenfilter\ngelesen / ungelesen",
-    "sync": "Synchronisieren"
+    "sync": "Synchronisieren",
+    "newsViewer": "Nachricht lesen"
 }

@@ -29,7 +29,7 @@ Future<void> main() async {
       TitleBarStyle.normal,
       windowButtonVisibility: true,
     );
-    await windowManager.setMinimumSize(const Size(500, 600));
+    await windowManager.setMinimumSize(const Size(700, 600));
     await windowManager.show();
     await windowManager.setPreventClose(false);
     await windowManager.setSkipTaskbar(false);
@@ -97,9 +97,7 @@ class FluxNewsDesktop extends StatelessWidget {
                                             height: double.infinity, width: 800, child: FluentNavigationMainView())
                                         : const SizedBox(
                                             height: double.infinity, width: 500, child: FluentNavigationMainView()),
-                                const Expanded(
-                                  child: WebViewMainView(),
-                                ),
+                                const Expanded(child: WebViewMainView()),
                               ]),
                             );
                           });

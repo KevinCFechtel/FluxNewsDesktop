@@ -79,5 +79,6 @@
     "manualTruncate": "Truncate news",
     "successfullSaveToThirdParty": "The news was successfully saved!",
     "newsReadFilter": "News filter\nread / unread",
-    "sync": "Sync"
+    "sync": "Sync",
+    "newsViewer": "News viewer"
 }
