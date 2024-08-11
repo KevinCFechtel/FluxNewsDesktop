@@ -26,7 +26,6 @@ class FluentNewsRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print("Rebuild!");
     final contextController = FlyoutController();
     final contextAttachKey = GlobalKey();
     FluentAppTheme appTheme = context.watch<FluentAppTheme>();
