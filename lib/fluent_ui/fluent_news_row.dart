@@ -26,6 +26,7 @@ class FluentNewsRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    print("Rebuild!");
     final contextController = FlyoutController();
     final contextAttachKey = GlobalKey();
     FluentAppTheme appTheme = context.watch<FluentAppTheme>();
@@ -193,14 +194,10 @@ class FluentNewsRow extends StatelessWidget {
                 children: [
                   news.getImageURL() != FluxNewsState.noImageUrlString
                       ? Expanded(
-                          flex: searchView
-                              ? context.select((FluxNewsState model) => model.isTablet)
-                                  ? 4
-                                  : 5
-                              : 5,
+                          flex: 5,
                           child: CachedNetworkImage(
                             imageUrl: news.getImageURL(),
-                            height: appState.isTablet ? 250 : 175,
+                            height: 200,
                             width: double.infinity,
                             fit: BoxFit.cover,
                             fadeInDuration: const Duration(seconds: 0),
@@ -211,11 +208,7 @@ class FluentNewsRow extends StatelessWidget {
                       // if no image is available, shrink this widget
                       : const SizedBox.shrink(),
                   Expanded(
-                    flex: searchView
-                        ? context.select((FluxNewsState model) => model.isTablet)
-                            ? 7
-                            : 5
-                        : 5,
+                    flex: 5,
                     child: AbsorbPointer(
                       child: ListTile(
                         title: Text(

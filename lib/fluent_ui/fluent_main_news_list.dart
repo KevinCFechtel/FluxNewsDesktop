@@ -54,6 +54,7 @@ class FluentBodyNewsList extends StatelessWidget {
                                 itemScrollController: appState.itemScrollController,
                                 itemPositionsListener: appState.itemPositionsListener,
                                 initialScrollIndex: appState.scrollPosition,
+                                minCacheExtent: 20000,
                                 itemBuilder: (context, i) {
                                   return width <= 1600
                                       ? FluentNewsCard(
@@ -65,7 +66,7 @@ class FluentBodyNewsList extends StatelessWidget {
                             onNotification: (ScrollNotification scrollInfo) {
                               final metrics = scrollInfo.metrics;
                               // check if set read on scroll over is activated in settings
-                              if (context.read<FluxNewsState>().markAsReadOnScrollOver) {
+                              if (appState.markAsReadOnScrollOver) {
                                 // if the sync is in progress, no news should marked as read
                                 if (appState.syncProcess == false) {
                                   // set all news as read if the list reached the bottom (the edge)
@@ -83,25 +84,23 @@ class FluentBodyNewsList extends StatelessWidget {
                                               'Caught an error in updateNewsStatusInDB function!', LogLevel.ERROR,
                                               exception: exception, stackTrace: stacktrace);
 
-                                          if (context.read<FluxNewsState>().errorString !=
-                                              AppLocalizations.of(context)!.databaseError) {
-                                            context.read<FluxNewsState>().errorString =
-                                                AppLocalizations.of(context)!.databaseError;
-                                            context.read<FluxNewsState>().newError = true;
-                                            context.read<FluxNewsState>().refreshView();
+                                          if (appState.errorString != AppLocalizations.of(context)!.databaseError) {
+                                            appState.errorString = AppLocalizations.of(context)!.databaseError;
+                                            appState.newError = true;
+                                            appState.refreshView();
                                           }
                                         }
                                         snapshot.data![i].status = FluxNewsState.readNewsStatus;
                                       }
                                       // set the scroll position back to the top of the list
-                                      context.read<FluxNewsState>().scrollPosition = 0;
+                                      appState.scrollPosition = 0;
                                     }
                                   } else {
                                     // if the list doesn't reached the bottom,
                                     // mark the news which got scrolled over as read.
                                     // Iterate through the news list from start
                                     // to the actual position and mark them as read
-                                    for (int i = 0; i < context.read<FluxNewsState>().scrollPosition; i++) {
+                                    for (int i = 0; i < appState.scrollPosition; i++) {
                                       try {
                                         updateNewsStatusInDB(
                                             snapshot.data![i].newsID, FluxNewsState.readNewsStatus, appState);
@@ -110,12 +109,10 @@ class FluentBodyNewsList extends StatelessWidget {
                                             'Caught an error in updateNewsStatusInDB function!', LogLevel.ERROR,
                                             exception: exception, stackTrace: stacktrace);
 
-                                        if (context.read<FluxNewsState>().errorString !=
-                                            AppLocalizations.of(context)!.databaseError) {
-                                          context.read<FluxNewsState>().errorString =
-                                              AppLocalizations.of(context)!.databaseError;
-                                          context.read<FluxNewsState>().newError = true;
-                                          context.read<FluxNewsState>().refreshView();
+                                        if (appState.errorString != AppLocalizations.of(context)!.databaseError) {
+                                          appState.errorString = AppLocalizations.of(context)!.databaseError;
+                                          appState.newError = true;
+                                          appState.refreshView();
                                         }
                                       }
                                       snapshot.data![i].status = FluxNewsState.readNewsStatus;
@@ -127,6 +124,7 @@ class FluentBodyNewsList extends StatelessWidget {
                                 appState.refreshView();
                                 context.read<FluxNewsCounterState>().refreshView();
                               }
+
                               // return always false to ensure the processing of the notification
                               return false;
                             },
