@@ -7,19 +7,31 @@ import 'package:webview_windows/webview_windows.dart';
 class FluxNewsWebViewState extends ChangeNotifier {
   // TEST Webview
 
-  WebViewController macWebController = WebViewController();
-  WebviewController windowsWebController = WebviewController();
+  WebViewController? macWebController;
+  WebviewController? windowsWebController;
   bool isLoaded = false;
+
+  void initWebViewState() {
+    if (Platform.isMacOS) {
+      macWebController = WebViewController();
+    } else if (Platform.isWindows) {
+      windowsWebController = WebviewController();
+    }
+  }
 
   Future<void> loadWebPage(String url) async {
     if (Platform.isMacOS) {
-      macWebController.loadRequest(Uri.parse(url));
-      isLoaded = true;
+      if (macWebController != null) {
+        macWebController!.loadRequest(Uri.parse(url));
+        isLoaded = true;
+      }
     } else if (Platform.isWindows) {
       String? checkRequirements = await WebviewController.getWebViewVersion();
       if (checkRequirements != null) {
-        windowsWebController.loadUrl(url);
-        isLoaded = true;
+        if (windowsWebController != null) {
+          windowsWebController!.loadUrl(url);
+          isLoaded = true;
+        }
       }
     }
 
@@ -28,25 +40,37 @@ class FluxNewsWebViewState extends ChangeNotifier {
 
   Future<void> pageBack() async {
     if (Platform.isMacOS) {
-      macWebController.goBack();
+      if (macWebController != null) {
+        macWebController!.goBack();
+      }
     } else if (Platform.isWindows) {
-      windowsWebController.goBack();
+      if (windowsWebController != null) {
+        windowsWebController!.goBack();
+      }
     }
   }
 
   Future<void> pageForward() async {
     if (Platform.isMacOS) {
-      macWebController.goForward();
+      if (macWebController != null) {
+        macWebController!.goForward();
+      }
     } else if (Platform.isWindows) {
-      windowsWebController.goForward();
+      if (windowsWebController != null) {
+        windowsWebController!.goForward();
+      }
     }
   }
 
   Future<void> pageReload() async {
     if (Platform.isMacOS) {
-      macWebController.reload();
+      if (macWebController != null) {
+        macWebController!.reload();
+      }
     } else if (Platform.isWindows) {
-      windowsWebController.reload();
+      if (windowsWebController != null) {
+        windowsWebController!.reload();
+      }
     }
   }
 

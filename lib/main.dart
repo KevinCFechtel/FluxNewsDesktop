@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter_acrylic/flutter_acrylic.dart' as flutter_acrylic;
 import 'package:flux_news_desktop/fluent_ui/fluent_app_main_view.dart';
@@ -22,7 +24,10 @@ Future<void> main() async {
   // if it's not on the web, windows or android, load the accent color
   SystemTheme.accentColor.load();
   await flutter_acrylic.Window.initialize();
-  await flutter_acrylic.Window.hideWindowControls();
+  if (Platform.isMacOS) {
+    await flutter_acrylic.Window.hideWindowControls();
+  }
+
   await WindowManager.instance.ensureInitialized();
   windowManager.waitUntilReadyToShow().then((_) async {
     await windowManager.setTitleBarStyle(
@@ -70,17 +75,20 @@ class FluxNewsDesktop extends StatelessWidget {
                                 accentColor: appTheme.color,
                                 visualDensity: VisualDensity.standard,
                                 focusTheme: FocusThemeData(
-                                  glowFactor: is10footScreen(context) ? 2.0 : 0.0,
+                                  glowFactor:
+                                      is10footScreen(context) ? 2.0 : 0.0,
                                 ),
                               ),
                               theme: FluentThemeData(
                                 accentColor: appTheme.color,
                                 visualDensity: VisualDensity.standard,
                                 focusTheme: FocusThemeData(
-                                  glowFactor: is10footScreen(context) ? 2.0 : 0.0,
+                                  glowFactor:
+                                      is10footScreen(context) ? 2.0 : 0.0,
                                 ),
                               ),
-                              localizationsDelegates: AppLocalizations.localizationsDelegates,
+                              localizationsDelegates:
+                                  AppLocalizations.localizationsDelegates,
                               supportedLocales: const [
                                 Locale('en', ''),
                                 Locale('de', ''),
@@ -94,9 +102,13 @@ class FluxNewsDesktop extends StatelessWidget {
                                       )
                                     : width > 1600
                                         ? const SizedBox(
-                                            height: double.infinity, width: 800, child: FluentNavigationMainView())
+                                            height: double.infinity,
+                                            width: 800,
+                                            child: FluentNavigationMainView())
                                         : const SizedBox(
-                                            height: double.infinity, width: 500, child: FluentNavigationMainView()),
+                                            height: double.infinity,
+                                            width: 500,
+                                            child: FluentNavigationMainView()),
                                 const Expanded(child: WebViewMainView()),
                               ]),
                             );

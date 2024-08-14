@@ -77,15 +77,25 @@ class WebViewMainView extends StatelessWidget {
             ),
             Expanded(
                 child: Platform.isMacOS
-                    ? WebViewWidget(
-                        controller: webViewState.macWebController,
-                      )
-                    : Webview(webViewState.windowsWebController))
+                    ? webViewState.macWebController != null
+                        ? WebViewWidget(
+                            controller: webViewState.macWebController!,
+                          )
+                        : Container(
+                            color: appTheme.backgroundColor,
+                            child: const Column(children: [SizedBox.shrink()]))
+                    : webViewState.windowsWebController != null
+                        ? Webview(webViewState.windowsWebController!)
+                        : Container(
+                            color: appTheme.backgroundColor,
+                            child: const Column(children: [SizedBox.shrink()])))
           ],
         ),
       );
     } else {
-      return Container(color: appTheme.backgroundColor, child: const Column(children: [SizedBox.shrink()]));
+      return Container(
+          color: appTheme.backgroundColor,
+          child: const Column(children: [SizedBox.shrink()]));
     }
   }
 }

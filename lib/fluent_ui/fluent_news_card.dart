@@ -31,7 +31,8 @@ class FluentNewsCard extends StatelessWidget {
     FluentAppTheme appTheme = context.watch<FluentAppTheme>();
     FluxNewsWebViewState webAppState = context.read<FluxNewsWebViewState>();
     FluxNewsState appState = context.watch<FluxNewsState>();
-    FluxNewsCounterState appCounterState = context.watch<FluxNewsCounterState>();
+    FluxNewsCounterState appCounterState =
+        context.watch<FluxNewsCounterState>();
     return FlyoutTarget(
         key: contextAttachKey,
         controller: contextController,
@@ -39,14 +40,21 @@ class FluentNewsCard extends StatelessWidget {
           onTap: () async {
             // on tab we update the status of the news to read and open the news
             try {
-              updateNewsStatusInDB(news.newsID, FluxNewsState.readNewsStatus, appState);
+              updateNewsStatusInDB(
+                  news.newsID, FluxNewsState.readNewsStatus, appState);
             } on Exception catch (exception, stacktrace) {
-              logThis('updateNewsStatusInDB', 'Caught an error in updateNewsStatusInDB function!', LogLevel.ERROR,
-                  exception: exception, stackTrace: stacktrace);
+              logThis(
+                  'updateNewsStatusInDB',
+                  'Caught an error in updateNewsStatusInDB function!',
+                  LogLevel.ERROR,
+                  exception: exception,
+                  stackTrace: stacktrace);
 
               if (context.mounted) {
-                if (appState.errorString != AppLocalizations.of(context)!.databaseError) {
-                  appState.errorString = AppLocalizations.of(context)!.databaseError;
+                if (appState.errorString !=
+                    AppLocalizations.of(context)!.databaseError) {
+                  appState.errorString =
+                      AppLocalizations.of(context)!.databaseError;
                   appState.newError = true;
                   appState.refreshView();
                 }
@@ -116,10 +124,13 @@ class FluentNewsCard extends StatelessWidget {
                                 ? const Icon(FluentIcons.favorite_star)
                                 : const Icon(FluentIcons.favorite_star_fill),
                             label: news.starred
-                                ? Text(AppLocalizations.of(context)!.deleteBookmark)
-                                : Text(AppLocalizations.of(context)!.addBookmark),
+                                ? Text(AppLocalizations.of(context)!
+                                    .deleteBookmark)
+                                : Text(
+                                    AppLocalizations.of(context)!.addBookmark),
                             onPressed: () async {
-                              await markAsBookmarkContextFunction(news, appState, context, searchView);
+                              await markAsBookmarkContextFunction(
+                                  news, appState, context, searchView);
                               if (context.mounted) {
                                 Navigator.pop(context);
                               }
@@ -127,17 +138,24 @@ class FluentNewsCard extends StatelessWidget {
                           ),
                           CommandBarButton(
                             icon: news.status == FluxNewsState.readNewsStatus
-                                ? const Text("New", style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold))
+                                ? const Text("New",
+                                    style: TextStyle(
+                                        fontSize: 10,
+                                        fontWeight: FontWeight.bold))
                                 : const Icon(FluentIcons.accept),
                             label: news.status == FluxNewsState.readNewsStatus
-                                ? Text(AppLocalizations.of(context)!.markAsUnread)
-                                : Text(AppLocalizations.of(context)!.markAsRead),
+                                ? Text(
+                                    AppLocalizations.of(context)!.markAsUnread)
+                                : Text(
+                                    AppLocalizations.of(context)!.markAsRead),
                             onPressed: () {
                               // switch between bookmarked or not bookmarked depending on the previous status
                               if (news.status == FluxNewsState.readNewsStatus) {
-                                markNewsAsReadContextAction(news, appState, context, searchView, appCounterState);
+                                markNewsAsReadContextAction(news, appState,
+                                    context, searchView, appCounterState);
                               } else {
-                                markNewsAsUnreadContextAction(news, appState, context, searchView, appCounterState);
+                                markNewsAsUnreadContextAction(news, appState,
+                                    context, searchView, appCounterState);
                               }
                               Navigator.pop(context);
                             },
@@ -150,7 +168,8 @@ class FluentNewsCard extends StatelessWidget {
                               overflow: TextOverflow.ellipsis,
                             ),
                             onPressed: () async {
-                              await saveNewsInThirdPartyContextAction(news, appState, context);
+                              await saveNewsInThirdPartyContextAction(
+                                  news, appState, context);
                               if (context.mounted) {
                                 Navigator.pop(context);
                               }
@@ -170,7 +189,9 @@ class FluentNewsCard extends StatelessWidget {
                   boxShadow: [
                     BoxShadow(
                       color: appTheme.mode == ThemeMode.system
-                          ? WidgetsBinding.instance.platformDispatcher.platformBrightness == Brightness.light
+                          ? WidgetsBinding.instance.platformDispatcher
+                                      .platformBrightness ==
+                                  Brightness.light
                               ? Colors.grey[90]
                               : Colors.black
                           : appTheme.mode == ThemeMode.light
@@ -180,7 +201,9 @@ class FluentNewsCard extends StatelessWidget {
                     ),
                   ],
                   color: appTheme.mode == ThemeMode.system
-                      ? WidgetsBinding.instance.platformDispatcher.platformBrightness == Brightness.light
+                      ? WidgetsBinding.instance.platformDispatcher
+                                  .platformBrightness ==
+                              Brightness.light
                           ? Colors.grey[10]
                           : Colors.grey[160]
                       : appTheme.mode == ThemeMode.light
@@ -213,8 +236,9 @@ class FluentNewsCard extends StatelessWidget {
                       child: ListTile(
                           title: Text(
                             news.title,
-                            style:
-                                news.status == FluxNewsState.unreadNewsStatus ? appTheme.unreadText : appTheme.readText,
+                            style: news.status == FluxNewsState.unreadNewsStatus
+                                ? appTheme.unreadText
+                                : appTheme.readText,
                           ),
                           subtitle: Column(
                             children: [
@@ -224,31 +248,42 @@ class FluentNewsCard extends StatelessWidget {
                                 ),
                                 child: Row(
                                   children: [
-                                    news.status == FluxNewsState.unreadNewsStatus
+                                    news.status ==
+                                            FluxNewsState.unreadNewsStatus
                                         ? const Padding(
-                                            padding: EdgeInsets.only(right: 15.0),
+                                            padding:
+                                                EdgeInsets.only(right: 15.0),
                                             child: SizedBox(
                                                 width: 25,
                                                 height: 35,
                                                 child: Center(
                                                     child: Text("New",
-                                                        style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold)))))
+                                                        style: TextStyle(
+                                                            fontSize: 10,
+                                                            fontWeight:
+                                                                FontWeight
+                                                                    .bold)))))
                                         : Padding(
-                                            padding: const EdgeInsets.only(right: 15.0),
+                                            padding: const EdgeInsets.only(
+                                                right: 15.0),
                                             child: SizedBox(
                                                 width: 25,
                                                 height: 35,
-                                                child: Icon(FluentIcons.accept, color: Colors.grey[120]))),
+                                                child: Icon(FluentIcons.accept,
+                                                    color: Colors.grey[120]))),
                                     appState.showFeedIcons
                                         ? Padding(
-                                            padding: const EdgeInsets.only(right: 5.0),
-                                            child: news.getFeedIcon(16.0, context))
+                                            padding: const EdgeInsets.only(
+                                                right: 5.0),
+                                            child:
+                                                news.getFeedIcon(16.0, context))
                                         : const SizedBox.shrink(),
                                     Padding(
                                       padding: const EdgeInsets.only(left: 0.0),
                                       child: Text(
                                         news.feedTitle,
-                                        style: news.status == FluxNewsState.unreadNewsStatus
+                                        style: news.status ==
+                                                FluxNewsState.unreadNewsStatus
                                             ? appTheme.unreadText
                                             : appTheme.readText,
                                       ),
@@ -256,8 +291,12 @@ class FluentNewsCard extends StatelessWidget {
                                     Padding(
                                       padding: const EdgeInsets.only(left: 8.0),
                                       child: Text(
-                                        context.read<FluxNewsState>().dateFormat.format(news.getPublishingDate()),
-                                        style: news.status == FluxNewsState.unreadNewsStatus
+                                        context
+                                            .read<FluxNewsState>()
+                                            .dateFormat
+                                            .format(news.getPublishingDate()),
+                                        style: news.status ==
+                                                FluxNewsState.unreadNewsStatus
                                             ? appTheme.unreadText
                                             : appTheme.readText,
                                       ),
@@ -268,7 +307,9 @@ class FluentNewsCard extends StatelessWidget {
                                       child: news.starred
                                           ? Icon(
                                               FluentIcons.add_favorite_fill,
-                                              color: news.status == FluxNewsState.unreadNewsStatus
+                                              color: news.status ==
+                                                      FluxNewsState
+                                                          .unreadNewsStatus
                                                   ? appTheme.unreadText.color
                                                   : appTheme.readText.color,
                                             )
@@ -279,10 +320,12 @@ class FluentNewsCard extends StatelessWidget {
                               ),
                               // here is the news text, the Opacity decide between read and unread
                               Padding(
-                                padding: const EdgeInsets.only(top: 2.0, bottom: 10),
+                                padding:
+                                    const EdgeInsets.only(top: 2.0, bottom: 10),
                                 child: Text(
                                   news.getText(appState),
-                                  style: news.status == FluxNewsState.unreadNewsStatus
+                                  style: news.status ==
+                                          FluxNewsState.unreadNewsStatus
                                       ? appTheme.unreadText
                                       : appTheme.readText,
                                 ),
