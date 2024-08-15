@@ -38,7 +38,11 @@ Future<void> main() async {
     await windowManager.show();
     await windowManager.setPreventClose(false);
     await windowManager.setSkipTaskbar(false);
-    windowManager.setTitle(FluxNewsState.applicationName);
+    if (Platform.isMacOS) {
+      windowManager.setTitle(FluxNewsState.applicationName);
+    } else if (Platform.isWindows) {
+      windowManager.setTitle("");
+    }
   });
 
   runApp(const SDTFScope(child: FluxNewsDesktop()));

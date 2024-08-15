@@ -16,6 +16,9 @@ class FluxNewsWebViewState extends ChangeNotifier {
       macWebController = WebViewController();
     } else if (Platform.isWindows) {
       windowsWebController = WebviewController();
+      if (windowsWebController != null) {
+        windowsWebController!.initialize();
+      }
     }
   }
 
@@ -79,6 +82,9 @@ class FluxNewsWebViewState extends ChangeNotifier {
       macWebController = WebViewController();
     } else if (Platform.isWindows) {
       windowsWebController = WebviewController();
+      if (windowsWebController != null) {
+        windowsWebController!.initialize();
+      }
     }
     isLoaded = false;
     notifyListeners();
