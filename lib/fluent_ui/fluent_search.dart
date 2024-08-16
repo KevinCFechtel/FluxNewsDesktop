@@ -66,10 +66,12 @@ class FluentSearch extends StatelessWidget {
               logThis('fetchSearchedNews', 'Caught an error in fetchSearchedNews function! : ${error.toString()}',
                   LogLevel.ERROR,
                   stackTrace: stackTrace);
-              if (appState.errorString != AppLocalizations.of(context)!.communicateionMinifluxError) {
-                appState.errorString = AppLocalizations.of(context)!.communicateionMinifluxError;
-                appState.newError = true;
-                appState.refreshView();
+              if (context.mounted) {
+                if (appState.errorString != AppLocalizations.of(context)!.communicateionMinifluxError) {
+                  appState.errorString = AppLocalizations.of(context)!.communicateionMinifluxError;
+                  appState.newError = true;
+                  appState.refreshView();
+                }
               }
               return [];
             });

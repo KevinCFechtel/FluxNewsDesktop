@@ -37,11 +37,12 @@ Future<void> syncNews(FluxNewsState appState, BuildContext context) async {
           .onError((error, stackTrace) {
     logThis('authCheck', 'Caught an error in authCheck function! : ${error.toString()}', LogLevel.ERROR,
         stackTrace: stackTrace);
-
-    if (appState.errorString != AppLocalizations.of(context)!.communicateionMinifluxError) {
-      appState.errorString = AppLocalizations.of(context)!.communicateionMinifluxError;
-      appState.newError = true;
-      appState.refreshView();
+    if (context.mounted) {
+      if (appState.errorString != AppLocalizations.of(context)!.communicateionMinifluxError) {
+        appState.errorString = AppLocalizations.of(context)!.communicateionMinifluxError;
+        appState.newError = true;
+        appState.refreshView();
+      }
     }
     return false;
   });
@@ -57,11 +58,12 @@ Future<void> syncNews(FluxNewsState appState, BuildContext context) async {
     await toggleNewsAsRead(http.Client(), appState).onError((error, stackTrace) {
       logThis('toggleNewsAsRead', 'Caught an error in toggleNewsAsRead function! : ${error.toString()}', LogLevel.ERROR,
           stackTrace: stackTrace);
-
-      if (appState.errorString != AppLocalizations.of(context)!.communicateionMinifluxError) {
-        appState.errorString = AppLocalizations.of(context)!.communicateionMinifluxError;
-        appState.newError = true;
-        appState.refreshView();
+      if (context.mounted) {
+        if (appState.errorString != AppLocalizations.of(context)!.communicateionMinifluxError) {
+          appState.errorString = AppLocalizations.of(context)!.communicateionMinifluxError;
+          appState.newError = true;
+          appState.refreshView();
+        }
       }
     });
 
@@ -69,11 +71,12 @@ Future<void> syncNews(FluxNewsState appState, BuildContext context) async {
     NewsList newNews = await fetchNews(http.Client(), appState).onError((error, stackTrace) {
       logThis('fetchNews', 'Caught an error in fetchNews function! : ${error.toString()}', LogLevel.ERROR,
           stackTrace: stackTrace);
-
-      if (appState.errorString != AppLocalizations.of(context)!.communicateionMinifluxError) {
-        appState.errorString = AppLocalizations.of(context)!.communicateionMinifluxError;
-        appState.newError = true;
-        appState.refreshView();
+      if (context.mounted) {
+        if (appState.errorString != AppLocalizations.of(context)!.communicateionMinifluxError) {
+          appState.errorString = AppLocalizations.of(context)!.communicateionMinifluxError;
+          appState.newError = true;
+          appState.refreshView();
+        }
       }
       return NewsList(news: [], newsCount: 0);
     });
@@ -84,11 +87,12 @@ Future<void> syncNews(FluxNewsState appState, BuildContext context) async {
       await markNotFetchedNewsAsRead(newNews, appState).onError((error, stackTrace) {
         logThis('markNotFetchedNewsAsRead',
             'Caught an error in markNotFetchedNewsAsRead function! : ${error.toString()}', LogLevel.ERROR);
-
-        if (appState.errorString != AppLocalizations.of(context)!.databaseError) {
-          appState.errorString = AppLocalizations.of(context)!.databaseError;
-          appState.newError = true;
-          appState.refreshView();
+        if (context.mounted) {
+          if (appState.errorString != AppLocalizations.of(context)!.databaseError) {
+            appState.errorString = AppLocalizations.of(context)!.databaseError;
+            appState.newError = true;
+            appState.refreshView();
+          }
         }
         return 0;
       });
@@ -100,11 +104,12 @@ Future<void> syncNews(FluxNewsState appState, BuildContext context) async {
       newCategories = await fetchCategoryInformation(http.Client(), appState).onError((error, stackTrace) {
         logThis('fetchCategoryInformation',
             'Caught an error in fetchCategoryInformation function! : ${error.toString()}', LogLevel.ERROR);
-
-        if (appState.errorString != AppLocalizations.of(context)!.communicateionMinifluxError) {
-          appState.errorString = AppLocalizations.of(context)!.communicateionMinifluxError;
-          appState.newError = true;
-          appState.refreshView();
+        if (context.mounted) {
+          if (appState.errorString != AppLocalizations.of(context)!.communicateionMinifluxError) {
+            appState.errorString = AppLocalizations.of(context)!.communicateionMinifluxError;
+            appState.newError = true;
+            appState.refreshView();
+          }
         }
         return Future<Categories>.value(Categories(categories: []));
       });
@@ -115,11 +120,12 @@ Future<void> syncNews(FluxNewsState appState, BuildContext context) async {
       await insertCategoriesInDB(newCategories, appState).onError((error, stackTrace) {
         logThis('insertCategoriesInDB', 'Caught an error in insertCategoriesInDB function! : ${error.toString()}',
             LogLevel.ERROR);
-
-        if (appState.errorString != AppLocalizations.of(context)!.databaseError) {
-          appState.errorString = AppLocalizations.of(context)!.databaseError;
-          appState.newError = true;
-          appState.refreshView();
+        if (context.mounted) {
+          if (appState.errorString != AppLocalizations.of(context)!.databaseError) {
+            appState.errorString = AppLocalizations.of(context)!.databaseError;
+            appState.newError = true;
+            appState.refreshView();
+          }
         }
         return 0;
       });
@@ -130,11 +136,12 @@ Future<void> syncNews(FluxNewsState appState, BuildContext context) async {
       await insertNewsInDB(newNews, appState).onError((error, stackTrace) {
         logThis('insertNewsInDB', 'Caught an error in insertNewsInDB function! : ${error.toString()}', LogLevel.ERROR,
             stackTrace: stackTrace);
-
-        if (appState.errorString != AppLocalizations.of(context)!.databaseError) {
-          appState.errorString = AppLocalizations.of(context)!.databaseError;
-          appState.newError = true;
-          appState.refreshView();
+        if (context.mounted) {
+          if (appState.errorString != AppLocalizations.of(context)!.databaseError) {
+            appState.errorString = AppLocalizations.of(context)!.databaseError;
+            appState.newError = true;
+            appState.refreshView();
+          }
         }
         return 0;
       });
@@ -173,11 +180,12 @@ Future<void> syncNews(FluxNewsState appState, BuildContext context) async {
         logThis(
             'fetchStarredNews', 'Caught an error in fetchStarredNews function! : ${error.toString()}', LogLevel.ERROR,
             stackTrace: stackTrace);
-
-        if (appState.errorString != AppLocalizations.of(context)!.communicateionMinifluxError) {
-          appState.errorString = AppLocalizations.of(context)!.communicateionMinifluxError;
-          appState.newError = true;
-          appState.refreshView();
+        if (context.mounted) {
+          if (appState.errorString != AppLocalizations.of(context)!.communicateionMinifluxError) {
+            appState.errorString = AppLocalizations.of(context)!.communicateionMinifluxError;
+            appState.newError = true;
+            appState.refreshView();
+          }
         }
         return NewsList(news: [], newsCount: 0);
       });
@@ -190,11 +198,12 @@ Future<void> syncNews(FluxNewsState appState, BuildContext context) async {
         logThis('updateStarredNewsInDB', 'Caught an error in updateStarredNewsInDB function! ${error.toString()}',
             LogLevel.ERROR,
             stackTrace: stackTrace);
-
-        if (appState.errorString != AppLocalizations.of(context)!.databaseError) {
-          appState.errorString = AppLocalizations.of(context)!.databaseError;
-          appState.newError = true;
-          appState.refreshView();
+        if (context.mounted) {
+          if (appState.errorString != AppLocalizations.of(context)!.databaseError) {
+            appState.errorString = AppLocalizations.of(context)!.databaseError;
+            appState.newError = true;
+            appState.refreshView();
+          }
         }
         return 0;
       });
@@ -206,11 +215,12 @@ Future<void> syncNews(FluxNewsState appState, BuildContext context) async {
         logThis('cleanUnstarredNews', 'Caught an error in cleanUnstarredNews function! : ${error.toString()}',
             LogLevel.ERROR,
             stackTrace: stackTrace);
-
-        if (appState.errorString != AppLocalizations.of(context)!.databaseError) {
-          appState.errorString = AppLocalizations.of(context)!.databaseError;
-          appState.newError = true;
-          appState.refreshView();
+        if (context.mounted) {
+          if (appState.errorString != AppLocalizations.of(context)!.databaseError) {
+            appState.errorString = AppLocalizations.of(context)!.databaseError;
+            appState.newError = true;
+            appState.refreshView();
+          }
         }
       });
     }
@@ -221,11 +231,12 @@ Future<void> syncNews(FluxNewsState appState, BuildContext context) async {
         logThis(
             'cleanStarredNews', 'Caught an error in cleanStarredNews function! : ${error.toString()}', LogLevel.ERROR,
             stackTrace: stackTrace);
-
-        if (appState.errorString != AppLocalizations.of(context)!.databaseError) {
-          appState.errorString = AppLocalizations.of(context)!.databaseError;
-          appState.newError = true;
-          appState.refreshView();
+        if (context.mounted) {
+          if (appState.errorString != AppLocalizations.of(context)!.databaseError) {
+            appState.errorString = AppLocalizations.of(context)!.databaseError;
+            appState.newError = true;
+            appState.refreshView();
+          }
         }
       });
     }

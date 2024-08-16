@@ -24,11 +24,12 @@ Future<void> markAsBookmarkContextFunction(
   await toggleBookmark(http.Client(), appState, news).onError((error, stackTrace) {
     logThis('toggleBookmark', 'Caught an error in toggleBookmark function! : ${error.toString()}', LogLevel.ERROR,
         stackTrace: stackTrace);
-
-    if (appState.errorString != AppLocalizations.of(context)!.communicateionMinifluxError) {
-      appState.errorString = AppLocalizations.of(context)!.communicateionMinifluxError;
-      appState.newError = true;
-      appState.refreshView();
+    if (context.mounted) {
+      if (appState.errorString != AppLocalizations.of(context)!.communicateionMinifluxError) {
+        appState.errorString = AppLocalizations.of(context)!.communicateionMinifluxError;
+        appState.newError = true;
+        appState.refreshView();
+      }
     }
   });
 
@@ -71,8 +72,9 @@ Future<void> markAsBookmarkContextFunction(
           logThis(
               'queryNewsFromDB', 'Caught an error in queryNewsFromDB function! : ${error.toString()}', LogLevel.ERROR,
               stackTrace: stackTrace);
-
-          appState.errorString = AppLocalizations.of(context)!.databaseError;
+          if (context.mounted) {
+            appState.errorString = AppLocalizations.of(context)!.databaseError;
+          }
           return [];
         });
       }
@@ -113,8 +115,9 @@ void markNewsAsReadContextAction(
     appState.newsList = queryNewsFromDB(appState, appState.feedIDs).onError((error, stackTrace) {
       logThis('queryNewsFromDB', 'Caught an error in queryNewsFromDB function! : ${error.toString()}', LogLevel.ERROR,
           stackTrace: stackTrace);
-
-      appState.errorString = AppLocalizations.of(context)!.databaseError;
+      if (context.mounted) {
+        appState.errorString = AppLocalizations.of(context)!.databaseError;
+      }
       return [];
     });
     appState.refreshView();
@@ -160,8 +163,9 @@ void markNewsAsUnreadContextAction(
     appState.newsList = queryNewsFromDB(appState, appState.feedIDs).onError((error, stackTrace) {
       logThis('queryNewsFromDB', 'Caught an error in queryNewsFromDB function! : ${error.toString()}', LogLevel.ERROR,
           stackTrace: stackTrace);
-
-      appState.errorString = AppLocalizations.of(context)!.databaseError;
+      if (context.mounted) {
+        appState.errorString = AppLocalizations.of(context)!.databaseError;
+      }
       return [];
     });
     appState.refreshView();
@@ -180,7 +184,9 @@ Future<void> saveNewsInThirdPartyContextAction(News news, FluxNewsState appState
         'Caught an error in saveNewsToThirdPartyService function! : ${error.toString()}', LogLevel.ERROR);
 
     if (!appState.newError) {
-      appState.errorString = AppLocalizations.of(context)!.communicateionMinifluxError;
+      if (context.mounted) {
+        appState.errorString = AppLocalizations.of(context)!.communicateionMinifluxError;
+      }
       appState.newError = true;
       appState.refreshView();
     }

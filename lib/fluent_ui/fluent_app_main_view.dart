@@ -39,8 +39,7 @@ class FluentNavigationMainView extends StatelessWidget {
   }
 
   // helper function for the initState() to use async function on init
-  Future<void> initConfig(BuildContext context, FluxNewsState appState,
-      FluentAppTheme appTheme) async {
+  Future<void> initConfig(BuildContext context, FluxNewsState appState, FluentAppTheme appTheme) async {
     await appState.initLogging();
     // read persistent saved config
     bool completed = await appState.readConfigValues();
@@ -57,8 +56,7 @@ class FluentNavigationMainView extends StatelessWidget {
 
         if (appState.brightnessMode == FluxNewsState.brightnessModeDarkString) {
           appTheme.mode = ThemeMode.dark;
-        } else if (appState.brightnessMode ==
-            FluxNewsState.brightnessModeLightString) {
+        } else if (appState.brightnessMode == FluxNewsState.brightnessModeLightString) {
           appTheme.mode = ThemeMode.light;
         } else {
           appTheme.mode = ThemeMode.system;
@@ -79,15 +77,12 @@ class FluentNavigationMainView extends StatelessWidget {
             await renewAllNewsCount(appState, context);
           }
         } on Exception catch (exception, stacktrace) {
-          logThis('initConfig', 'Caught an error in initConfig function!',
-              LogLevel.ERROR,
+          logThis('initConfig', 'Caught an error in initConfig function!', LogLevel.ERROR,
               exception: exception, stackTrace: stacktrace);
 
           if (context.mounted) {
-            if (appState.errorString !=
-                AppLocalizations.of(context)!.databaseError) {
-              appState.errorString =
-                  AppLocalizations.of(context)!.databaseError;
+            if (appState.errorString != AppLocalizations.of(context)!.databaseError) {
+              appState.errorString = AppLocalizations.of(context)!.databaseError;
               appState.newError = true;
               appState.refreshView();
             }
@@ -103,9 +98,7 @@ class FluentNavigationMainView extends StatelessWidget {
         appState.scrollPosition = appState.savedScrollPosition;
       }
 
-      if (appState.minifluxURL == null ||
-          appState.minifluxAPIKey == null ||
-          appState.errorOnMinifluxAuth) {
+      if (appState.minifluxURL == null || appState.minifluxAPIKey == null || appState.errorOnMinifluxAuth) {
         // navigate to settings screen if there are problems with the miniflux config
         appState.refreshView();
         //Navigator.pushNamed(context, FluxNewsState.settingsRouteString);
@@ -135,8 +128,7 @@ class FluentCategorieNavigationMainView extends StatelessWidget {
     final dateFormatString = '$datePattern $timePattern';
 
     FluxNewsState appState = context.watch<FluxNewsState>();
-    FluxNewsCounterState appCounterState =
-        context.watch<FluxNewsCounterState>();
+    FluxNewsCounterState appCounterState = context.watch<FluxNewsCounterState>();
     appState.dateFormat = DateFormat(dateFormatString);
     double width = MediaQuery.of(context).size.width;
 
@@ -200,9 +192,7 @@ class FluentCategorieNavigationMainView extends StatelessWidget {
             },
             pane: NavigationPane(
                 header: const NavigationHeader(),
-                displayMode: width >= 2000
-                    ? PaneDisplayMode.open
-                    : PaneDisplayMode.minimal,
+                displayMode: width >= 2000 ? PaneDisplayMode.open : PaneDisplayMode.minimal,
                 selected: appState.calculateSelectedFluentNavigationItem(),
                 items: [
                   homeListTile,
@@ -214,8 +204,7 @@ class FluentCategorieNavigationMainView extends StatelessWidget {
                     title: Text(AppLocalizations.of(context)!.search),
                     body: const FluentSearch(),
                     onTap: () {
-                      appState.selectedNavigation =
-                          FluxNewsState.searchRouteString;
+                      appState.selectedNavigation = FluxNewsState.searchRouteString;
                       appState.refreshView();
                     },
                   ),
@@ -224,8 +213,7 @@ class FluentCategorieNavigationMainView extends StatelessWidget {
                     title: Text(AppLocalizations.of(context)!.settings),
                     body: const FluentSettings(),
                     onTap: () {
-                      appState.selectedNavigation =
-                          FluxNewsState.settingsRouteString;
+                      appState.selectedNavigation = FluxNewsState.settingsRouteString;
                       appState.refreshView();
                     },
                   )
@@ -254,9 +242,7 @@ class FluentCategorieNavigationMainView extends StatelessWidget {
                       for (Feed feed in category.feeds) {
                         String routeString = "/Feed/${feed.feedID}";
                         feedItems.add(PaneItem(
-                          icon: appState.showFeedIcons
-                              ? feed.getFeedIcon(16.0, context)
-                              : const SizedBox.shrink(),
+                          icon: appState.showFeedIcons ? feed.getFeedIcon(16.0, context) : const SizedBox.shrink(),
                           title: Text(
                             feed.title,
                           ),
@@ -270,13 +256,10 @@ class FluentCategorieNavigationMainView extends StatelessWidget {
                           ),
                           trailing: appState.truncateMode == 2
                               ? ToggleButton(
-                                  checked: feed.manualTruncate != null
-                                      ? feed.manualTruncate!
-                                      : false,
+                                  checked: feed.manualTruncate != null ? feed.manualTruncate! : false,
                                   onChanged: (value) async {
                                     feed.manualTruncate = value;
-                                    await updateManualTruncateStatusOfFeedInDB(
-                                        feed.feedID, value, appState);
+                                    await updateManualTruncateStatusOfFeedInDB(feed.feedID, value, appState);
                                     appState.refreshView();
                                   },
                                   child: const Icon(FluentIcons.cut),
@@ -286,8 +269,7 @@ class FluentCategorieNavigationMainView extends StatelessWidget {
                           onTap: () {
                             appState.selectedNavigation = routeString;
                             appState.refreshView();
-                            feedOnClick(
-                                feed, appState, snapshot.data!, context);
+                            feedOnClick(feed, appState, snapshot.data!, context);
                           },
                         ));
                       }
@@ -310,8 +292,7 @@ class FluentCategorieNavigationMainView extends StatelessWidget {
                         onTap: () {
                           appState.selectedNavigation = routeString;
                           appState.refreshView();
-                          categoryOnClick(
-                              category, appState, snapshot.data!, context);
+                          categoryOnClick(category, appState, snapshot.data!, context);
                         },
                       ));
                       /*
@@ -348,11 +329,8 @@ class FluentCategorieNavigationMainView extends StatelessWidget {
                       },
                       pane: NavigationPane(
                           header: const NavigationHeader(),
-                          displayMode: width >= 2000
-                              ? PaneDisplayMode.open
-                              : PaneDisplayMode.minimal,
-                          selected:
-                              appState.calculateSelectedFluentNavigationItem(),
+                          displayMode: width >= 2000 ? PaneDisplayMode.open : PaneDisplayMode.minimal,
+                          selected: appState.calculateSelectedFluentNavigationItem(),
                           items: items,
                           footerItems: [
                             PaneItem(
@@ -360,19 +338,16 @@ class FluentCategorieNavigationMainView extends StatelessWidget {
                               title: Text(AppLocalizations.of(context)!.search),
                               body: const FluentSearch(),
                               onTap: () {
-                                appState.selectedNavigation =
-                                    FluxNewsState.searchRouteString;
+                                appState.selectedNavigation = FluxNewsState.searchRouteString;
                                 appState.refreshView();
                               },
                             ),
                             PaneItem(
                               icon: const Icon(FluentIcons.settings),
-                              title:
-                                  Text(AppLocalizations.of(context)!.settings),
+                              title: Text(AppLocalizations.of(context)!.settings),
                               body: const FluentSettings(),
                               onTap: () {
-                                appState.selectedNavigation =
-                                    FluxNewsState.settingsRouteString;
+                                appState.selectedNavigation = FluxNewsState.settingsRouteString;
                                 appState.refreshView();
                               },
                             )
@@ -387,15 +362,13 @@ class FluentCategorieNavigationMainView extends StatelessWidget {
     return getData;
   }
 
-  Future<void> feedOnClick(Feed feed, FluxNewsState appState,
-      Categories categories, BuildContext context) async {
+  Future<void> feedOnClick(Feed feed, FluxNewsState appState, Categories categories, BuildContext context) async {
     appState.selectedCategoryElementType = FluxNewsState.feedElementType;
     // on tab we want to show only the news of this feed in the news list.
     // set the feed id of the selected feed in the feedIDs filter
     appState.feedIDs = [feed.feedID];
     // reload the news list with the new filter
-    appState.newsList =
-        queryNewsFromDB(appState, appState.feedIDs).whenComplete(() {
+    appState.newsList = queryNewsFromDB(appState, appState.feedIDs).whenComplete(() {
       waitUntilNewsListBuild(appState).whenComplete(
         () {
           appState.itemScrollController.jumpTo(index: 0);
@@ -412,14 +385,13 @@ class FluentCategorieNavigationMainView extends StatelessWidget {
 
   // if the title of the category is clicked,
   // we want all the news of this category in the news view.
-  Future<void> categoryOnClick(Category category, FluxNewsState appState,
-      Categories categories, BuildContext context) async {
+  Future<void> categoryOnClick(
+      Category category, FluxNewsState appState, Categories categories, BuildContext context) async {
     appState.selectedCategoryElementType = FluxNewsState.categoryElementType;
     // add the according feeds of this category as a filter
     appState.feedIDs = category.getFeedIDs();
     // reload the news list with the new filter
-    appState.newsList =
-        queryNewsFromDB(appState, appState.feedIDs).whenComplete(() {
+    appState.newsList = queryNewsFromDB(appState, appState.feedIDs).whenComplete(() {
       waitUntilNewsListBuild(appState).whenComplete(
         () {
           appState.itemScrollController.jumpTo(index: 0);
@@ -436,14 +408,12 @@ class FluentCategorieNavigationMainView extends StatelessWidget {
 
   // if the "All News" ListTile is clicked,
   // we want all the news in the news view.
-  Future<void> allNewsOnClick(
-      FluxNewsState appState, BuildContext context) async {
+  Future<void> allNewsOnClick(FluxNewsState appState, BuildContext context) async {
     appState.selectedCategoryElementType = FluxNewsState.allNewsElementType;
     // empty the feedIds which are used as a filter if a specific category is selected
     appState.feedIDs = null;
     // reload the news list with the new filter (empty)
-    appState.newsList =
-        queryNewsFromDB(appState, appState.feedIDs).whenComplete(() {
+    appState.newsList = queryNewsFromDB(appState, appState.feedIDs).whenComplete(() {
       waitUntilNewsListBuild(appState).whenComplete(
         () {
           appState.itemScrollController.jumpTo(index: 0);
@@ -462,18 +432,15 @@ class FluentCategorieNavigationMainView extends StatelessWidget {
 
   // if the "Bookmarked" ListTile is clicked,
   // we want all the bookmarked news in the news view.
-  Future<void> bookmarkedOnClick(
-      FluxNewsState appState, BuildContext context) async {
-    appState.selectedCategoryElementType =
-        FluxNewsState.bookmarkedNewsElementType;
+  Future<void> bookmarkedOnClick(FluxNewsState appState, BuildContext context) async {
+    appState.selectedCategoryElementType = FluxNewsState.bookmarkedNewsElementType;
     // set the feedIDs filter to -1 to only load bookmarked news
     // -1 is a impossible feed id of a regular miniflux feed,
     // so we use it to decide between all news (feedIds = null)
     // and bookmarked news (feedIds = -1).
     appState.feedIDs = [-1];
     // reload the news list with the new filter (-1 only bookmarked news)
-    appState.newsList =
-        queryNewsFromDB(appState, appState.feedIDs).whenComplete(() {
+    appState.newsList = queryNewsFromDB(appState, appState.feedIDs).whenComplete(() {
       waitUntilNewsListBuild(appState).whenComplete(
         () {
           appState.itemScrollController.jumpTo(index: 0);
@@ -505,9 +472,7 @@ class NavigationHeader extends StatelessWidget {
           title: Text(
             AppLocalizations.of(context)!.minifluxServer,
           ),
-          subtitle: appState.minifluxURL == null
-              ? const SizedBox.shrink()
-              : Text(appState.minifluxURL!),
+          subtitle: appState.minifluxURL == null ? const SizedBox.shrink() : Text(appState.minifluxURL!),
         ),
       ],
     );
@@ -523,8 +488,7 @@ class AppBarButtons extends StatelessWidget {
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
     FluxNewsState appState = context.watch<FluxNewsState>();
-    FluxNewsCounterState appCounterState =
-        context.watch<FluxNewsCounterState>();
+    FluxNewsCounterState appCounterState = context.watch<FluxNewsCounterState>();
 
     return CommandBar(
       mainAxisAlignment: MainAxisAlignment.end,
@@ -539,19 +503,15 @@ class AppBarButtons extends StatelessWidget {
               appState.newsStatus = FluxNewsState.allNewsString;
 
               // save the state persistent
-              appState.storage.write(
-                  key: FluxNewsState.secureStorageNewsStatusKey,
-                  value: FluxNewsState.allNewsString);
+              appState.storage.write(key: FluxNewsState.secureStorageNewsStatusKey, value: FluxNewsState.allNewsString);
 
               // refresh news list with the all news state
-              appState.newsList =
-                  queryNewsFromDB(appState, appState.feedIDs).whenComplete(() {
+              appState.newsList = queryNewsFromDB(appState, appState.feedIDs).whenComplete(() {
                 waitUntilNewsListBuild(appState).whenComplete(
                   () {
-                    context
-                        .read<FluxNewsState>()
-                        .itemScrollController
-                        .jumpTo(index: 0);
+                    if (context.mounted) {
+                      context.read<FluxNewsState>().itemScrollController.jumpTo(index: 0);
+                    }
                   },
                 );
               });
@@ -566,19 +526,16 @@ class AppBarButtons extends StatelessWidget {
               appState.newsStatus = FluxNewsState.unreadNewsStatus;
 
               // save the state persistent
-              appState.storage.write(
-                  key: FluxNewsState.secureStorageNewsStatusKey,
-                  value: FluxNewsState.unreadNewsStatus);
+              appState.storage
+                  .write(key: FluxNewsState.secureStorageNewsStatusKey, value: FluxNewsState.unreadNewsStatus);
 
               // refresh news list with the only unread news state
-              appState.newsList =
-                  queryNewsFromDB(appState, appState.feedIDs).whenComplete(() {
+              appState.newsList = queryNewsFromDB(appState, appState.feedIDs).whenComplete(() {
                 waitUntilNewsListBuild(appState).whenComplete(
                   () {
-                    context
-                        .read<FluxNewsState>()
-                        .itemScrollController
-                        .jumpTo(index: 0);
+                    if (context.mounted) {
+                      context.read<FluxNewsState>().itemScrollController.jumpTo(index: 0);
+                    }
                   },
                 );
               });
@@ -595,10 +552,7 @@ class AppBarButtons extends StatelessWidget {
               ? const SizedBox(
                   height: 25.0,
                   width: 25.0,
-                  child: Center(
-                      child: Text("New",
-                          style: TextStyle(
-                              fontSize: 10, fontWeight: FontWeight.bold))))
+                  child: Center(child: Text("New", style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold))))
               : const Padding(
                   padding: EdgeInsets.only(
                     left: 5.0,
@@ -610,25 +564,21 @@ class AppBarButtons extends StatelessWidget {
           onPressed: () async {
             // switch between newest first and oldest first
             // if the current sort order is newest first change to oldest first
-            if (appState.sortOrder ==
-                FluxNewsState.sortOrderNewestFirstString) {
+            if (appState.sortOrder == FluxNewsState.sortOrderNewestFirstString) {
               // switch the state to all news
               appState.sortOrder = FluxNewsState.sortOrderOldestFirstString;
 
               // save the state persistent
-              await appState.storage.write(
-                  key: FluxNewsState.secureStorageSortOrderKey,
-                  value: FluxNewsState.sortOrderOldestFirstString);
+              await appState.storage
+                  .write(key: FluxNewsState.secureStorageSortOrderKey, value: FluxNewsState.sortOrderOldestFirstString);
 
               // refresh news list with the all news state
-              appState.newsList =
-                  queryNewsFromDB(appState, appState.feedIDs).whenComplete(() {
+              appState.newsList = queryNewsFromDB(appState, appState.feedIDs).whenComplete(() {
                 waitUntilNewsListBuild(appState).whenComplete(
                   () {
-                    context
-                        .read<FluxNewsState>()
-                        .itemScrollController
-                        .jumpTo(index: 0);
+                    if (context.mounted) {
+                      context.read<FluxNewsState>().itemScrollController.jumpTo(index: 0);
+                    }
                   },
                 );
               });
@@ -643,19 +593,16 @@ class AppBarButtons extends StatelessWidget {
               appState.sortOrder = FluxNewsState.sortOrderNewestFirstString;
 
               // save the state persistent
-              await appState.storage.write(
-                  key: FluxNewsState.secureStorageSortOrderKey,
-                  value: FluxNewsState.sortOrderNewestFirstString);
+              await appState.storage
+                  .write(key: FluxNewsState.secureStorageSortOrderKey, value: FluxNewsState.sortOrderNewestFirstString);
 
               // refresh news list with the only unread news state
-              appState.newsList =
-                  queryNewsFromDB(appState, appState.feedIDs).whenComplete(() {
+              appState.newsList = queryNewsFromDB(appState, appState.feedIDs).whenComplete(() {
                 waitUntilNewsListBuild(appState).whenComplete(
                   () {
-                    context
-                        .read<FluxNewsState>()
-                        .itemScrollController
-                        .jumpTo(index: 0);
+                    if (context.mounted) {
+                      context.read<FluxNewsState>().itemScrollController.jumpTo(index: 0);
+                    }
                   },
                 );
               });
@@ -679,14 +626,12 @@ class AppBarButtons extends StatelessWidget {
             // mark news as read
             markNewsAsReadInDB(appState);
             // refresh news list with the all news state
-            appState.newsList =
-                queryNewsFromDB(appState, appState.feedIDs).whenComplete(() {
+            appState.newsList = queryNewsFromDB(appState, appState.feedIDs).whenComplete(() {
               waitUntilNewsListBuild(appState).whenComplete(
                 () {
-                  context
-                      .read<FluxNewsState>()
-                      .itemScrollController
-                      .jumpTo(index: 0);
+                  if (context.mounted) {
+                    context.read<FluxNewsState>().itemScrollController.jumpTo(index: 0);
+                  }
                 },
               );
             });
@@ -697,14 +642,11 @@ class AppBarButtons extends StatelessWidget {
             appState.refreshView();
             Navigator.pop(context);
           },
-          label: appState.selectedCategoryElementType ==
-                  FluxNewsState.feedElementType
+          label: appState.selectedCategoryElementType == FluxNewsState.feedElementType
               ? Text(AppLocalizations.of(context)!.markFeedAsRead)
-              : appState.selectedCategoryElementType ==
-                      FluxNewsState.categoryElementType
+              : appState.selectedCategoryElementType == FluxNewsState.categoryElementType
                   ? Text(AppLocalizations.of(context)!.markCategoryAsRead)
-                  : appState.selectedCategoryElementType ==
-                          FluxNewsState.bookmarkedNewsElementType
+                  : appState.selectedCategoryElementType == FluxNewsState.bookmarkedNewsElementType
                       ? Text(AppLocalizations.of(context)!.markBookmarkedAsRead)
                       : Text(AppLocalizations.of(context)!.markAllAsRead),
           icon: const SizedBox(
@@ -719,9 +661,7 @@ class AppBarButtons extends StatelessWidget {
           onPressed: () async {
             await syncNews(appState, context);
           },
-          label: width > 1600
-              ? Text(AppLocalizations.of(context)!.sync)
-              : const SizedBox.shrink(),
+          label: width > 1600 ? Text(AppLocalizations.of(context)!.sync) : const SizedBox.shrink(),
           icon: appState.syncProcess
               ? const SizedBox(
                   height: 15.0,
@@ -742,8 +682,7 @@ class AppBarTitle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    FluxNewsCounterState appCounterState =
-        context.watch<FluxNewsCounterState>();
+    FluxNewsCounterState appCounterState = context.watch<FluxNewsCounterState>();
     FluxNewsState appState = context.watch<FluxNewsState>();
     double width = MediaQuery.of(context).size.width;
 
@@ -784,8 +723,7 @@ class FluentMainView extends StatelessWidget {
 class FluxNewsBodyStatefulWrapper extends StatefulWidget {
   final Function onInit;
   final Widget child;
-  const FluxNewsBodyStatefulWrapper(
-      {super.key, required this.onInit, required this.child});
+  const FluxNewsBodyStatefulWrapper({super.key, required this.onInit, required this.child});
   @override
   FluxNewsBodyState createState() => FluxNewsBodyState();
 }
