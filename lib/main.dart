@@ -111,7 +111,7 @@ class FluxNewsDesktop extends StatelessWidget {
                                             child: FluentNavigationMainView())
                                         : const SizedBox(
                                             height: double.infinity,
-                                            width: 500,
+                                            width: 650,
                                             child: FluentNavigationMainView()),
                                 const Expanded(child: WebViewMainView()),
                               ]),
