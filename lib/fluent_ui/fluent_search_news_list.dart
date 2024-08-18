@@ -46,7 +46,7 @@ class FluentSearchNewsList extends StatelessWidget {
                               key: const PageStorageKey<String>('NewsSearchList'),
                               itemCount: snapshot.data!.length,
                               itemBuilder: (context, i) {
-                                return width <= 1600
+                                return width <= 1300
                                     ? FluentNewsCard(news: snapshot.data![i], context: context, searchView: searchView)
                                     : FluentNewsRow(news: snapshot.data![i], context: context, searchView: searchView);
                               }),

@@ -118,7 +118,7 @@ class FluxNewsState extends ChangeNotifier {
   late Offset tapPosition;
   int scrollPosition = 0;
   final ScrollController scrollController = ScrollController();
-  ListController listController = ListController();
+  final ListController listController = ListController();
 
   //final listController listController = listController.create();
 
