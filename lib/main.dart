@@ -79,20 +79,17 @@ class FluxNewsDesktop extends StatelessWidget {
                                 accentColor: appTheme.color,
                                 visualDensity: VisualDensity.standard,
                                 focusTheme: FocusThemeData(
-                                  glowFactor:
-                                      is10footScreen(context) ? 2.0 : 0.0,
+                                  glowFactor: is10footScreen(context) ? 2.0 : 0.0,
                                 ),
                               ),
                               theme: FluentThemeData(
                                 accentColor: appTheme.color,
                                 visualDensity: VisualDensity.standard,
                                 focusTheme: FocusThemeData(
-                                  glowFactor:
-                                      is10footScreen(context) ? 2.0 : 0.0,
+                                  glowFactor: is10footScreen(context) ? 2.0 : 0.0,
                                 ),
                               ),
-                              localizationsDelegates:
-                                  AppLocalizations.localizationsDelegates,
+                              localizationsDelegates: AppLocalizations.localizationsDelegates,
                               supportedLocales: const [
                                 Locale('en', ''),
                                 Locale('de', ''),
@@ -104,15 +101,8 @@ class FluxNewsDesktop extends StatelessWidget {
                                         width: 400,
                                         child: FluentNavigationMainView(),
                                       )
-                                    : width > 1600
-                                        ? const SizedBox(
-                                            height: double.infinity,
-                                            width: 800,
-                                            child: FluentNavigationMainView())
-                                        : const SizedBox(
-                                            height: double.infinity,
-                                            width: 650,
-                                            child: FluentNavigationMainView()),
+                                    : const SizedBox(
+                                        height: double.infinity, width: 720, child: FluentNavigationMainView()),
                                 const Expanded(child: WebViewMainView()),
                               ]),
                             );
