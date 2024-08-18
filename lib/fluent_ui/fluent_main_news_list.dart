@@ -49,6 +49,7 @@ class FluentBodyNewsList extends StatelessWidget {
                       // to save scroll position persistent
                       : ListViewObserver(
                           autoTriggerObserveTypes: const [ObserverAutoTriggerObserveType.scrollEnd],
+                          triggerOnObserveType: ObserverTriggerOnObserveType.directly,
                           customTargetRenderSliverType: (renderObj) {
                             return renderObj.runtimeType.toString() == 'RenderSuperSliverList';
                           },
@@ -63,10 +64,14 @@ class FluentBodyNewsList extends StatelessWidget {
                                     : FluentNewsRow(news: snapshot.data![i], context: context, searchView: searchView);
                               }),
                           onObserve: (resultModel) {
-                            int lastItem = resultModel.displayingChildModelList.last.index;
+                            int lastItem = 0;
+                            double lastItemTrailingMarginToViewport = -1.0;
                             int firstItem = 0;
-                            if (resultModel.firstChild != null) {
-                              firstItem = resultModel.firstChild!.index;
+                            if (resultModel.displayingChildIndexList.isNotEmpty) {
+                              firstItem = resultModel.displayingChildIndexList.first;
+                              lastItem = resultModel.displayingChildIndexList.last;
+                              lastItemTrailingMarginToViewport =
+                                  resultModel.displayingChildModelList.last.trailingMarginToViewport;
                             }
                             appState.scrollPosition = firstItem;
 
@@ -77,7 +82,7 @@ class FluentBodyNewsList extends StatelessWidget {
                               // if the sync is in progress, no news should marked as read
                               if (appState.syncProcess == false) {
                                 // set all news as read if the list reached the bottom (the edge)
-                                if (lastItem == snapshot.data!.length - 1) {
+                                if (lastItem == snapshot.data!.length - 1 && lastItemTrailingMarginToViewport >= 0) {
                                   // to ensure that the list is at the bottom edge and not at the top edge
                                   // the amount of scrolled pixels must be greater 0
                                   //if (metrics.pixels > 0) {

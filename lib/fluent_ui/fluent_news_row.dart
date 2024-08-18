@@ -58,6 +58,7 @@ class FluentNewsRow extends StatelessWidget {
 
             context.read<FluxNewsCounterState>().listUpdated = true;
             context.read<FluxNewsCounterState>().refreshView();
+            webAppState.setTitle(news.title);
             await webAppState.loadWebPage(news.url);
             appState.refreshView();
 

@@ -80,5 +80,6 @@
     "successfullSaveToThirdParty": "The news was successfully saved!",
     "newsReadFilter": "News filter\nread / unread",
     "sync": "Sync",
-    "newsViewer": "News viewer"
+    "newsViewer": "News viewer",
+    "done": "Done"
 }

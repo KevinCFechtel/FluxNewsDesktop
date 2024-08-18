@@ -80,5 +80,6 @@
     "successfullSaveToThirdParty": "Die Nachricht wurde erfolgreich gespeichert!",
     "newsReadFilter": "Nachrichtenfilter\ngelesen / ungelesen",
     "sync": "Synchronisieren",
-    "newsViewer": "Nachricht lesen"
+    "newsViewer": "Nachricht lesen",
+    "done": "Fertig"
 }

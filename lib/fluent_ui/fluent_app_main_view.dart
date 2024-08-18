@@ -94,7 +94,7 @@ class FluentNavigationMainView extends StatelessWidget {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       // set the scroll position to the persistent saved scroll position on normal startup
       // if sync on startup is enabled, the scroll position is set to the top of the list
-      if (!appState.syncOnStart) {
+      if (!appState.syncOnStart && !appState.markAsReadOnScrollOver) {
         appState.jumpToItem(appState.savedScrollPosition);
       }
 

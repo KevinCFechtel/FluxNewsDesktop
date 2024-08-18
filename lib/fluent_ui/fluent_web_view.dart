@@ -23,17 +23,21 @@ class WebViewMainView extends StatelessWidget {
         child: Column(
           children: [
             Padding(
-              padding: const EdgeInsets.fromLTRB(50, 10, 0, 8),
+              padding: const EdgeInsets.fromLTRB(10, 10, 0, 8),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  Text(AppLocalizations.of(context)!.newsViewer,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.normal,
-                      )),
+                  FilledButton(
+                      onPressed: () {
+                        webViewState.closeWebview();
+                      },
+                      child: Text(AppLocalizations.of(context)!.done)),
+                  Expanded(
+                      child: Padding(
+                          padding: const EdgeInsets.only(left: 20.0),
+                          child: Text(webViewState.webViewTitle, overflow: TextOverflow.ellipsis))),
                   Padding(
-                    padding: const EdgeInsets.only(left: 20.0),
+                    padding: const EdgeInsets.only(left: 10.0),
                     child: IconButton(
                       icon: const Icon(
                         FluentIcons.chrome_back,
@@ -62,16 +66,6 @@ class WebViewMainView extends StatelessWidget {
                       await webViewState.pageReload();
                     },
                   ),
-                  const Spacer(),
-                  IconButton(
-                    icon: const Icon(
-                      FluentIcons.chrome_close,
-                      size: 15,
-                    ),
-                    onPressed: () async {
-                      webViewState.closeWebview();
-                    },
-                  )
                 ],
               ),
             ),
@@ -81,21 +75,16 @@ class WebViewMainView extends StatelessWidget {
                         ? WebViewWidget(
                             controller: webViewState.macWebController!,
                           )
-                        : Container(
-                            color: appTheme.backgroundColor,
-                            child: const Column(children: [SizedBox.shrink()]))
+                        : Container(color: appTheme.backgroundColor, child: const Column(children: [SizedBox.shrink()]))
                     : webViewState.windowsWebController != null
                         ? Webview(webViewState.windowsWebController!)
                         : Container(
-                            color: appTheme.backgroundColor,
-                            child: const Column(children: [SizedBox.shrink()])))
+                            color: appTheme.backgroundColor, child: const Column(children: [SizedBox.shrink()])))
           ],
         ),
       );
     } else {
-      return Container(
-          color: appTheme.backgroundColor,
-          child: const Column(children: [SizedBox.shrink()]));
+      return Container(color: appTheme.backgroundColor, child: const Column(children: [SizedBox.shrink()]));
     }
   }
 }

@@ -10,6 +10,7 @@ class FluxNewsWebViewState extends ChangeNotifier {
   WebViewController? macWebController;
   WebviewController? windowsWebController;
   bool isLoaded = false;
+  String webViewTitle = "";
 
   void initWebViewState() {
     if (Platform.isMacOS) {
@@ -86,7 +87,13 @@ class FluxNewsWebViewState extends ChangeNotifier {
         windowsWebController!.initialize();
       }
     }
+    webViewTitle = "";
     isLoaded = false;
+    notifyListeners();
+  }
+
+  void setTitle(String title) {
+    webViewTitle = title;
     notifyListeners();
   }
 
