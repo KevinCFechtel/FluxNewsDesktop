@@ -147,8 +147,6 @@ class FluentNewsCard extends StatelessWidget {
                             icon: const Icon(FluentIcons.save),
                             label: Text(
                               AppLocalizations.of(context)!.contextSaveButton,
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
                             ),
                             onPressed: () async {
                               await saveNewsInThirdPartyContextAction(news, appState, context);

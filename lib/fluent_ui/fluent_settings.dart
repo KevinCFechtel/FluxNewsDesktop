@@ -146,19 +146,18 @@ class FluentSettings extends StatelessWidget {
                       child: Row(
                         children: [
                           const Padding(
-                            padding: EdgeInsets.only(left: 17.0),
+                            padding: EdgeInsets.only(left: 17.0, right: 12.0),
                             child: Icon(
                               FluentIcons.light,
                             ),
                           ),
-                          Padding(
-                            padding: const EdgeInsets.only(left: 12.0),
+                          Expanded(
                             child: Text(
                               AppLocalizations.of(context)!.brightnesMode,
                               style: const TextStyle(fontSize: 16),
+                              overflow: TextOverflow.visible,
                             ),
                           ),
-                          const Spacer(),
                           ComboBox<KeyValueRecordType>(
                             value: appState.brightnessModeSelection,
                             items: appState.recordTypesBrightnessMode!
@@ -189,25 +188,25 @@ class FluentSettings extends StatelessWidget {
                     // this row contains the selection of the mark as read on scroll over
                     // if it is turned on, a news is marked as read if it is scrolled over
                     Padding(
-                      padding: const EdgeInsets.only(top: 10.0, bottom: 10),
+                      padding: const EdgeInsets.only(
+                        top: 10.0,
+                        bottom: 10,
+                      ),
                       child: Row(
                         children: [
                           const Padding(
-                            padding: EdgeInsets.only(
-                              left: 17.0,
-                            ),
+                            padding: EdgeInsets.only(left: 17.0, right: 12.0),
                             child: Icon(
                               FluentIcons.accept,
                             ),
                           ),
-                          Padding(
-                            padding: const EdgeInsets.only(left: 12.0),
+                          Expanded(
                             child: Text(
                               AppLocalizations.of(context)!.markAsReadOnScrollover,
                               style: const TextStyle(fontSize: 16),
+                              overflow: TextOverflow.visible,
                             ),
                           ),
-                          const Spacer(),
                           ToggleSwitch(
                             checked: appState.markAsReadOnScrollOver,
                             onChanged: (bool value) {
@@ -231,19 +230,18 @@ class FluentSettings extends StatelessWidget {
                       child: Row(
                         children: [
                           const Padding(
-                            padding: EdgeInsets.only(left: 17.0),
+                            padding: EdgeInsets.only(left: 17.0, right: 12.0),
                             child: Icon(
                               FluentIcons.refresh,
                             ),
                           ),
-                          Padding(
-                            padding: const EdgeInsets.only(left: 12.0),
+                          Expanded(
                             child: Text(
                               AppLocalizations.of(context)!.syncOnStart,
                               style: const TextStyle(fontSize: 16),
+                              overflow: TextOverflow.visible,
                             ),
                           ),
-                          const Spacer(),
                           ToggleSwitch(
                             checked: appState.syncOnStart,
                             onChanged: (bool value) {
@@ -268,19 +266,18 @@ class FluentSettings extends StatelessWidget {
                       child: Row(
                         children: [
                           const Padding(
-                            padding: EdgeInsets.only(left: 17.0),
+                            padding: EdgeInsets.only(left: 17.0, right: 12.0),
                             child: Icon(
                               FluentIcons.number_symbol,
                             ),
                           ),
-                          Padding(
-                            padding: const EdgeInsets.only(left: 12.0),
+                          Expanded(
                             child: Text(
                               AppLocalizations.of(context)!.multilineAppBarTextSetting,
                               style: const TextStyle(fontSize: 16),
+                              overflow: TextOverflow.visible,
                             ),
                           ),
-                          const Spacer(),
                           ToggleSwitch(
                             checked: appState.multilineAppBarText,
                             onChanged: (bool value) {
@@ -304,19 +301,18 @@ class FluentSettings extends StatelessWidget {
                       child: Row(
                         children: [
                           const Padding(
-                            padding: EdgeInsets.only(left: 17.0),
+                            padding: EdgeInsets.only(left: 17.0, right: 12.0),
                             child: Icon(
                               FluentIcons.picture_center,
                             ),
                           ),
-                          Padding(
-                            padding: const EdgeInsets.only(left: 12.0),
+                          Expanded(
                             child: Text(
                               AppLocalizations.of(context)!.showFeedIconsTextSettings,
                               style: const TextStyle(fontSize: 16),
+                              overflow: TextOverflow.visible,
                             ),
                           ),
-                          const Spacer(),
                           ToggleSwitch(
                             checked: appState.showFeedIcons,
                             onChanged: (bool value) {
@@ -341,19 +337,18 @@ class FluentSettings extends StatelessWidget {
                       child: Row(
                         children: [
                           const Padding(
-                            padding: EdgeInsets.only(left: 17.0),
+                            padding: EdgeInsets.only(left: 17.0, right: 12.0),
                             child: Icon(
                               FluentIcons.save,
                             ),
                           ),
-                          Padding(
-                            padding: const EdgeInsets.only(left: 12.0),
+                          Expanded(
                             child: Text(
                               AppLocalizations.of(context)!.amountSaved,
                               style: const TextStyle(fontSize: 16),
+                              overflow: TextOverflow.visible,
                             ),
                           ),
-                          const Spacer(),
                           ComboBox<int>(
                             value: appState.amountOfSavedNews,
                             items: amountOfSavedNewsList.map<ComboBoxItem<int>>((int value) {
@@ -382,19 +377,18 @@ class FluentSettings extends StatelessWidget {
                       child: Row(
                         children: [
                           const Padding(
-                            padding: EdgeInsets.only(left: 17.0),
+                            padding: EdgeInsets.only(left: 17.0, right: 12.0),
                             child: Icon(
                               FluentIcons.favorite_star_fill,
                             ),
                           ),
-                          Padding(
-                            padding: const EdgeInsets.only(left: 12.0),
+                          Expanded(
                             child: Text(
                               AppLocalizations.of(context)!.amountSavedStarred,
                               style: const TextStyle(fontSize: 16),
+                              overflow: TextOverflow.visible,
                             ),
                           ),
-                          const Spacer(),
                           ComboBox<int>(
                             value: appState.amountOfSavedStarredNews,
                             items: amountOfSavedStarredNewsList.map<ComboBoxItem<int>>((int value) {
@@ -424,19 +418,18 @@ class FluentSettings extends StatelessWidget {
                       child: Row(
                         children: [
                           const Padding(
-                            padding: EdgeInsets.only(left: 17.0),
+                            padding: EdgeInsets.only(left: 17.0, right: 12.0),
                             child: Icon(
                               FluentIcons.sync,
                             ),
                           ),
-                          Padding(
-                            padding: const EdgeInsets.only(left: 12.0),
+                          Expanded(
                             child: Text(
                               AppLocalizations.of(context)!.amountOfSyncedNews,
                               style: const TextStyle(fontSize: 16),
+                              overflow: TextOverflow.visible,
                             ),
                           ),
-                          const Spacer(),
                           ComboBox<int>(
                             value: appState.amountOfSyncedNews,
                             items: amountOfNewsToSync.map<ComboBoxItem<int>>((int value) {
@@ -465,19 +458,18 @@ class FluentSettings extends StatelessWidget {
                       child: Row(
                         children: [
                           const Padding(
-                            padding: EdgeInsets.only(left: 17.0),
+                            padding: EdgeInsets.only(left: 17.0, right: 12.0),
                             child: Icon(
                               FluentIcons.search,
                             ),
                           ),
-                          Padding(
-                            padding: const EdgeInsets.only(left: 12.0),
+                          Expanded(
                             child: Text(
                               AppLocalizations.of(context)!.amountOfSearchedNews,
                               style: const TextStyle(fontSize: 16),
+                              overflow: TextOverflow.visible,
                             ),
                           ),
-                          const Spacer(),
                           ComboBox<int>(
                             value: appState.amountOfSearchedNews,
                             items: amountOfNewsToSearch.map<ComboBoxItem<int>>((int value) {
@@ -517,21 +509,18 @@ class FluentSettings extends StatelessWidget {
                       child: Row(
                         children: [
                           const Padding(
-                            padding: EdgeInsets.only(
-                              left: 17.0,
-                            ),
+                            padding: EdgeInsets.only(left: 17.0, right: 12.0),
                             child: Icon(
                               FluentIcons.cut,
                             ),
                           ),
-                          Padding(
-                            padding: const EdgeInsets.only(left: 12.0),
+                          Expanded(
                             child: Text(
                               AppLocalizations.of(context)!.activateTruncate,
                               style: const TextStyle(fontSize: 16),
+                              overflow: TextOverflow.visible,
                             ),
                           ),
-                          const Spacer(),
                           ToggleSwitch(
                             checked: appState.activateTruncate,
                             onChanged: (bool value) {
@@ -626,19 +615,18 @@ class FluentSettings extends StatelessWidget {
                             child: Row(
                               children: [
                                 const Padding(
-                                  padding: EdgeInsets.only(left: 17.0),
+                                  padding: EdgeInsets.only(left: 17.0, right: 12.0),
                                   child: Icon(
                                     FluentIcons.cut,
                                   ),
                                 ),
-                                Padding(
-                                  padding: const EdgeInsets.only(left: 12.0),
+                                Expanded(
                                   child: Text(
                                     AppLocalizations.of(context)!.charactersToTruncate,
                                     style: const TextStyle(fontSize: 16),
+                                    overflow: TextOverflow.visible,
                                   ),
                                 ),
-                                const Spacer(),
                                 ComboBox<int>(
                                   value: appState.charactersToTruncate,
                                   items: amountOfCharactersToTruncate.map<ComboBoxItem<int>>((int value) {
@@ -668,19 +656,18 @@ class FluentSettings extends StatelessWidget {
                             child: Row(
                               children: [
                                 const Padding(
-                                  padding: EdgeInsets.only(left: 17.0),
+                                  padding: EdgeInsets.only(left: 17.0, right: 12.0),
                                   child: Icon(
                                     FluentIcons.cut,
                                   ),
                                 ),
-                                Padding(
-                                  padding: const EdgeInsets.only(left: 12.0),
+                                Expanded(
                                   child: Text(
                                     AppLocalizations.of(context)!.charactersToTruncateLimit,
                                     style: const TextStyle(fontSize: 16),
+                                    overflow: TextOverflow.visible,
                                   ),
                                 ),
-                                const Spacer(),
                                 ComboBox<int>(
                                   value: appState.charactersToTruncateLimit,
                                   items: amountOfCharactersToTruncateLimit.map<ComboBoxItem<int>>((int value) {
@@ -725,19 +712,18 @@ class FluentSettings extends StatelessWidget {
                       child: Row(
                         children: [
                           const Padding(
-                            padding: EdgeInsets.only(left: 17.0),
+                            padding: EdgeInsets.only(left: 17.0, right: 12.0),
                             child: Icon(
                               FluentIcons.developer_tools,
                             ),
                           ),
-                          Padding(
-                            padding: const EdgeInsets.only(left: 12.0),
+                          Expanded(
                             child: Text(
                               AppLocalizations.of(context)!.debugModeTextSettings,
                               style: const TextStyle(fontSize: 16),
+                              overflow: TextOverflow.visible,
                             ),
                           ),
-                          const Spacer(),
                           ToggleSwitch(
                             checked: appState.debugMode,
                             onChanged: (bool value) {
