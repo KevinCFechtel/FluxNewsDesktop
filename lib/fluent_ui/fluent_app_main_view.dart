@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flux_news_desktop/database/database_backend.dart';
+import 'package:flux_news_desktop/fluent_ui/fluent_feed_settings.dart';
 import 'package:flux_news_desktop/fluent_ui/fluent_main_news_list.dart';
 import 'package:flux_news_desktop/fluent_ui/fluent_theme.dart';
 import 'package:flux_news_desktop/state/flux_news_counter_state.dart';
@@ -150,6 +151,7 @@ class FluentCategorieNavigationMainView extends StatelessWidget {
                 ),
               ),
             ),
+            trailing: SizedBox.fromSize(size: const Size.square(30)),
             body: const FluentMainView(),
             onTap: () {
               appState.selectedNavigation = FluxNewsState.rootRouteString;
@@ -164,6 +166,7 @@ class FluentCategorieNavigationMainView extends StatelessWidget {
             title: Text(
               AppLocalizations.of(context)!.bookmarked,
             ),
+            trailing: SizedBox.fromSize(size: const Size.square(30)),
             infoBadge: InfoBadge(
               source: Padding(
                 padding: const EdgeInsets.fromLTRB(10, 1, 10, 0),
@@ -216,6 +219,15 @@ class FluentCategorieNavigationMainView extends StatelessWidget {
                       appState.selectedNavigation = FluxNewsState.settingsRouteString;
                       appState.refreshView();
                     },
+                  ),
+                  PaneItem(
+                    icon: const Icon(FluentIcons.settings),
+                    title: Text(AppLocalizations.of(context)!.feedSettings),
+                    body: const FluentFeedSettings(),
+                    onTap: () {
+                      appState.selectedNavigation = FluxNewsState.feedSettingsRouteString;
+                      appState.refreshView();
+                    },
                   )
                 ]),
           );
@@ -235,9 +247,6 @@ class FluentCategorieNavigationMainView extends StatelessWidget {
                     items.add(homeListTile);
                     for (Category category in snapshot.data!.categories) {
                       String routeString = "/Categoriy/${category.categoryID}";
-                      if (items.length > 2) {
-                        items.add(PaneItemSeparator());
-                      }
                       List<NavigationPaneItem> feedItems = [];
                       for (Feed feed in category.feeds) {
                         String routeString = "/Feed/${feed.feedID}";
@@ -254,17 +263,6 @@ class FluentCategorieNavigationMainView extends StatelessWidget {
                               ),
                             ),
                           ),
-                          trailing: appState.truncateMode == 2
-                              ? ToggleButton(
-                                  checked: feed.manualTruncate != null ? feed.manualTruncate! : false,
-                                  onChanged: (value) async {
-                                    feed.manualTruncate = value;
-                                    await updateManualTruncateStatusOfFeedInDB(feed.feedID, value, appState);
-                                    appState.refreshView();
-                                  },
-                                  child: const Icon(FluentIcons.cut),
-                                )
-                              : const SizedBox.shrink(),
                           body: const FluentMainView(),
                           onTap: () {
                             appState.selectedNavigation = routeString;
@@ -286,7 +284,10 @@ class FluentCategorieNavigationMainView extends StatelessWidget {
                             ),
                           ),
                         ),
-                        trailing: const Icon(FluentIcons.chevron_up),
+                        trailing: const Icon(
+                          FluentIcons.chevron_up,
+                          size: 16,
+                        ),
                         items: feedItems,
                         body: const FluentMainView(),
                         onTap: () {
@@ -318,7 +319,8 @@ class FluentCategorieNavigationMainView extends StatelessWidget {
                     items.add(bookmarkedListtile);
                     navPane = NavigationView(
                       appBar: const NavigationAppBar(
-                        leading: Icon(FontAwesomeIcons.bookOpen),
+                        automaticallyImplyLeading: false,
+                        //leading: Icon(FontAwesomeIcons.bookOpen),
                         title: AppBarTitle(),
                         actions: Center(child: AppBarButtons()),
                       ),
@@ -329,6 +331,7 @@ class FluentCategorieNavigationMainView extends StatelessWidget {
                       },
                       pane: NavigationPane(
                           header: const NavigationHeader(),
+                          //menuButton: const Icon(FontAwesomeIcons.bookOpen),
                           displayMode: width >= 2000 ? PaneDisplayMode.open : PaneDisplayMode.minimal,
                           selected: appState.calculateSelectedFluentNavigationItem(),
                           items: items,
@@ -348,6 +351,15 @@ class FluentCategorieNavigationMainView extends StatelessWidget {
                               body: const FluentSettings(),
                               onTap: () {
                                 appState.selectedNavigation = FluxNewsState.settingsRouteString;
+                                appState.refreshView();
+                              },
+                            ),
+                            PaneItem(
+                              icon: const Icon(FluentIcons.settings),
+                              title: Text(AppLocalizations.of(context)!.feedSettings),
+                              body: const FluentFeedSettings(),
+                              onTap: () {
+                                appState.selectedNavigation = FluxNewsState.feedSettingsRouteString;
                                 appState.refreshView();
                               },
                             )

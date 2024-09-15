@@ -42,6 +42,7 @@ class FluxNewsState extends ChangeNotifier {
   static const String bookmarkedRouteString = '/bookmarked';
   static const String settingsRouteString = '/settings';
   static const String searchRouteString = '/search';
+  static const String feedSettingsRouteString = '/feedSettings';
   static const int amountOfNewlyCaughtNews = 1000;
   static const String unreadNewsStatus = 'unread';
   static const String readNewsStatus = 'read';
@@ -108,6 +109,7 @@ class FluxNewsState extends ChangeNotifier {
   // vars for lists of main view
   late Future<List<News>> newsList;
   late Future<Categories> categoryList;
+  late Future<List<Feed>> feedSettingsList;
   List<int>? feedIDs;
   String selectedNavigation = "";
   Map<int, String> navigationRouteStrings = {};
@@ -232,6 +234,10 @@ class FluxNewsState extends ChangeNotifier {
                           newsCount INTEGER,
                           crawler INTEGER,
                           manualTruncate INTEGER,
+                          preferParagraph INTEGER,
+                          preferAttachmentImage INTEGER,
+                          manualAdaptLightModeToIcon INTEGER,
+                          manualAdaptDarkModeToIcon INTEGER,
                           categoryID INTEGER)''',
         );
         // create the table attachments
@@ -307,10 +313,97 @@ class FluxNewsState extends ChangeNotifier {
                           manualTruncate INTEGER,
                           categoryID INTEGER)''',
           );
+        } else if (oldVersion == 5) {
+          logThis('upgradeDB', 'Upgrading DB from version 4', LogLevel.INFO);
+
+          await db.execute(
+            '''CREATE TABLE tempFeeds(feedID INTEGER PRIMARY KEY, 
+                          title TEXT, 
+                          site_url TEXT, 
+                          iconMimeType TEXT,
+                          newsCount INTEGER,
+                          crawler INTEGER,
+                          manualTruncate INTEGER,
+                          preferParagraph INTEGER,
+                          preferAttachmentImage INTEGER,
+                          manualAdaptLightModeToIcon INTEGER,
+                          manualAdaptDarkModeToIcon INTEGER,
+                          categoryID INTEGER)''',
+          );
+
+          await db.execute('''insert into tempFeeds (feedID, 
+                                        title,
+                                        site_url, 
+                                        iconMimeType,
+                                        newsCount,
+                                        crawler,
+                                        manualTruncate,
+                                        preferParagraph,
+                                        preferAttachmentImage,
+                                        manualAdaptLightModeToIcon,
+                                        manualAdaptDarkModeToIcon,
+                                        categoryID) 
+                 select feedID, 
+                        title,
+                        site_url, 
+                        iconMimeType,
+                        newsCount,
+                        crawler,
+                        manualTruncate,
+                        0 AS preferParagraph,
+                        0 AS preferAttachmentImage,
+                        0 AS manualAdaptLightModeToIcon,
+                        0 AS manualAdaptDarkModeToIcon,
+                        categoryID  
+                  from feeds;''');
+
+          // create the table feeds
+          await db.execute('DROP TABLE IF EXISTS feeds');
+          await db.execute(
+            '''CREATE TABLE feeds(feedID INTEGER PRIMARY KEY, 
+                          title TEXT, 
+                          site_url TEXT, 
+                          iconMimeType TEXT,
+                          newsCount INTEGER,
+                          crawler INTEGER,
+                          manualTruncate INTEGER,
+                          preferParagraph INTEGER,
+                          preferAttachmentImage INTEGER,
+                          manualAdaptLightModeToIcon INTEGER,
+                          manualAdaptDarkModeToIcon INTEGER,
+                          categoryID INTEGER)''',
+          );
+
+          await db.execute('''insert into feeds (feedID, 
+                                        title,
+                                        site_url, 
+                                        iconMimeType,
+                                        newsCount,
+                                        crawler,
+                                        manualTruncate,
+                                        preferParagraph,
+                                        preferAttachmentImage,
+                                        manualAdaptLightModeToIcon,
+                                        manualAdaptDarkModeToIcon,
+                                        categoryID) 
+                 select feedID, 
+                        title,
+                        site_url, 
+                        iconMimeType,
+                        newsCount,
+                        crawler,
+                        manualTruncate,
+                        preferParagraph,
+                        preferAttachmentImage,
+                        manualAdaptLightModeToIcon,
+                        manualAdaptDarkModeToIcon,
+                        categoryID  
+                  from tempFeeds;''');
+          await db.execute('DROP TABLE IF EXISTS tempFeeds');
         }
         logThis('upgradeDB', 'Finished upgrading DB', LogLevel.INFO);
       },
-      version: 5,
+      version: 6,
     );
   }
 
@@ -645,6 +738,14 @@ class FluxNewsState extends ChangeNotifier {
     );
   }
 
+  // this function is needed because after the news are fetched from the database,
+  // the list of news need some time to be generated.
+  // only after the list is generated, we can set the scroll position of the list
+  // we can check that the list is generated if the scroll controller is attached to the list.
+  // so the function checks the scroll controller and if it's not attached it waits 1 millisecond
+  // and check then again if the scroll controller is attached.
+  // With calling this function as await, we can wait with the further processing
+  // on finishing with the list build.
   Future<void> waitUntilNewsListBuild() async {
     final completer = Completer();
     if (scrollController.positions.isNotEmpty) {
