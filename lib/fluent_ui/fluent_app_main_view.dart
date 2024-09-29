@@ -12,7 +12,6 @@ import 'package:flux_news_desktop/models/news_model.dart';
 import 'package:flux_news_desktop/fluent_ui/fluent_search.dart';
 import 'package:flux_news_desktop/fluent_ui/fluent_settings.dart';
 import 'package:flux_news_desktop/functions/sync_news.dart';
-import 'package:flux_news_desktop/state/flux_news_webview_state.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:my_logger/core/constants.dart';
@@ -31,7 +30,6 @@ class FluentNavigationMainView extends StatelessWidget {
     return FluxNewsBodyStatefulWrapper(
       onInit: () {
         initConfig(context, appState, appTheme);
-        context.read<FluxNewsWebViewState>().initWebViewState();
         appState.categoryList = queryCategoriesFromDB(appState, context);
         appState.newsList = Future<List<News>>.value([]);
       },
