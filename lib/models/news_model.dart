@@ -35,7 +35,8 @@ class News {
       this.preferParagraph,
       this.preferAttachmentImage,
       this.manualAdaptLightModeToIcon,
-      this.manualAdaptDarkModeToIcon});
+      this.manualAdaptDarkModeToIcon,
+      this.openMinifluxEntry});
   // define the properties
   int newsID = 0;
   int feedID = 0;
@@ -61,6 +62,7 @@ class News {
   bool? preferAttachmentImage = false;
   bool? manualAdaptLightModeToIcon = false;
   bool? manualAdaptDarkModeToIcon = false;
+  bool? openMinifluxEntry = false;
 
   // define the method to convert the json to the model
   factory News.fromJson(Map<String, dynamic> json) {
@@ -128,7 +130,8 @@ class News {
         preferParagraph = res['preferParagraph'] == 1 ? true : false,
         preferAttachmentImage = res['preferAttachmentImage'] == 1 ? true : false,
         manualAdaptLightModeToIcon = res['manualAdaptLightModeToIcon'] == 1 ? true : false,
-        manualAdaptDarkModeToIcon = res['manualAdaptDarkModeToIcon'] == 1 ? true : false;
+        manualAdaptDarkModeToIcon = res['manualAdaptDarkModeToIcon'] == 1 ? true : false,
+        openMinifluxEntry = res['openMinifluxEntry'] == 1 ? true : false;
 
   // define the method to extract the text from the html content
   // the text is first searched in the raw text
@@ -296,19 +299,67 @@ class News {
     manualAdaptDarkModeToIcon ??= false;
     if (icon != null) {
       if (iconMimeType == 'image/svg+xml') {
-        if (darkModeEnabled) {
-          return SvgPicture.string(
-            String.fromCharCodes(icon!),
-            width: size,
-            height: size,
-            colorFilter: ColorFilter.mode(Colors.grey[30], BlendMode.srcIn),
-          );
+        if (manualAdaptLightModeToIcon! || manualAdaptDarkModeToIcon!) {
+          if (manualAdaptDarkModeToIcon!) {
+            if (darkModeEnabled) {
+              return Container(
+                  padding: const EdgeInsets.all(1.5),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(3),
+                    color: appTheme.unreadText.color,
+                  ),
+                  child: SvgPicture.string(
+                    String.fromCharCodes(icon!),
+                    width: size,
+                    height: size,
+                  ));
+            } else {
+              if (manualAdaptLightModeToIcon!) {
+                return Container(
+                    padding: const EdgeInsets.all(1.5),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(3),
+                      color: appTheme.unreadText.color,
+                    ),
+                    child: SvgPicture.string(
+                      String.fromCharCodes(icon!),
+                      width: size,
+                      height: size,
+                    ));
+              } else {
+                return SvgPicture.string(
+                  String.fromCharCodes(icon!),
+                  width: size,
+                  height: size,
+                );
+              }
+            }
+          } else {
+            if (!darkModeEnabled) {
+              return Container(
+                  padding: const EdgeInsets.all(1.5),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(3),
+                    color: appTheme.unreadText.color,
+                  ),
+                  child: SvgPicture.string(
+                    String.fromCharCodes(icon!),
+                    width: size,
+                    height: size,
+                  ));
+            } else {
+              return SvgPicture.string(
+                String.fromCharCodes(icon!),
+                width: size,
+                height: size,
+              );
+            }
+          }
         } else {
           return SvgPicture.string(
             String.fromCharCodes(icon!),
             width: size,
             height: size,
-            colorFilter: ColorFilter.mode(Colors.grey[140], BlendMode.srcIn),
           );
         }
       } else {
@@ -316,7 +367,11 @@ class News {
           if (manualAdaptDarkModeToIcon!) {
             if (darkModeEnabled) {
               return Container(
-                  color: appTheme.unreadText.color,
+                  padding: const EdgeInsets.all(1.5),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(3),
+                    color: appTheme.unreadText.color,
+                  ),
                   child: Image.memory(
                     icon!,
                     width: size,
@@ -332,7 +387,11 @@ class News {
           } else {
             if (!darkModeEnabled) {
               return Container(
-                  color: appTheme.unreadText.color,
+                  padding: const EdgeInsets.all(1.5),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(3),
+                    color: appTheme.unreadText.color,
+                  ),
                   child: Image.memory(
                     icon!,
                     width: size,
@@ -341,7 +400,11 @@ class News {
             } else {
               if (manualAdaptLightModeToIcon!) {
                 return Container(
-                    color: appTheme.unreadText.color,
+                    padding: const EdgeInsets.all(1.5),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(3),
+                      color: appTheme.unreadText.color,
+                    ),
                     child: Image.memory(
                       icon!,
                       width: size,
@@ -418,7 +481,8 @@ class Feed {
       this.preferParagraph,
       this.preferAttachmentImage,
       this.manualAdaptLightModeToIcon,
-      this.manualAdaptDarkModeToIcon});
+      this.manualAdaptDarkModeToIcon,
+      this.openMinifluxEntry});
 
   // define the properties
   int feedID = 0;
@@ -434,6 +498,7 @@ class Feed {
   bool? preferAttachmentImage = false;
   bool? manualAdaptLightModeToIcon = false;
   bool? manualAdaptDarkModeToIcon = false;
+  bool? openMinifluxEntry = false;
 
   // define the method to convert the model from json
   factory Feed.fromJson(Map<String, dynamic> json) {
@@ -460,6 +525,7 @@ class Feed {
       'preferAttachmentImage': preferAttachmentImage,
       'manualAdaptLightModeToIcon': manualAdaptLightModeToIcon,
       'manualAdaptDarkModeToIcon': manualAdaptDarkModeToIcon,
+      'openMinifluxEntry': openMinifluxEntry
     };
   }
 
@@ -475,7 +541,8 @@ class Feed {
         preferParagraph = res['preferParagraph'] == 1 ? true : false,
         preferAttachmentImage = res['preferAttachmentImage'] == 1 ? true : false,
         manualAdaptLightModeToIcon = res['manualAdaptLightModeToIcon'] == 1 ? true : false,
-        manualAdaptDarkModeToIcon = res['manualAdaptDarkModeToIcon'] == 1 ? true : false;
+        manualAdaptDarkModeToIcon = res['manualAdaptDarkModeToIcon'] == 1 ? true : false,
+        openMinifluxEntry = res['openMinifluxEntry'] == 1 ? true : false;
 
   // define the method to get the feed icon as a widget
   // the icon could be a svg or a png image
@@ -495,19 +562,67 @@ class Feed {
     manualAdaptDarkModeToIcon ??= false;
     if (icon != null) {
       if (iconMimeType == 'image/svg+xml') {
-        if (darkModeEnabled) {
-          return SvgPicture.string(
-            String.fromCharCodes(icon!),
-            width: size,
-            height: size,
-            colorFilter: ColorFilter.mode(Colors.grey[30], BlendMode.srcIn),
-          );
+        if (manualAdaptLightModeToIcon! || manualAdaptDarkModeToIcon!) {
+          if (manualAdaptDarkModeToIcon!) {
+            if (darkModeEnabled) {
+              return Container(
+                  padding: const EdgeInsets.all(1.5),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(3),
+                    color: appTheme.unreadText.color,
+                  ),
+                  child: SvgPicture.string(
+                    String.fromCharCodes(icon!),
+                    width: size,
+                    height: size,
+                  ));
+            } else {
+              if (manualAdaptLightModeToIcon!) {
+                return Container(
+                    padding: const EdgeInsets.all(1.5),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(3),
+                      color: appTheme.unreadText.color,
+                    ),
+                    child: SvgPicture.string(
+                      String.fromCharCodes(icon!),
+                      width: size,
+                      height: size,
+                    ));
+              } else {
+                return SvgPicture.string(
+                  String.fromCharCodes(icon!),
+                  width: size,
+                  height: size,
+                );
+              }
+            }
+          } else {
+            if (!darkModeEnabled) {
+              return Container(
+                  padding: const EdgeInsets.all(1.5),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(3),
+                    color: appTheme.unreadText.color,
+                  ),
+                  child: SvgPicture.string(
+                    String.fromCharCodes(icon!),
+                    width: size,
+                    height: size,
+                  ));
+            } else {
+              return SvgPicture.string(
+                String.fromCharCodes(icon!),
+                width: size,
+                height: size,
+              );
+            }
+          }
         } else {
           return SvgPicture.string(
             String.fromCharCodes(icon!),
             width: size,
             height: size,
-            colorFilter: ColorFilter.mode(Colors.grey[140], BlendMode.srcIn),
           );
         }
       } else {
@@ -515,7 +630,11 @@ class Feed {
           if (manualAdaptDarkModeToIcon!) {
             if (darkModeEnabled) {
               return Container(
-                  color: appTheme.unreadText.color,
+                  padding: const EdgeInsets.all(1.5),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(3),
+                    color: appTheme.unreadText.color,
+                  ),
                   child: Image.memory(
                     icon!,
                     width: size,
@@ -524,7 +643,11 @@ class Feed {
             } else {
               if (manualAdaptLightModeToIcon!) {
                 return Container(
-                    color: appTheme.unreadText.color,
+                    padding: const EdgeInsets.all(1.5),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(3),
+                      color: appTheme.unreadText.color,
+                    ),
                     child: Image.memory(
                       icon!,
                       width: size,
@@ -541,7 +664,11 @@ class Feed {
           } else {
             if (!darkModeEnabled) {
               return Container(
-                  color: appTheme.unreadText.color,
+                  padding: const EdgeInsets.all(1.5),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(3),
+                    color: appTheme.unreadText.color,
+                  ),
                   child: Image.memory(
                     icon!,
                     width: size,

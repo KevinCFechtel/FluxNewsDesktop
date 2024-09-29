@@ -58,7 +58,21 @@ class FluentNewsCard extends StatelessWidget {
             context.read<FluxNewsCounterState>().listUpdated = true;
             context.read<FluxNewsCounterState>().refreshView();
             webAppState.setTitle(news.title);
-            await webAppState.loadWebPage(news.url);
+            String url = news.url;
+            if (news.openMinifluxEntry != null && news.openMinifluxEntry!) {
+              if (appState.minifluxURL != null) {
+                String minifluxBaseURL = appState.minifluxURL!;
+                if (minifluxBaseURL.endsWith('/v1/')) {
+                  minifluxBaseURL = minifluxBaseURL.substring(0, minifluxBaseURL.length - 3);
+                }
+                url = minifluxBaseURL +
+                    FluxNewsState.minifluxEntryPathPrefix +
+                    news.feedID.toString() +
+                    FluxNewsState.minifluxEntryPathSuffix +
+                    news.newsID.toString();
+              }
+            }
+            await webAppState.loadWebPage(url);
             appState.refreshView();
 
             // there are difference on launching the news url between the platforms

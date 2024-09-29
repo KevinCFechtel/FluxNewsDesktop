@@ -230,6 +230,39 @@ class FluentFeedSettingsList extends StatelessWidget {
               ],
             ),
           ),
+          const Divider(),
+          Padding(
+            padding: const EdgeInsets.only(top: 10.0, bottom: 10),
+            child: Row(
+              children: [
+                const Padding(
+                  padding: EdgeInsets.only(left: 17.0, right: 12.0),
+                  child: Icon(
+                    FluentIcons.account_browser,
+                  ),
+                ),
+                Expanded(
+                  child: Text(
+                    AppLocalizations.of(context)!.openMinifluxEntry,
+                    overflow: TextOverflow.visible,
+                  ),
+                ),
+                ToggleSwitch(
+                  checked: feed.openMinifluxEntry == null ? false : feed.openMinifluxEntry!,
+                  onChanged: (bool value) async {
+                    feed.openMinifluxEntry = value;
+                    await updateOpenMinifluxEntryStatusOfFeedInDB(feed.feedID, value, appState);
+
+                    // reload the news list with the new filter
+                    appState.newsList = queryNewsFromDB(appState, appState.feedIDs).whenComplete(() {
+                      appState.jumpToItem(0);
+                    });
+                    appState.refreshView();
+                  },
+                ),
+              ],
+            ),
+          ),
         ],
       ),
     );
