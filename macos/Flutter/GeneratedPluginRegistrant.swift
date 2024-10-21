@@ -10,7 +10,7 @@ import flutter_secure_storage_macos
 import macos_window_utils
 import path_provider_foundation
 import screen_retriever
-import sqflite
+import sqflite_darwin
 import system_date_time_format
 import system_theme
 import window_manager
