@@ -48,6 +48,9 @@ class FluxNewsWebViewState extends ChangeNotifier {
   }
 
   void closeWebview() {
+    if (webController != null) {
+      webController!.dispose();
+    }
     webController = null;
     webViewTitle = "";
     isLoaded = false;

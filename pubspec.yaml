@@ -61,11 +61,11 @@ dependencies:
   super_sliver_list: ^0.4.1
   flutter_inappwebview: ^6.1.0
 dependency_overrides:
-  flutter_secure_storage_web: 
+  flutter_secure_storage_web: #^2.0.0-beta.1
     git:
       url: https://github.com/mogol/flutter_secure_storage.git
       path: flutter_secure_storage_web
-      ref: c53ee6ee9f668345a98dae199dc4a22bb1a72a03
+      ref: 1d7b32bde7910bc2ffd1db5245ee0b2478ff4b7d
 
 dev_dependencies:
   flutter_test:
