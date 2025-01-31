@@ -115,7 +115,8 @@ class FluentNewsCard extends StatelessWidget {
               ancestor: Navigator.of(context).context.findRenderObject(),
             );
             contextController.showFlyout(
-                barrierColor: Colors.black.withOpacity(0.1),
+                barrierColor: Colors.black.withValues(alpha: 0.1),
+                //barrierColor: Colors.black.withOpacity(0.1),
                 position: position,
                 builder: (context) {
                   return FlyoutContent(
